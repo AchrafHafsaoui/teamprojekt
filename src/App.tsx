@@ -1,19 +1,19 @@
 import React from 'react';
 
-// Importing the components we’ll create below
+// Importing the components
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Overview from './components/Dashboard/Overview';
 
 const App: React.FC = () => (
-  <div className="h-screen flex flex-col bg-[#D9D9D9]">
-    <Header /> 
-    <div className="flex flex-1">
-      <div className="w-48"> {/* Container for Sidebar with fixed width */}
+  <div className="flex flex-col bg-[#c6c6c6]">
+    <Header />
+    <div className="flex flex-1 mt-12">
+      <div className="w-48"> 
         <Sidebar />
       </div>
-      <div className="flex-1 p-4"> {/* Main content area takes the remaining width */}
-        <Overview /> 
+      <div className="flex-1 p-4"> 
+        <Overview />
       </div>
     </div>
   </div>
