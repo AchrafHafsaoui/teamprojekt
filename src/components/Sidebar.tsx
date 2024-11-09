@@ -7,7 +7,7 @@ const Sidebar: React.FC = () => (
         { label: "Overview", icon: "📊" },
         { label: "Charging Stations", icon: "⚡" },
         { label: "Charging Schedule", icon: "⏱️" },
-        { label: "Driving Schedule", icon: "🚗" },
+        { label: "Driving Schedule", icon: "🚏" },
         { label: "Parking", icon: "🅿️" },
         { label: "Electricity Schedule", icon: "🔋" },
         { label: "Electricity Status", icon: "💡" },
