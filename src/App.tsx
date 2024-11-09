@@ -9,8 +9,10 @@ const App: React.FC = () => (
   <div className="h-screen flex flex-col bg-[#D9D9D9]">
     <Header /> 
     <div className="flex flex-1">
-      <Sidebar /> 
-      <div className="flex-1 "> 
+      <div className="w-48"> {/* Container for Sidebar with fixed width */}
+        <Sidebar />
+      </div>
+      <div className="flex-1 p-4"> {/* Main content area takes the remaining width */}
         <Overview /> 
       </div>
     </div>
