@@ -7,7 +7,7 @@ const Header: React.FC = () => (
     <img src={logo} alt="Logo" className="h-8" /> {/* Logo */}
     <div className="flex space-x-2">
       <button className="text-gray-400">
-        <img src={userIcon} alt="User Icon" className="h-6 w-6" /> {/* SVG Icon */}
+        <img src={userIcon} alt="User Icon" style={{width: '40px', height:'40px'}} className='bg-white' /> {/* SVG Icon */}
       </button>
     </div>
   </div>
