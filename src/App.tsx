@@ -8,8 +8,8 @@ import Overview from './components/Dashboard/Overview';
 const App: React.FC = () => (
   <div className="flex flex-col bg-[#c6c6c6]">
     <Header />
-    <div className="flex flex-1 mt-12">
-      <div className="w-48"> 
+    <div className="flex mt-12">
+      <div className="w-20"> 
         <Sidebar />
       </div>
       <div className="flex-1 p-4"> 
