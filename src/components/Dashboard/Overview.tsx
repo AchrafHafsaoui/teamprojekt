@@ -1,6 +1,7 @@
 import React from 'react';
 import FleetStatus from './FleetStatus';
 import ChargingStationsStatus from './ChargingStationsStatus';
+import DrivingSchedule from './DrivingSchedule';
 
 const OverviewSection: React.FC = () => {
   return (
@@ -14,7 +15,7 @@ const OverviewSection: React.FC = () => {
           <FleetStatus />
         </div>
         <div className="bg-white shadow-md rounded-lg p-4">
-          <FleetStatus /> {/* Replace with driving schedule */}
+          <DrivingSchedule /> {/* Replace with driving schedule */}
         </div>
         <div className="bg-white shadow-md rounded-lg p-4">
           <FleetStatus /> {/* Replace with charging schedule */}
