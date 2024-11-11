@@ -1,117 +1,148 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
-interface ChargingStation {
-  id: string;
-  status: string;
-  power: string;
-}
-
-const ChargingStationsStatus: React.FC = () => {
-  // Define the state with initial data
-  const [stations, setStations] = useState<ChargingStation[]>([
-    { id: '111112', status: 'Operational', power: '50 kW' },
-    { id: '111115', status: 'Maintenance', power: '-- kW' },
-    { id: '111119', status: 'Operational', power: '59 kW' },
-    { id: '111175', status: 'Out Of Service', power: '-- kW' },
-    { id: '111190', status: 'Operational', power: '70 kW' },
-    { id: '111193', status: 'Maintenance', power: '-- kW' },
-    { id: '111198', status: 'Operational', power: '45 kW' },
-    { id: '111200', status: 'Out Of Service', power: '-- kW' },
-    { id: '111203', status: 'Operational', power: '60 kW' },
-    { id: '111207', status: 'Operational', power: '55 kW' },
-    { id: '111210', status: 'Maintenance', power: '-- kW' },
-    { id: '111214', status: 'Out Of Service', power: '-- kW' },
-    { id: '111218', status: 'Operational', power: '52 kW' },
-    { id: '111222', status: 'Operational', power: '63 kW' },
-    { id: '111225', status: 'Maintenance', power: '-- kW' },
-    { id: '111229', status: 'Out Of Service', power: '-- kW' },
-    { id: '111233', status: 'Operational', power: '48 kW' },
-]);
-
-
-  // Function to display icons based on status
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Operational":
-        return "✅";
-      case "Maintenance":
-        return "⚠️";
-      case "Out Of Service":
-        return "❌";
-      default:
-        return "";
-    }
-  };
-
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  // Calculate the buses to display based on current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentData = stations.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(stations.length / itemsPerPage);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  return (
-    <div className='bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4'>
-      <h2 className="text-lg font-semibold mb-2">Charging Stations Status</h2>
-      <table className="min-w-full border-collapse border">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="w-1/3 text-center p-2">ID</th>
-            <th className="w-1/3 text-center p-2">Status</th>
-            <th className="w-1/3 text-center p-2">Power</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentData.map((station) => (
-            <tr key={station.id} className="text-center border-b">
-              <td className="w-1/3 text-center p-2">{station.id}</td>
-              <td className="w-1/3 text-center p-2">
-                <div className="flex items-center justify-center space-x-2">
-                  <span title={station.status} className="text-2xl">{getStatusIcon(station.status)}</span>
-                </div>
-              </td>
-              <td className="w-1/3 text-center p-2">{station.power}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex justify-between mt-2 text-sm text-gray-600">
-        <span>showing: {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, stations.length)} of {stations.length}</span>
-        <div className="flex space-x-2">
-          <button
-            onClick={handlePreviousPage}
-            className={`text-blue-500 hover:underline ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : ''}`}
-            disabled={currentPage === 1}
-          >
-            previous
-          </button>
-          <button
-            onClick={handleNextPage}
-            className={`text-blue-500 hover:underline ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : ''}`}
-            disabled={currentPage === totalPages}
-          >
-            next
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+type StationData = {
+    stationId: string;
+    status: 'Operational' | 'Maintenance' | 'Out Of Service';
+    power: number;
 };
 
-export default ChargingStationsStatus;
+const ChargingStationStatus: React.FC = () => {
+    const stations: StationData[] = [
+        { stationId: '1001', status: 'Operational', power: 50 },
+        { stationId: '1002', status: 'Maintenance', power: 0 },
+        { stationId: '1003', status: 'Operational', power: 30 },
+        { stationId: '1004', status: 'Out Of Service', power: 0 },
+        { stationId: '1005', status: 'Operational', power: 70 },
+        { stationId: '1006', status: 'Operational', power: 66 },
+        { stationId: '1007', status: 'Operational', power: 90 },
+        { stationId: '1008', status: 'Operational', power: 81 },
+    ];
+
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 3; // Show only 3 stations per page
+
+    const currentStations = stations.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+    );
+
+    const handleNextPage = () => {
+        if (currentPage < Math.ceil(stations.length / itemsPerPage) - 1) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    // State to track the current animated value for each station
+    const [animatedValues, setAnimatedValues] = useState<number[]>([]);
+
+    const getStatusColor = (status: 'Operational' | 'Maintenance' | 'Out Of Service') => {
+        switch (status) {
+            case 'Operational':
+                return '#4CAF50'; // Green
+            case 'Maintenance':
+                return '#FF9800'; // Orange
+            case 'Out Of Service':
+                return '#F44336'; // Red
+            default:
+                return '#BDBDBD'; // Gray
+        }
+    };
+
+    useEffect(() => {
+        // Start animation for each station's charging power
+        const newAnimatedValues = currentStations.map((station) => {
+            let startValue = 0;
+            const targetValue = station.status === 'Operational' ? station.power : 0;
+            const duration = 1500; // Animation duration (in ms)
+            let startTime: number | null = null;
+
+            // Function to animate the progress bar
+            const animate = (timestamp: number) => {
+                if (!startTime) startTime = timestamp;
+                const progress = (timestamp - startTime) / duration;
+                if (progress < 1) {
+                    setAnimatedValues((prevValues) => [
+                        ...prevValues.filter((_, index) => index !== currentStations.indexOf(station)),
+                        startValue + (targetValue - startValue) * progress,
+                    ]);
+                    requestAnimationFrame(animate);
+                } else {
+                    setAnimatedValues((prevValues) => [
+                        ...prevValues.filter((_, index) => index !== currentStations.indexOf(station)),
+                        targetValue,
+                    ]);
+                }
+            };
+
+            requestAnimationFrame(animate);
+
+            return targetValue;
+        });
+
+        setAnimatedValues(newAnimatedValues);
+    }, [currentPage, currentStations]);
+
+    return (
+        <div className="bg-[#F1F1F1] w-full h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Charging Station Status</h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {currentStations.map((station, index) => (
+                    <div
+                        key={station.stationId}
+                        className="bg-white p-4 rounded-lg shadow-lg flex flex-col items-center"
+                    >
+                        <h3 className="text-lg font-semibold">{`Station ID: ${station.stationId}`}</h3>
+                        <div className="w-24 h-24 mb-4">
+                            <CircularProgressbar
+                                value={animatedValues[index] || 0}
+                                maxValue={100}
+                                text={`${station.status === 'Operational' ? animatedValues[index]?.toFixed(0) : 0} kW`}
+                                strokeWidth={10}
+                                styles={{
+                                    path: {
+                                        stroke: getStatusColor(station.status),
+                                    },
+                                    text: {
+                                        fill: getStatusColor(station.status),
+                                        fontSize: '12px',
+                                    },
+                                }}
+                            />
+                        </div>
+                        <p>Status: {station.status}</p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex justify-between mt-4">
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 0}
+                    className="disabled:opacity-50 bg-blue-500 text-white py-2 px-4 rounded"
+                >
+                    Previous
+                </button>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === Math.ceil(stations.length / itemsPerPage) - 1}
+                    className="disabled:opacity-50 bg-blue-500 text-white py-2 px-4 rounded"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default ChargingStationStatus;
