@@ -112,7 +112,7 @@ const FleetStatus: React.FC = () => {
         animation: {
             duration: 1500,
             easing: 'easeOutCubic',
-            delay: (context: any) => context.dataIndex * 200,
+            delay: (context: any) => context.dataIndex * 80,
         },
     };
     
@@ -133,7 +133,7 @@ const FleetStatus: React.FC = () => {
     return (
         <div className="bg-[#F1F1F1] rounded-lg w-full h-full flex flex-col">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Status of Fleet:</h2>
+                <h2 className="text-lg font-semibold">Status of Fleet</h2>
                 <div className="flex spacFe-x-4">
                     <button
                         onClick={handlePreviousPage}
