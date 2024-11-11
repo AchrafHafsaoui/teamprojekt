@@ -6,7 +6,7 @@ import Header from './components/Header';
 import Overview from './components/Dashboard/Overview';
 
 const App: React.FC = () => (
-  <div className="flex flex-col bg-[#c6c6c6]">
+  <div className="flex flex-col bg-white">
     <Header />
     <div className="flex mt-12">
       <div className="w-20"> 
