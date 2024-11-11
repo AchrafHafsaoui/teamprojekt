@@ -67,7 +67,7 @@ const ChargingStationsStatus: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className='bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4'>
       <h2 className="text-lg font-semibold mb-2">Charging Stations Status</h2>
       <table className="min-w-full border-collapse border">
         <thead>

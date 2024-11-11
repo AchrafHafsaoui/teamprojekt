@@ -19,54 +19,30 @@ ChartJS.register(
     Legend
 );
 
-type BusData = {
-    busId: string;
-    battery: number | null; // Allow null for placeholder items
-};
+// Sample data for daily energy consumption for each month
+const monthlyData = [
+    { month: 'Jan', values: Array.from({ length: 31 }, () => Math.floor(Math.random() * 100)) },
+    { month: 'Feb', values: Array.from({ length: 28 }, () => Math.floor(Math.random() * 100)) },
+    { month: 'Mar', values: Array.from({ length: 31 }, () => Math.floor(Math.random() * 100)) },
+    // Add more months as needed
+];
 
-const FleetStatus: React.FC = () => {
-    const buses: BusData[] = [
-        { busId: '23001', battery: 30 },
-        { busId: '19101', battery: 70 },
-        { busId: '15401', battery: 20 },
-        { busId: '18757', battery: 95 },
-        { busId: '19289', battery: 65 },
-        { busId: '21001', battery: 50 },
-        { busId: '22345', battery: 80 },
-        { busId: '23456', battery: 45 },
-        { busId: '24567', battery: 60 },
-        { busId: '25678', battery: 90 },
-        { busId: '26789', battery: 40 },
-        { busId: '27890', battery: 55 },
-        { busId: '28901', battery: 85 },
-        { busId: '29012', battery: 30 },
-        { busId: '30123', battery: 75 },
-        { busId: '31234', battery: 50 },
-        { busId: '32345', battery: 95 },
-    ];
-
+const EnergyConsumption: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 10;
 
-    const indexOfFirstItem = currentPage * itemsPerPage;
-    const indexOfLastItem = indexOfFirstItem + itemsPerPage;
-    let currentBuses = buses.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Pad the currentBuses array with placeholders if it has fewer than itemsPerPage
-    if (currentBuses.length < itemsPerPage) {
-        currentBuses = [
-            ...currentBuses,
-            ...Array(itemsPerPage - currentBuses.length).fill({ busId: '', battery: null })
-        ];
-    }
+    const currentMonthData = monthlyData[currentPage];
+    const highestValue = Math.max(...currentMonthData.values);
+    const lowestValue = Math.min(...currentMonthData.values);
 
     const data = {
-        labels: currentBuses.map((bus) => bus.busId || ''), // Use empty labels for placeholders
+        labels: currentMonthData.values.map((_, index) => `${currentMonthData.month} ${index + 1}`),
         datasets: [
             {
-                label: 'Battery Status (%)',
-                data: currentBuses.map((bus) => bus.battery),
-                backgroundColor: currentBuses.map((bus) => (bus.battery !== null ? 'rgb(7, 142, 205)' : 'transparent')), // Hide bars for placeholders
+                label: 'Electricity Consumption (kWh)',
+                data: currentMonthData.values,
+                backgroundColor: currentMonthData.values.map((value) =>
+                    value === highestValue || value === lowestValue ? 'rgb(7, 142, 205)' : 'black'
+                ),
                 borderRadius: 15,
                 borderSkipped: false,
             },
@@ -82,21 +58,20 @@ const FleetStatus: React.FC = () => {
             },
             tooltip: {
                 callbacks: {
-                    label: (tooltipItem: any) => `${tooltipItem.raw}%`,
+                    label: (tooltipItem: any) => `${tooltipItem.raw} kWh`,
                 },
             },
         },
         scales: {
             x: {
                 grid: {
-                    display: false, // Removes vertical grid lines
+                    display: false,
                 },
             },
             y: {
                 beginAtZero: true,
-                max: 100,
                 ticks: {
-                    display: false, // Hides the numbers on the y-axis
+                    display: false,
                 },
                 grid: {
                     drawTicks: true,
@@ -105,21 +80,19 @@ const FleetStatus: React.FC = () => {
                     borderDash: [5, 5],
                 },
                 border: {
-                    display: false, // Removes the vertical y-axis line
+                    display: false,
                 },
             },
         },
         animation: {
             duration: 1500,
             easing: 'easeOutCubic',
-            delay: (context: any) => context.dataIndex * 80,
+            delay: (context: any) => context.dataIndex * 20,
         },
     };
-    
-    
 
     const handleNextPage = () => {
-        if (currentPage < Math.ceil(buses.length / itemsPerPage) - 1) {
+        if (currentPage < monthlyData.length - 1) {
             setCurrentPage(currentPage + 1);
         }
     };
@@ -131,10 +104,10 @@ const FleetStatus: React.FC = () => {
     };
 
     return (
-        <div className="bg-[#F1F1F1] w-full h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+        <div className="w-full h-full flex flex-col bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Status of Fleet</h2>
-                <div className="flex spacFe-x-4">
+                <h2 className="text-lg font-semibold">Energy Consumption (Daily)</h2>
+                <div className="flex space-x-4">
                     <button
                         onClick={handlePreviousPage}
                         disabled={currentPage === 0}
@@ -146,7 +119,7 @@ const FleetStatus: React.FC = () => {
                     </button>
                     <button
                         onClick={handleNextPage}
-                        disabled={currentPage === Math.ceil(buses.length / itemsPerPage) - 1}
+                        disabled={currentPage === monthlyData.length - 1}
                         className="disabled:opacity-50"
                     >
                         <svg width="19" height="40" viewBox="0 0 12 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -159,8 +132,7 @@ const FleetStatus: React.FC = () => {
                 <Bar key={currentPage} data={data} options={options} />
             </div>
         </div>
-
     );
 };
 
-export default FleetStatus;
+export default EnergyConsumption;

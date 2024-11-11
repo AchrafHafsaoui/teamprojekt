@@ -2,7 +2,7 @@ import React from 'react';
 import userIcon from '../assets/icons/menuLogo.svg'; 
 
 const Header: React.FC = () => (
-  <div className="flex justify-end items-center bg-white p-1 border-none fixed left-0 right-0 z-0">
+  <div className="flex justify-end items-center bg-white p-1 border-none fixed left-0 right-0 z-0 shadow-[rgba(0,0,15,0.1)_0px_1px_10px_0px] h-12">
     <div className="flex justify-between mx-15 text-lg items-center">
     <p className='mx-10 hover:underline'>settings</p>
     <p className='mx-10 hover:underline'>account</p>
