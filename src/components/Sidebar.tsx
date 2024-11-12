@@ -8,11 +8,13 @@ import ElectricityScheduleIcon from "../assets/icons/electricity schedule.svg";
 import ElectricityStatusIcon from "../assets/icons/electricity status.svg";
 import FleetStatusIcon from "../assets/icons/Fleet status.svg";
 import logo from  "../assets/logo.png";
+import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg"
 
 const Sidebar: React.FC = () => {
   const [activeButton, setActiveButton] = useState<string>("Overview");
 
   const menuItems = [
+    /*{ label: FenexityEneflex, icon: logo},*/
     { label: "Overview", icon: OverviewIcon },
     { label: "Charging Stations", icon: ChargingStationIcon },
     { label: "Charging Schedule", icon: ChargingScheduleIcon },
@@ -26,12 +28,16 @@ const Sidebar: React.FC = () => {
   return (
     <div className="flex flex-col bg-[#F1F1F1]  w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between">
       <div className="flex flex-col space-y-2 mt-4">
-        <img src={logo} className="w-12 mx-auto"></img>
+        <div className="flex   mb-8 ">
+          <img src={logo} className="w-10 ml-5" alt="Main Logo" />
+          
+          <img src={FenexityEneflex} className="w-20 ml-6 whitespace-nowrap ml-2 text-black font-semibold overflow-hidden " alt="Fenexity Eneflex" />
+        </div>
         {menuItems.map((item) => (
           <button
             key={item.label}
             onClick={() => setActiveButton(item.label)}
-            className="flex items-center p-2 rounded hover:bg-[#C0C0C0] hover:ml-3   transition duration-300 relative"
+            className="flex items-center p-1 rounded hover:bg-[#C0C0C0] hover:ml-3   transition duration-300 relative"
           >
             <img src={item.icon} alt={item.label} className="w-10 mx-4" />
             <span
