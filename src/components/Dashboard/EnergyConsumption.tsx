@@ -41,7 +41,7 @@ const EnergyConsumption: React.FC = () => {
                 label: 'Electricity Consumption (kWh)',
                 data: currentMonthData.values,
                 backgroundColor: currentMonthData.values.map((value) =>
-                    value === highestValue || value === lowestValue ? 'rgb(7, 142, 205)' : 'black'
+                    value === highestValue || value === lowestValue ? 'rgb(7, 142, 205)' : 'rgba(0,0,0,0.7)'
                 ),
                 borderRadius: 15,
                 borderSkipped: false,
@@ -104,7 +104,7 @@ const EnergyConsumption: React.FC = () => {
     };
 
     return (
-        <div className="w-full h-full flex flex-col bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+        <div className="w-full h-full bg-opacity-60 flex flex-col bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Energy Consumption (Daily)</h2>
                 <div className="flex space-x-4">
