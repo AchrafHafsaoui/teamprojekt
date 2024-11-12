@@ -47,7 +47,7 @@ const Sidebar: React.FC = () => {
           </button>
         ))}
       </div>
-      <div className="text-xs text-center mb-10 text-black">v 0.0.1</div>
+      <div className="text-xs text-center mb-5 text-black">v 0.0.1</div>
     </div>
   );
 };

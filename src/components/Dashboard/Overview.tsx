@@ -6,7 +6,7 @@ import EnergyConsumption from './EnergyConsumption';
 
 const Overview: React.FC = () => {
     return (
-        <div className="grid mt-16 ml-20 w-full flex-1 bg-white gap-8">
+        <div className="grid mt-20 ml-20 w-full flex-1 bg-white gap-8">
             {/* Upper Section with 3 rectangles */}
             <div className="grid grid-cols-3 gap-20 h-1/2 mx-20">
                 <div className="grid grid-rows-2 col-span-1">
