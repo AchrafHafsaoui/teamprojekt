@@ -8,7 +8,7 @@ const App: React.FC = () => (
     <Header />
     <div className="flex">
       <Sidebar />
-      <Overview />
+      {/* <Overview /> */}
     </div>
   </div>
 );
