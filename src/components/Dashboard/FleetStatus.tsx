@@ -1,34 +1,17 @@
-import React, { useState } from 'react';
-import { Bar } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-);
+import React, { useState, useEffect } from 'react';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 type BusData = {
     busId: string;
-    battery: number | null; // Allow null for placeholder items
+    battery: number;
 };
 
 const FleetStatus: React.FC = () => {
     const buses: BusData[] = [
-        { busId: '23001', battery: 30 },
-        { busId: '19101', battery: 70 },
-        { busId: '15401', battery: 20 },
+        { busId: '23001', battery: 50 },
+        { busId: '19101', battery: 0 },
+        { busId: '15401', battery: 30 },
         { busId: '18757', battery: 95 },
         { busId: '19289', battery: 65 },
         { busId: '21001', battery: 50 },
@@ -46,77 +29,12 @@ const FleetStatus: React.FC = () => {
     ];
 
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 10;
+    const [animatedValues, setAnimatedValues] = useState<number[]>(Array(buses.length).fill(0));
+    const itemsPerPage = 6;
 
     const indexOfFirstItem = currentPage * itemsPerPage;
     const indexOfLastItem = indexOfFirstItem + itemsPerPage;
-    let currentBuses = buses.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Pad the currentBuses array with placeholders if it has fewer than itemsPerPage
-    if (currentBuses.length < itemsPerPage) {
-        currentBuses = [
-            ...currentBuses,
-            ...Array(itemsPerPage - currentBuses.length).fill({ busId: '', battery: null })
-        ];
-    }
-
-    const data = {
-        labels: currentBuses.map((bus) => bus.busId || ''), // Use empty labels for placeholders
-        datasets: [
-            {
-                label: 'Battery Status (%)',
-                data: currentBuses.map((bus) => bus.battery),
-                backgroundColor: currentBuses.map((bus) => (bus.battery !== null ? 'rgb(7, 142, 205)' : 'transparent')), // Hide bars for placeholders
-                borderRadius: 15,
-                borderSkipped: false,
-            },
-        ],
-    };
-
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                callbacks: {
-                    label: (tooltipItem: any) => `${tooltipItem.raw}%`,
-                },
-            },
-        },
-        scales: {
-            x: {
-                grid: {
-                    display: false, // Removes vertical grid lines
-                },
-            },
-            y: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                    display: false, // Hides the numbers on the y-axis
-                },
-                grid: {
-                    drawTicks: true,
-                    color: '#e5e5e5',
-                    lineWidth: 1,
-                    borderDash: [5, 5],
-                },
-                border: {
-                    display: false, // Removes the vertical y-axis line
-                },
-            },
-        },
-        animation: {
-            duration: 1500,
-            easing: 'easeOutCubic',
-            delay: (context: any) => context.dataIndex * 80,
-        },
-    };
-    
-    
+    const currentBuses = buses.slice(indexOfFirstItem, indexOfLastItem);
 
     const handleNextPage = () => {
         if (currentPage < Math.ceil(buses.length / itemsPerPage) - 1) {
@@ -130,11 +48,29 @@ const FleetStatus: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        currentBuses.forEach((bus, index) => {
+            let currentBattery = 0;
+            const interval = setInterval(() => {
+                if (currentBattery < bus.battery) {
+                    currentBattery += 1;
+                    setAnimatedValues(prevValues => {
+                        const newValues = [...prevValues];
+                        newValues[index + indexOfFirstItem] = currentBattery;
+                        return newValues;
+                    });
+                } else {
+                    clearInterval(interval);
+                }
+            }, 15);
+        });
+    }, [currentPage]);
+
     return (
-        <div className="bg-[#F1F1F1] w-full h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+        <div className="bg-[#F1F1F1] w-full max-h-[500px] h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Status of Fleet</h2>
-                <div className="flex spacFe-x-4">
+                <div className="flex space-x-4">
                     <button
                         onClick={handlePreviousPage}
                         disabled={currentPage === 0}
@@ -155,11 +91,27 @@ const FleetStatus: React.FC = () => {
                     </button>
                 </div>
             </div>
-            <div className="h-full">
-                <Bar key={currentPage} data={data} options={options} />
+            <div className="grid grid-cols-3 gap-4 h-full">
+                {currentBuses.map((bus, index) => (
+                    <div key={bus.busId} className="flex flex-col items-center">
+                        <h3 className="text-xl font-semibold mb-2">{bus.busId}</h3>
+                        <div style={{width: '6vw'}}> 
+                            <CircularProgressbar
+                                value={animatedValues[index + indexOfFirstItem] || 0}
+                                maxValue={100}
+                                text={`${animatedValues[index + indexOfFirstItem] || 0} kW`}
+                                styles={buildStyles({
+                                    pathColor: 'rgb(7, 142, 205)',
+                                    textColor: '#000',
+                                    trailColor: '#d6d6d6',
+                                    textSize: '12px',
+                                })}
+                            />
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
-
     );
 };
 
