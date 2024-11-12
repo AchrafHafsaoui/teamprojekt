@@ -17,7 +17,7 @@ const DrivingSchedule: React.FC = () => {
 
     return (
         <div className="bg-[#F1F1F1] bg-opacity-60 w-full h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
-            <h2 className="text-lg font-semibold">Driving Schedule</h2>
+            <h2 className="text-2xl font-semibold">Driving Schedule</h2>
             <div className="flex justify-between my-2">
                 {/* Column Headers */}
                 <div className="w-1/2 text-center font-semibold">Departure</div>
