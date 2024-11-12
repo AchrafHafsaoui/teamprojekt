@@ -3,6 +3,7 @@ import FleetStatus from './FleetStatus';
 import ChargingStationsStatus from './ChargingStationsStatus';
 import ElectricityCost from './ElectricityCost';
 import EnergyConsumption from './EnergyConsumption';
+import DrivingSchedule from './DrivingSchedule';
 
 const Overview: React.FC = () => {
     return (
@@ -14,12 +15,14 @@ const Overview: React.FC = () => {
                     <h2 className="ml-10 text-7xl font-semibold">Belmonte!</h2>
                     <ElectricityCost />
                 </div>
+                <DrivingSchedule />
                 <EnergyConsumption />
             </div>
 
             {/* Lower Section with 2 rectangles */}
             <div className="grid grid-cols-2 gap-20 h-1/2 mt-4 mx-20">
                 <FleetStatus />
+                <DrivingSchedule />
             </div>
         </div>
     );

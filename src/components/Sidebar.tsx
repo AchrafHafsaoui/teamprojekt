@@ -31,7 +31,11 @@ const Sidebar: React.FC = () => {
         <div className="flex   mb-8 ">
           <img src={logo} className="w-10 ml-5" alt="Main Logo" />
           
-          <img src={FenexityEneflex} className="w-20 ml-6 text-black font-semibold overflow-hidden " alt="Fenexity Eneflex" />
+          <img
+  src={FenexityEneflex}
+  className="ml-6 text-black font-semibold overflow-hidden max-w-[8rem]"
+  alt="Fenexity Eneflex"
+/>
         </div>
         {menuItems.map((item) => (
           <button
