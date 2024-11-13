@@ -104,7 +104,7 @@ const EnergyConsumption: React.FC = () => {
     };
 
     return (
-        <div className="w-full h-full bg-opacity-60 flex flex-col bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+        <div className="h-full bg-opacity-60 flex flex-col bg-[#F1F1F1] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold">Energy Consumption</h2>
                 <div className="flex space-x-4">

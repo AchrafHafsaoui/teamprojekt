@@ -8,11 +8,14 @@ import ParkingStatus from './ParkingStatus';
 
 const Overview: React.FC = () => {
     return (
-        <div className="grid mt-20 ml-20 flex-1 gap-8 max-h-svh overflow-hidden">
-            {/* Upper Section with 3 rectangles */}
-            <div className="grid grid-cols-3 gap-20 mx-20 md:grid-cols-3 md:gap-20 md:mx-20 sm:grid-cols-1">
-                <div className="flex flex-col items-start justify-center">
-                    <h2 className="ml-5 text-6xl font-light tracking-wide">
+        <div
+            className="flex flex-col h-screen w-screen gap-10 pl-40 pr-20 pt-20 pb-20 bg-cover bg-center"
+            style={{ backgroundImage: 'url("/path-to-your-image.jpg")' }} // Replace with your image path
+        >
+            {/* Upper Section */}
+            <div className="flex flex-1 gap-10 h-3/5">
+                <div className="flex flex-col justify-center flex-1 px-4 rounded-lg">
+                    <h2 className="text-5xl font-light tracking-wide ml-2">
                         <TypeAnimation
                             sequence={['Hello,']}
                             speed={20}
@@ -20,7 +23,7 @@ const Overview: React.FC = () => {
                             wrapper="span"
                         />
                     </h2>
-                    <h2 className="ml-5 text-7xl font-semibold mb-5" style={{ color: 'rgb(7, 142, 205)' }}>
+                    <h2 className="text-6xl font-semibold mb-5 ml-2" style={{ color: 'rgb(7, 142, 205)' }}>
                         <TypeAnimation
                             sequence={['Belmonte!']}
                             speed={40}
@@ -34,18 +37,14 @@ const Overview: React.FC = () => {
                 <EnergyConsumption />
             </div>
 
-            {/* Middle Section with 2 rectangles */}
-            <div className="grid grid-cols-6 gap-20 mt-4 mx-20 md:grid-cols-6 md:gap-20 md:mx-20 sm:grid-cols-1">
+            {/* Middle Section */}
+            <div className="flex flex-1 gap-10">
                 <FleetStatus />
-                <div className="col-span-3">
-                    <DrivingSchedule />
-                </div>
+                <DrivingSchedule />
             </div>
 
-            {/* Parking Status Section as a new row */}
-            <div className="mx-20 my-8">
-                <ParkingStatus />
-            </div>
+            {/* Parking Status Section */}
+            <ParkingStatus />
         </div>
     );
 };
