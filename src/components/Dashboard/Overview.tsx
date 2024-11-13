@@ -9,7 +9,7 @@ import ParkingStatus from './ParkingStatus';
 const Overview: React.FC = () => {
     return (
         <div
-            className="grid h-screen w-screen gap-10 p-10 bg-cover bg-center ml-20 mt-10"
+            className="grid h-screen w-screen gap-10 p-10 bg-cover bg-center ml-20 mt-10 mr-10"
             style={{
                 backgroundImage: 'url("/path-to-your-image.jpg")', // Replace with your image path
                 backgroundSize: 'cover',

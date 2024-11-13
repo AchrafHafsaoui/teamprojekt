@@ -5,7 +5,7 @@ import userIcon from '../assets/icons/menuLogo.svg';
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
-    <div className="flex justify-end items-center bg-white bg-opacity-0 p-1 border-none fixed left-0 right-0 z-0  h-20">
+    <div className="flex justify-end items-center bg-white bg-opacity-0 p-1 border-none fixed left-0 right-0 mt-5">
       <div className={`transition-all transform duration-500  ${isMenuOpen ? ' translate-x-0 opacity-100' : ' translate-x-20 opacity-0'}`} style={{ visibility: isMenuOpen ? 'visible' : 'hidden' }}>
         <div className="flex justify-between mx-8 text-2xl items-center">
           <p className="mx-5 mb-2 text-xl relative group">
@@ -22,7 +22,7 @@ const Header: React.FC = () => {
           </p>
         </div>
       </div>
-      <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`mr-2 border border-[#D3D3D3] shadow-md rounded-full p-3 bg-opacity-60 ${isMenuOpen ? ' bg-[#d6d6d682] backdrop-blur-sm' : ' bg-white bg-opacity-60'}`} >
+      <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`mr-5 border border-[#D3D3D3] shadow-md rounded-full p-3 bg-opacity-50 ${isMenuOpen ? ' bg-[#d6d6d682] backdrop-blur-sm' : ' bg-white bg-opacity-60'}`} >
         <img
           src={userIcon}
           alt="User Icon"
