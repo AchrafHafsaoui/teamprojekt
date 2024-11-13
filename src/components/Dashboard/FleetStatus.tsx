@@ -125,7 +125,7 @@ const FleetStatus: React.FC = () => {
                             </div>
                             {bus.charging && (
                                 <div className="absolute inset-0 flex items-center justify-center animate-ping"
-                                    style={{ animationDuration: '1.5s' }} // Adjust the duration here
+                                    style={{ animationDuration: '1.5s' }}
                                 >
                                     <div
                                         className="w-8 h-8 rounded-full opacity-50"
