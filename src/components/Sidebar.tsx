@@ -26,13 +26,13 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col bg-white bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between">
+    <div className="flex flex-col bg-white bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between group">
       <div className="flex flex-col space-y-2 mt-4">
         <div className="flex   mb-8 ">
           <img src={logo} className="w-10 ml-5" alt="Main Logo" />
           <img
             src={FenexityEneflex}
-            className="ml-6 text-black  font-semibold overflow-hidden max-w-[8rem]"
+            className=" ml-4 opacity-0 max-w-[8rem]  group-hover:opacity-100 group-hover:visible transition-opacity duration-200"
             alt="Fenexity Eneflex"
           />
         </div>
