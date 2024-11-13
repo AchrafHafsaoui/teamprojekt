@@ -6,19 +6,19 @@ type BusData = {
     busId: string;
     battery: number;
     status: 'inDepot' | 'maintenance' | 'onRoute';
+    charging: boolean;
 };
 
 const FleetStatus: React.FC = () => {
     const buses: BusData[] = [
-        { busId: '23001', battery: 50, status: 'onRoute' },
-        { busId: '19101', battery: 0, status: 'inDepot' },
-        { busId: '15401', battery: 30, status: 'maintenance' },
-        { busId: '18757', battery: 95, status: 'onRoute' },
-        { busId: '19289', battery: 65, status: 'inDepot' },
-        { busId: '21001', battery: 50, status: 'maintenance' },
-        { busId: '22345', battery: 80, status: 'onRoute' },
-        { busId: '23456', battery: 45, status: 'inDepot' },
-        // ... add more buses as needed
+        { busId: '23001', battery: 50, status: 'onRoute', charging: true },
+        { busId: '19101', battery: 0, status: 'inDepot', charging: false },
+        { busId: '15401', battery: 30, status: 'maintenance', charging: true },
+        { busId: '18757', battery: 95, status: 'onRoute', charging: false },
+        { busId: '19289', battery: 65, status: 'inDepot', charging: true },
+        { busId: '21001', battery: 50, status: 'maintenance', charging: false },
+        { busId: '22345', battery: 80, status: 'onRoute', charging: false },
+        { busId: '23456', battery: 45, status: 'inDepot', charging: true },
     ];
 
     const [currentPage, setCurrentPage] = useState(0);
@@ -111,7 +111,7 @@ const FleetStatus: React.FC = () => {
                                 value={animatedValues[index + indexOfFirstItem] || 0}
                                 maxValue={100}
                                 text={`${animatedValues[index + indexOfFirstItem] || 0}%`}
-                                strokeWidth={20}
+                                strokeWidth={10}
                                 styles={buildStyles({
                                     pathColor: 'rgba(7, 142, 205, 0.8)',
                                     textColor: '#000',
@@ -123,6 +123,16 @@ const FleetStatus: React.FC = () => {
                             <div className="absolute bottom-1 text-center font-bold" style={{ fontSize: '1rem' }}>
                                 {renderStatusIcon(bus.status)}
                             </div>
+                            {bus.charging && (
+                                <div className="absolute inset-0 flex items-center justify-center animate-ping"
+                                    style={{ animationDuration: '1.5s' }} // Adjust the duration here
+                                >
+                                    <div
+                                        className="w-8 h-8 rounded-full opacity-50"
+                                        style={{ backgroundColor: 'rgb(7, 142, 205)' }}
+                                    ></div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}
