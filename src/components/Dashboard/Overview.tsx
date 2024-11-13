@@ -9,42 +9,60 @@ import ParkingStatus from './ParkingStatus';
 const Overview: React.FC = () => {
     return (
         <div
-            className="flex flex-col h-screen w-screen gap-10 pl-40 pr-20 pt-20 pb-20 bg-cover bg-center"
-            style={{ backgroundImage: 'url("/path-to-your-image.jpg")' }} // Replace with your image path
+            className="grid h-screen w-screen gap-10 p-10 bg-cover bg-center ml-20 mt-10"
+            style={{
+                backgroundImage: 'url("/path-to-your-image.jpg")', // Replace with your image path
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
         >
-            {/* Upper Section */}
-            <div className="flex flex-1 gap-10 h-3/5">
-                <div className="flex flex-col justify-center flex-1 px-4 rounded-lg">
-                    <h2 className="text-5xl font-light tracking-wide ml-2">
-                        <TypeAnimation
-                            sequence={['Hello,']}
-                            speed={20}
-                            cursor={false}
-                            wrapper="span"
-                        />
-                    </h2>
-                    <h2 className="text-6xl font-semibold mb-5 ml-2" style={{ color: 'rgb(7, 142, 205)' }}>
-                        <TypeAnimation
-                            sequence={['Belmonte!']}
-                            speed={40}
-                            cursor={false}
-                            wrapper="span"
-                        />
-                    </h2>
-                    <ElectricityCost />
+            {/* Define 3 rows: Upper, Middle, and Parking Status */}
+            <div className="grid grid-rows-[minmax(300px,auto)_minmax(300px,auto)_1fr] h-full gap-10">
+                
+                {/* Upper Section with 3 columns */}
+                <div className="grid gap-10 lg:grid-cols-3 md:grid-cols-1 sm:grid-cols-1 p-4">
+                    <div className="flex flex-col justify-center px-4 rounded-lg">
+                        <h2 className="text-5xl font-light tracking-wide ml-2">
+                            <TypeAnimation
+                                sequence={['Hello,']}
+                                speed={20}
+                                cursor={false}
+                                wrapper="span"
+                            />
+                        </h2>
+                        <h2 className="text-6xl font-semibold mb-5 ml-2" style={{ color: 'rgb(7, 142, 205)' }}>
+                            <TypeAnimation
+                                sequence={['Belmonte!']}
+                                speed={40}
+                                cursor={false}
+                                wrapper="span"
+                            />
+                        </h2>
+                        <ElectricityCost />
+                    </div>
+                    <div className="rounded-lg overflow-hidden">
+                        <DrivingSchedule />
+                    </div>
+                    <div className="rounded-lg overflow-hidden">
+                        <EnergyConsumption />
+                    </div>
                 </div>
-                <DrivingSchedule />
-                <EnergyConsumption />
-            </div>
 
-            {/* Middle Section */}
-            <div className="flex flex-1 gap-10">
-                <FleetStatus />
-                <DrivingSchedule />
-            </div>
+                {/* Middle Section with 2 columns */}
+                <div className="grid gap-10 lg:grid-cols-2 sm:grid-cols-1 p-4">
+                    <div className="rounded-lg overflow-hidden">
+                        <FleetStatus />
+                    </div>
+                    <div className="rounded-lg overflow-hidden">
+                        <DrivingSchedule />
+                    </div>
+                </div>
 
-            {/* Parking Status Section */}
-            <ParkingStatus />
+                {/* Parking Status Section occupying the remaining row */}
+                <div className="rounded-lg overflow-hidden p-4">
+                    <ParkingStatus />
+                </div>
+            </div>
         </div>
     );
 };

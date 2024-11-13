@@ -14,14 +14,14 @@ const App: React.FC = () => (
       backgroundRepeat: 'no-repeat',
       backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light overlay
       backgroundBlendMode: 'overlay', // Overlay to soften the image
-    }}/>
+    }} />
     <div className='z-10'>
       <Header />
       <div className="flex flex-grow h-full">
         <Sidebar />
         <Overview />
       </div>
-      </div>
+    </div>
   </div>
 );
 
