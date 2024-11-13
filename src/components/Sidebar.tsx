@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
           <img src={logo} className="w-10 ml-5" alt="Main Logo" />
           <img
             src={FenexityEneflex}
-            className="ml-6 text-black font-semibold overflow-hidden max-w-[8rem]"
+            className="ml-6 text-black  font-semibold overflow-hidden max-w-[8rem]"
             alt="Fenexity Eneflex"
           />
         </div>

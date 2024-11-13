@@ -1,17 +1,18 @@
 import React from 'react';
-import { TypeAnimation } from 'react-type-animation';
 import FleetStatus from './FleetStatus';
 import ChargingStationsStatus from './ChargingStationsStatus';
 import ElectricityCost from './ElectricityCost';
 import EnergyConsumption from './EnergyConsumption';
 import DrivingSchedule from './DrivingSchedule';
+import { TypeAnimation } from 'react-type-animation';
+import ParkingStatus from './ParkingStatus';
 
 const Overview: React.FC = () => {
     return (
         <div className="grid mt-20 ml-20 w-full flex-1 gap-8">
             {/* Upper Section with 3 rectangles */}
-            <div className="grid grid-cols-3 gap-20 h-1/2 mx-20">
-                <div className="flex flex-col items-start justify-center col-span-1">
+            <div className="grid grid-cols-3 gap-20 mx-20 md:grid-cols-3 md:gap-20 md:mx-20 sm:grid-cols-1">
+                <div className="flex flex-col items-start justify-center">
                     <h2 className="ml-5 text-6xl font-light tracking-wide">
                         <TypeAnimation
                             sequence={['Hello,']}
@@ -35,10 +36,14 @@ const Overview: React.FC = () => {
             </div>
 
             {/* Lower Section with 2 rectangles */}
-            <div className="grid grid-cols-2 gap-20 h-1/2 mt-4 mx-20">
+            <div className="grid grid-cols-6 gap-20 mt-4 mx-20 md:grid-cols-6 md:gap-20 md:mx-20 sm:grid-cols-1">
                 <FleetStatus />
-                <DrivingSchedule />
+                <div className='col-span-3'>
+                    <DrivingSchedule />
+                </div>
             </div>
+
+
         </div>
     );
 };
