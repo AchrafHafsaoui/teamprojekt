@@ -38,7 +38,7 @@ const DrivingSchedule: React.FC = () => {
                 <div className="text-center w-1/2">Departure</div>
                 <div className="text-center w-1/2">Arrival</div>
             </div>
-            <div className="flex overflow-y-auto h-60 custom-scrollbar divide-x divide-gray-300">
+            <div className="flex overflow-y-auto h-60 custom-scrollbar">
                 {/* Departure Column */}
                 <div className="w-1/2 pr-4">
                     <div className="flex flex-col items-start space-y-3">
@@ -58,6 +58,10 @@ const DrivingSchedule: React.FC = () => {
                         })}
                     </div>
                 </div>
+
+                {/* Divider */}
+                <div className="border-l-2 border-gray-300 sticky top-0 h-full"></div> {/* Make the divider sticky */}
+
                 {/* Arrival Column */}
                 <div className="w-1/2 pl-4">
                     <div className="flex flex-col items-start space-y-3">
