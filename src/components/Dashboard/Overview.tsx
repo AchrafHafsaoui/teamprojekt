@@ -5,6 +5,7 @@ import EnergyConsumption from './EnergyConsumption';
 import DrivingSchedule from './DrivingSchedule';
 import { TypeAnimation } from 'react-type-animation';
 import ParkingStatus from './ParkingStatus';
+import ChargingSchedule from './ChargingSchedule';
 
 const Overview: React.FC = () => {
     return (
@@ -54,7 +55,7 @@ const Overview: React.FC = () => {
                         <FleetStatus />
                     </div>
                     <div className="rounded-lg overflow-hidden">
-                        <DrivingSchedule />
+                        <ChargingSchedule />
                     </div>
                 </div>
 
