@@ -12,7 +12,7 @@ const App: React.FC = () => (
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
-      backgroundColor: 'rgba(255, 255, 255, 0.7)', // Light overlay
+      backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light overlay
       backgroundBlendMode: 'overlay', // Overlay to soften the image
     }} />
     <div className='z-10'>

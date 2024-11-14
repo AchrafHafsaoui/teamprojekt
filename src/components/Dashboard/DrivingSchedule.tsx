@@ -32,50 +32,46 @@ const DrivingSchedule: React.FC = () => {
     };
 
     return (
-        <div className="bg-[#F1F1F1] bg-opacity-50 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1">
-            <h2 className="text-2xl font-semibold">Driving Schedule</h2>
-            <div className="flex justify-between my-2">
-                {/* Column Headers */}
-                <div className="w-1/2 text-center font-semibold">Departure</div>
-                <div className="w-1/2 text-center font-semibold">Arrival</div>
+        <div className="bg-[#F1F1F1] bg-opacity-60 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+            <h2 className="text-2xl font-semibold mb-4">Driving Schedule</h2>
+            <div className="flex justify-between mb-4 px-2 text-lg font-semibold">
+                <div className="text-center w-1/2">Departure</div>
+                <div className="text-center w-1/2">Arrival</div>
             </div>
-            {/* Scrollable Content */}
-            <div className="flex justify-between overflow-auto h-60 custom-scrollbar">
+            <div className="flex overflow-y-auto h-60 custom-scrollbar divide-x divide-gray-300">
                 {/* Departure Column */}
-                <div className="w-1/2">
-                    <div className="flex flex-col items-center">
+                <div className="w-1/2 pr-4">
+                    <div className="flex flex-col items-start space-y-3">
                         {scheduleData.map((entry) => {
                             const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
                             return (
-                                <div key={entry.id} className="flex justify-between w-3/4 my-1">
-                                    <div className="text-left">
-                                        <span className="font-bold">{entry.id}</span>
-                                        <span className="block text-xs">{type}</span>
-                                        <span className="block text-xs">{batteryCapacity}</span>
-                                        <span className="block text-xs">{length}</span>
+                                <div key={entry.id} className="flex justify-between w-full">
+                                    <div>
+                                        <span className="font-semibold text-gray-700">{entry.id}</span>
+                                        <span className="block text-sm text-gray-500">{type}</span>
+                                        <span className="block text-sm text-gray-500">{batteryCapacity}</span>
+                                        <span className="block text-sm text-gray-500">{length}</span>
                                     </div>
-                                    <span>{entry.departureTime}</span>
+                                    <span className="font-medium text-gray-700">{entry.departureTime}</span>
                                 </div>
                             );
                         })}
                     </div>
                 </div>
-                {/* Divider */}
-                <div className="border-l border-gray-300"></div>
                 {/* Arrival Column */}
-                <div className="w-1/2">
-                    <div className="flex flex-col items-center">
+                <div className="w-1/2 pl-4">
+                    <div className="flex flex-col items-start space-y-3">
                         {scheduleData.map((entry) => {
                             const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
                             return (
-                                <div key={entry.id} className="flex justify-between w-3/4 my-1">
-                                    <div className="text-left">
-                                        <span className="font-bold">{entry.id}</span>
-                                        <span className="block text-xs">{type}</span>
-                                        <span className="block text-xs">{batteryCapacity}</span>
-                                        <span className="block text-xs">{length}</span>
+                                <div key={entry.id} className="flex justify-between w-full">
+                                    <div>
+                                        <span className="font-semibold text-gray-700">{entry.id}</span>
+                                        <span className="block text-sm text-gray-500">{type}</span>
+                                        <span className="block text-sm text-gray-500">{batteryCapacity}</span>
+                                        <span className="block text-sm text-gray-500">{length}</span>
                                     </div>
-                                    <span>{entry.arrivalTime}</span>
+                                    <span className="font-medium text-gray-700">{entry.arrivalTime}</span>
                                 </div>
                             );
                         })}

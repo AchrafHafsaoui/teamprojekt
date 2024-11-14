@@ -9,7 +9,7 @@ import ParkingStatus from './ParkingStatus';
 const Overview: React.FC = () => {
     return (
         <div
-            className="grid h-screen w-screen gap-10 p-10 bg-cover bg-center ml-20 mt-10 mr-10"
+            className="grid h-screen w-screen gap-10 px-10 bg-cover bg-center ml-20 mr-10 mt-14"
             style={{
                 backgroundImage: 'url("/path-to-your-image.jpg")', // Replace with your image path
                 backgroundSize: 'cover',
@@ -17,12 +17,12 @@ const Overview: React.FC = () => {
             }}
         >
             {/* Define 3 rows: Upper, Middle, and Parking Status */}
-            <div className="grid grid-rows-[minmax(300px,auto)_minmax(300px,auto)_1fr] h-full gap-10">
+            <div className="grid grid-rows-[minmax(300px,auto)_minmax(300px,auto)_1fr] h-full gap-5">
                 
                 {/* Upper Section with 3 columns */}
                 <div className="grid gap-10 lg:grid-cols-3 md:grid-cols-1 sm:grid-cols-1 p-4">
                     <div className="flex flex-col justify-center px-4 rounded-lg">
-                        <h2 className="text-5xl font-light tracking-wide ml-2">
+                        <h2 className="text-6xl font-light tracking-wide ml-2">
                             <TypeAnimation
                                 sequence={['Hello,']}
                                 speed={20}
@@ -30,7 +30,7 @@ const Overview: React.FC = () => {
                                 wrapper="span"
                             />
                         </h2>
-                        <h2 className="text-6xl font-semibold mb-5 ml-2" style={{ color: 'rgb(7, 142, 205)' }}>
+                        <h2 className="text-7xl font-semibold mb-5 ml-2" style={{ color: 'rgb(7, 142, 205)' }}>
                             <TypeAnimation
                                 sequence={['Belmonte!']}
                                 speed={40}

@@ -39,7 +39,7 @@ const Sidebar: React.FC = () => {
           <button
             key={item.label}
             onClick={() => setActiveButton(item.label)}
-            className="flex items-center p-2 rounded hover:ml-3 transition duration-300 relative"
+            className="flex items-center p-1 rounded hover:ml-3 transition duration-300 relative"
             style={{ transition: 'background-color 0.3s' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(7, 142, 205, 0.35)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
