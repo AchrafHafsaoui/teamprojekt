@@ -5,21 +5,14 @@ import EnergyConsumption from './EnergyConsumption';
 import DrivingSchedule from './DrivingSchedule';
 import { TypeAnimation } from 'react-type-animation';
 import ParkingStatus from './ParkingStatus';
-import ChargingSchedule from './ChargingSchedule';
+import ChargingSchedule from './ChargingStationStatus';
 
 const Overview: React.FC = () => {
     return (
-        <div
-            className="grid h-screen w-screen gap-10 px-10 bg-cover bg-center ml-20 mr-10 mt-14"
-            style={{
-                backgroundImage: 'url("/path-to-your-image.jpg")', // Replace with your image path
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        >
+        <div className="grid h-full w-full gap-10 pl-40 pr-10 pt-10 overflow-hidden bg-cover bg-center">
             {/* Define 3 rows: Upper, Middle, and Parking Status */}
             <div className="grid grid-rows-[minmax(300px,auto)_minmax(300px,auto)_1fr] h-full gap-5">
-                
+
                 {/* Upper Section with 3 columns */}
                 <div className="grid gap-10 lg:grid-cols-3 md:grid-cols-1 sm:grid-cols-1 p-4">
                     <div className="flex flex-col justify-center px-4 rounded-lg">
