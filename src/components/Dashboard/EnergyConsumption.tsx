@@ -86,7 +86,7 @@ const EnergyConsumption: React.FC = () => {
         },
         animation: {
             duration: 1500,
-            easing: 'easeOutCubic',
+            easing: 'easeOutCubic' as const,
             delay: (context: any) => context.dataIndex * 20,
         },
     };
