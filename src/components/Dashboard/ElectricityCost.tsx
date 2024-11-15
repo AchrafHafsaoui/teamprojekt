@@ -6,7 +6,7 @@ const ElectricityCost: React.FC = () => {
             <div>
                 <p className="text-3xl leading-tight">Today’s electricity price</p>
             </div>
-            <p className="text-7xl font-bold">0.958 €/KWh</p>
+            <p className="text-6xl font-bold">0.958 €/KWh</p>
             <p className="text-lg text-gray-300">100 kWh available</p>
         </div>
     );

@@ -94,7 +94,7 @@ const FleetStatus: React.FC = () => {
                 </div>
             </div>
     
-            <div className="overflow-y-auto overflow-x-hidden h-80 custom-scrollbar">
+            <div className="overflow-x-hidden h-80 custom-scrollbar">
                 <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600">
                     <div className="text-center">Vehicule ID</div>
                     <div className="text-center">Availability</div>

@@ -9,7 +9,7 @@ import ChargingSchedule from './ChargingStationStatus';
 
 const Overview: React.FC = () => {
     return (
-        <div className="grid h-full w-full gap-10 pl-40 pr-10 pt-10 overflow-hidden bg-cover bg-center">
+        <div className="grid h-full w-full gap-10 pr-10 overflow-hidden bg-cover bg-center">
             {/* Define 3 rows: Upper, Middle, and Parking Status */}
             <div className="grid grid-rows-[minmax(300px,auto)_minmax(300px,auto)_1fr] h-full gap-5">
 

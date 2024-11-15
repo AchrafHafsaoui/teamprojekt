@@ -34,7 +34,7 @@ const ParkingStatus: React.FC = () => {
     };
 
     return (
-        <div className="bg-[#F1F1F1] col-span-3 bg-opacity-60 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+        <div className="bg-[#F1F1F1] col-span-3 bg-opacity-60 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
             <h2 className="text-2xl font-semibold text-gray-800">Parking Status</h2>
             <div className="relative overflow-x-auto h-36 mt-4 flex items-center">
                 <div className="flex space-x-8 px-4">
