@@ -22,6 +22,12 @@ const ChargingStationStatus: React.FC = () => {
     "all" | "OK" | "Down" | "Maintenance"
   >("all");
 
+  const [animatedSegments, setAnimatedSegments] = useState<number[]>([]);
+
+  useEffect(() => {
+    setAnimatedSegments(Array(20).fill(0)); // Initialize animated segments
+  }, []);
+
   const filteredStations =
     filterStatus === "all"
       ? stations
@@ -34,23 +40,6 @@ const ChargingStationStatus: React.FC = () => {
       (chargingPower / maxPower) * segmentCount,
     );
 
-    const [animatedSegments, setAnimatedSegments] = useState<number[]>(
-      Array(segmentCount).fill(0),
-    );
-
-    useEffect(() => {
-      // Animate each segment gradually
-      animatedSegments.forEach((_, index) => {
-        setTimeout(() => {
-          setAnimatedSegments((prev) => {
-            const newSegments = [...prev];
-            newSegments[index] = index < segmentsToShow ? 1 : 0; // Set to 1 if it should be filled
-            return newSegments;
-          });
-        }, index * 50); // Delay each segment's animation by 50ms for a gradual effect
-      });
-    }, [chargingPower, segmentsToShow]);
-
     return (
       <div className="flex space-x-0.5 w-full">
         {Array.from({ length: segmentCount }).map((_, index) => (
@@ -58,10 +47,10 @@ const ChargingStationStatus: React.FC = () => {
             key={index}
             className={`h-6 rounded transition-colors duration-500`}
             style={{
-              width: "4%", // Each segment takes 5% of the column width
-              backgroundColor: animatedSegments[index]
+              width: "4%", // Each segment takes 4% of the column width
+              backgroundColor: index < segmentsToShow
                 ? "#078ECD"
-                : "bg-gray-300",
+                : "#D3D3D3",
             }}
           ></div>
         ))}
