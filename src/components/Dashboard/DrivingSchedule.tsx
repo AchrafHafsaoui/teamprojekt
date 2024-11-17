@@ -87,7 +87,7 @@ const DrivingSchedule: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#F1F1F1] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
+    <div className="bg-[#FFFFFF] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
       <h2 className="text-2xl font-semibold mb-4">Driving Schedule</h2>
       <div className="flex justify-between mb-4 px-2 text-lg font-semibold">
         <div className="text-center w-1/2">Departure</div>
@@ -123,9 +123,7 @@ const DrivingSchedule: React.FC = () => {
             })}
           </div>
         </div>
-        {/* Divider */}
         <div className="border-l-2 border-gray-300 sticky top-0 h-full"></div>{" "}
-        {/* Make the divider sticky */}
         {/* Arrival Column */}
         <div className="w-1/2 pl-4">
           <div className="flex flex-col items-start space-y-3">
