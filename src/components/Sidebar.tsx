@@ -8,7 +8,6 @@ import ParkingIcon from "../assets/icons/parking.svg";
 import FleetStatusIcon from "../assets/icons/Fleet status.svg";
 import logo from "../assets/logo.png";
 import Icon from "../assets/icons/Icon.svg";
-import SettingsIcon from "../assets/icons/settings.svg";
 import GuideIcon from "../assets/icons/guide.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 
@@ -18,20 +17,31 @@ const Sidebar: React.FC = () => {
   const menuItems = [
     { label: "Overview", icon: OverviewIcon, path: "/" },
     { label: "Fleet Status", icon: FleetStatusIcon, path: "/fleet-status" },
-    { label: "Charging Stations", icon: ChargingStationIcon, path: "/charging-stations" },
-    { label: "Driving Schedule", icon: DrivingScheduleIcon, path: "/driving-schedule" },
-    { label: "Charging Schedule", icon: ChargingScheduleIcon, path: "/charging-schedule" },
+    {
+      label: "Charging Stations",
+      icon: ChargingStationIcon,
+      path: "/charging-stations",
+    },
+    {
+      label: "Driving Schedule",
+      icon: DrivingScheduleIcon,
+      path: "/driving-schedule",
+    },
+    {
+      label: "Charging Schedule",
+      icon: ChargingScheduleIcon,
+      path: "/charging-schedule",
+    },
     { label: "Parking", icon: ParkingIcon, path: "/parking" },
   ];
 
   const bottomMenuItems = [
     { label: "Account", icon: Icon, path: "/Icon" },
     { label: "Guide", icon: GuideIcon, path: "/guide" },
-    { label: "Settings", icon: SettingsIcon, path: "/settings" },
   ];
 
   return (
-    <div className="flex flex-col bg-white bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between group z-50">
+    <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-[#FFFFFF] group z-50">
       {/* Top menu part */}
       <div className="flex flex-col space-y-5 mt-4 flex-grow">
         <div className="flex mb-8">
@@ -49,13 +59,20 @@ const Sidebar: React.FC = () => {
             onClick={() => setActiveButton(item.label)}
             className="flex items-center p-1 rounded hover:ml-3 transition duration-300 relative"
             style={{ transition: "background-color 0.3s" }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                "rgba(7, 142, 205, 0.35)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
           >
             <img src={item.icon} alt={item.label} className="w-12 ml-2" />
             <span
               className={`whitespace-nowrap overflow-hidden ml-4 ${
-                activeButton === item.label ? "font-semibold text-[rgb(7, 142, 205)]" : "text-gray-800"
+                activeButton === item.label
+                  ? "font-semibold text-[rgb(7, 142, 205)]"
+                  : "text-gray-800"
               } text-lg tracking-wide transition-all`}
               style={{
                 textShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)",
@@ -79,13 +96,20 @@ const Sidebar: React.FC = () => {
             onClick={() => setActiveButton(item.label)}
             className="flex items-center p-1 rounded hover:ml-3 transition duration-300 relative"
             style={{ transition: "background-color 0.3s" }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                "rgba(7, 142, 205, 0.35)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
           >
-            <img src={item.icon} alt={item.label} className="w-12 ml-2" />
+            <img src={item.icon} alt={item.label} className="w-8 ml-5 mr-1" />
             <span
               className={`whitespace-nowrap overflow-hidden ml-4 ${
-                activeButton === item.label ? "font-semibold text-[rgb(7, 142, 205)]" : "text-gray-800"
+                activeButton === item.label
+                  ? "font-semibold text-[rgb(7, 142, 205)]"
+                  : "text-gray-800"
               } text-lg tracking-wide transition-all`}
               style={{
                 textShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)",
