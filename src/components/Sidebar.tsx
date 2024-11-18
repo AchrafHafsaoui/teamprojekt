@@ -8,7 +8,6 @@ import ParkingIcon from "../assets/icons/parking.svg";
 import FleetStatusIcon from "../assets/icons/Fleet status.svg";
 import logo from "../assets/logo.png";
 import Icon from "../assets/icons/Icon.svg";
-import GuideIcon from "../assets/icons/guide.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 
 const Sidebar: React.FC = () => {
@@ -35,10 +34,7 @@ const Sidebar: React.FC = () => {
     { label: "Parking", icon: ParkingIcon, path: "/parking" },
   ];
 
-  const bottomMenuItems = [
-    { label: "Account", icon: Icon, path: "/Icon" },
-    { label: "Guide", icon: GuideIcon, path: "/guide" },
-  ];
+  const bottomMenuItems = [{ label: "Account", icon: Icon, path: "/Icon" }];
 
   return (
     <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-[#FFFFFF] group z-50">
@@ -88,13 +84,13 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Bottom menu part */}
-      <div className="flex flex-col space-y-5 mb-5">
+      <div className="flex flex-col mb-5">
         {bottomMenuItems.map((item) => (
           <Link
             to={item.path}
             key={item.label}
             onClick={() => setActiveButton(item.label)}
-            className="flex items-center p-1 rounded hover:ml-3 transition duration-300 relative"
+            className="flex items-center p-1 rounded hover:ml-2 transition duration-300 relative"
             style={{ transition: "background-color 0.3s" }}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =
@@ -104,7 +100,7 @@ const Sidebar: React.FC = () => {
               (e.currentTarget.style.backgroundColor = "transparent")
             }
           >
-            <img src={item.icon} alt={item.label} className="w-8 ml-5 mr-1" />
+            <img src={item.icon} alt={item.label} className="w-8 ml-4 mr-2" />
             <span
               className={`whitespace-nowrap overflow-hidden ml-4 ${
                 activeButton === item.label
