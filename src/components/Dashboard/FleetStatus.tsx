@@ -26,7 +26,7 @@ const FleetStatus: React.FC = () => {
     {
       busId: "19101",
       availability: "Unvailable",
-      battery: 0,
+      battery: 80,
       status: "In Maintenance",
       charging: false,
       CAP: "20MWh",
