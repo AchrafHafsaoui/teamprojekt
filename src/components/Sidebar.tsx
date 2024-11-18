@@ -8,7 +8,6 @@ import ParkingIcon from "../assets/icons/parking.svg";
 import FleetStatusIcon from "../assets/icons/Fleet status.svg";
 import logo from "../assets/logo.png";
 import Icon from "../assets/icons/Icon.svg";
-import GuideIcon from "../assets/icons/guide.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 
 const Sidebar: React.FC = () => {
@@ -37,7 +36,6 @@ const Sidebar: React.FC = () => {
 
   const bottomMenuItems = [
     { label: "Account", icon: Icon, path: "/Icon" },
-    { label: "Guide", icon: GuideIcon, path: "/guide" },
   ];
 
   return (
@@ -88,7 +86,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Bottom menu part */}
-      <div className="flex flex-col space-y-5 mb-5">
+      <div className="flex flex-col mb-5">
         {bottomMenuItems.map((item) => (
           <Link
             to={item.path}
