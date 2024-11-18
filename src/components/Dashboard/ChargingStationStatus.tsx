@@ -22,7 +22,7 @@ const ChargingStationStatus: React.FC = () => {
     "all" | "OK" | "Down" | "Maintenance"
   >("all");
 
-  const [animatedSegments, setAnimatedSegments] = useState<number[]>([]);
+  const [, setAnimatedSegments] = useState<number[]>([]);
 
   useEffect(() => {
     setAnimatedSegments(Array(20).fill(0)); // Initialize animated segments

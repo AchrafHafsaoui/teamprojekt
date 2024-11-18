@@ -82,7 +82,7 @@ const FleetStatus: React.FC = () => {
       availability: "Charging",
       battery: 45,
       status: "In Depot",
-      charging: true,
+      charging: false,
       CAP: "0MWh",
       ENE: "40MWh",
     },
