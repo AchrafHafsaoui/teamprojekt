@@ -125,7 +125,7 @@ const DrivingSchedule: React.FC = () => {
         </div>
         <div className="border-l-2 border-gray-300 sticky top-0 h-full"></div>{" "}
         {/* Arrival Column */}
-        <div className="w-1/2 pl-4">
+        <div className="w-1/2 pl-4 mr-5">
           <div className="flex flex-col items-start space-y-3">
             {scheduleData.map((entry) => {
               const { type, batteryCapacity, length } = parseVehicleCode(

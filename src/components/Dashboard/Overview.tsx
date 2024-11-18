@@ -47,10 +47,10 @@ const Overview: React.FC = () => {
         {/* Middle Section with 2 columns */}
         <div className="grid gap-10 lg:grid-cols-2 sm:grid-cols-1 p-4">
           <div className="rounded-lg overflow-hidden">
-            <FleetStatus />
+            <FleetStatus showAllColumns={false} />
           </div>
           <div className="rounded-lg overflow-hidden">
-            <ChargingSchedule />
+            <ChargingSchedule fullHeight={false}/>
           </div>
         </div>
 

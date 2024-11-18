@@ -29,11 +29,11 @@ const App: React.FC = () => (
         <div className="flex-grow ml-40 mt-10 mb-10 mr-10">
           <Routes>
             <Route path="/" element={<Overview />} />
-            <Route path="/charging-stations" element={<ChargingStations />} />
+            <Route path="/charging-stations" element={<ChargingStations fullHeight={true} />} />
             <Route path="/driving-schedule" element={<DrivingSchedule />} />
             <Route path="/parking" element={<Parking />} />
             <Route path="/electricity-schedule" element={<ElectricitySchedule />} />
-            <Route path="/fleet-status" element={<FleetStatus />} />
+            <Route path="/fleet-status" element={<FleetStatus showAllColumns={true} />} />
           </Routes>
         </div>
       </div>
