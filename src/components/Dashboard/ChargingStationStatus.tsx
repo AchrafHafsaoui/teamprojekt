@@ -80,21 +80,22 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullHeight = fa
       <div className="flex items-center mb-4 w-full">
         <div className="flex-grow flex items-center">
           <h2 className="text-2xl font-semibold">Charging Station Status</h2>
-          <input
-            type="text"
-            placeholder="Search by Station ID"
-            className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          {fullHeight && (
+            <input
+              type="text"
+              placeholder="Search by Station ID"
+              className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          )}
         </div>
         <div className="flex space-x-3">
           {["all", "OK", "Down", "Maintenance"].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status as typeof filterStatus)}
-              className={`px-3 py-1 rounded-lg border font-semibold border-[#cccccc] ${
-                filterStatus === status ? "text-white" : "bg-[#ededed] text-gray-800"
-              } transition-colors`}
+              className={`px-3 py-1 rounded-lg border font-semibold border-[#cccccc] ${filterStatus === status ? "text-white" : "bg-[#ededed] text-gray-800"
+                } transition-colors`}
               style={{
                 backgroundColor: filterStatus === status ? "rgba(7, 142, 205, 0.8)" : undefined,
               }}
