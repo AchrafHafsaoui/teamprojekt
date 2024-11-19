@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 
 const ParkingStatus: React.FC = () => {
-  const parkingLots = [
+  const [parkingLots, setParkingLots] = useState([
     { name: "Darmstadt Nord", defaultSchema: "SBb-ssBs-BSB-SsSs-bsB" },
     { name: "Darmstadt Sud", defaultSchema: "SsSs-BBbs-sbBs-BbSS" },
     { name: "Frankfurt", defaultSchema: "BSBS-sbSb-SSss-BbSB-SbBB" },
     { name: "Mainz", defaultSchema: "SBSS-ssBb-sbSB-SSbb" },
     { name: "München", defaultSchema: "SbBB-ssSB-BBbs-SsBB" },
     { name: "Berlin", defaultSchema: "SSsb-BbBB-SBbs-BbSS-ssSb" },
-  ];
+  ]);
+
 
   const [selectedParking, setSelectedParking] = useState<string | null>("Darmstadt Nord");
   const [columns, setColumns] = useState<number>(0);
@@ -37,35 +38,26 @@ const ParkingStatus: React.FC = () => {
         setRowsPerColumn(columnsArray);
       }
     }
-  }, [selectedParking]); 
+  }, [selectedParking]);
 
-  const handleColumnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0) {
-      setColumns(value);
-      setRowsPerColumn((prev) => {
-        const updatedRows = [...prev];
-        if (value > prev.length) {
-          updatedRows.push(...Array(value - prev.length).fill(""));
-        } else {
-          updatedRows.length = value;
-        }
-        return updatedRows;
-      });
-    }
+  const handleColumnChange = () => {
+    setColumns((prev) => prev + 1); // Increment the columns by one
+    setRowsPerColumn((prev) => [...prev, ""]); // Add an empty row set for the new column
   };
 
-  const handleRowInputChange = (index: number, value: string) => {
-    const updatedRows = [...rowsPerColumn];
-    updatedRows[index] = value;
-    setRowsPerColumn(updatedRows);
-  };
 
   const addNewSlot = (columnIndex: number) => {
-    const updatedRows = [...rowsPerColumn];
-    updatedRows[columnIndex] += "s"; // Add a small, unoccupied slot by default
-    setRowsPerColumn(updatedRows);
+    setRowsPerColumn((prev) => {
+      const updatedRows = [...prev];
+      // Check if the row was initially empty
+      if (!updatedRows[columnIndex]) {
+        handleColumnChange(); // Call handleColumnChange if the row was empty
+      }
+      updatedRows[columnIndex] += "s"; // Add a small, unoccupied slot by default
+      return updatedRows;
+    });
   };
+
 
   const renderGrid = () => {
     return Array.from({ length: columns }).map((_, colIndex) => {
@@ -74,7 +66,7 @@ const ParkingStatus: React.FC = () => {
 
       return (
         <div key={colIndex} className="flex flex-col items-center space-y-2">
-          <h2 className="font-semibold text-xl">Column {colIndex+1}</h2>
+          <h2 className="font-semibold text-xl">Column {colIndex + 1}</h2>
           <div
             className="flex flex-col space-y-2"
             style={{ minWidth: "100px" }}
@@ -87,7 +79,7 @@ const ParkingStatus: React.FC = () => {
               return (
                 <div key={slotId} className="relative">
                   <div
-                    className={`flex items-center justify-center border rounded-xl border-gray-500 ${isBig ? "h-40" : "h-20"
+                    className={`flex items-center justify-center border rounded-xl border-gray-500 font-semibold text-lg ${isBig ? "h-40" : "h-20"
                       }`}
                     style={{
                       backgroundColor: isOccupied ? colorOccupied : colorFree,
@@ -172,20 +164,26 @@ const ParkingStatus: React.FC = () => {
       {/* Top Section with Fleet Status Scroll and Buttons */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-4">Fleet Status</h2>
-        {/* Fleet Status Horizontal Scroll */}
-
-
         {/* Edit and Return Buttons */}
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => setEditMode(!editMode)}
-            className="p-2 rounded-lg border font-semibold border-[#cccccc] transition"
-            style={{
-              backgroundColor: editMode ? "rgb(7, 142, 205)" : "transparent",
-              color: editMode ? "white" : "black",
+            onClick={() => {
+              if (editMode) {
+                // Remove empty columns when exiting edit mode
+                const nonEmptyColumns = rowsPerColumn.filter((column) => column.trim() !== "");
+                setRowsPerColumn([...nonEmptyColumns]); // Create a new array to remove empty columns from memory
+                setColumns(nonEmptyColumns.length); // Update the columns count
+              } else {
+                handleColumnChange(); // Add a new column only when entering edit mode
+              }
+              setEditMode(!editMode); // Toggle edit mode
             }}
+            className={`p-2 rounded-lg border font-semibold transition ${editMode
+                ? "bg-[#078ECD] text-white border-[#078ECD]"
+                : "bg-transparent text-black border-[#cccccc] hover:bg-[#078ECD] hover:text-white"
+              }`}
           >
-            {editMode ? "Exit Edit Mode" : "Edit"}
+            {editMode ? "Save" : "Edit"}
           </button>
         </div>
       </div>
@@ -202,18 +200,19 @@ const ParkingStatus: React.FC = () => {
             {parking.name}
           </button>
         ))}
-      </div>
-
-      {/* Number of Columns Input */}
-      <div className="flex items-center mb-6 space-x-4">
-        <label className="font-semibold text-gray-700">Number of Columns:</label>
-        <input
-          type="number"
-          min={0}
-          value={columns || ""}
-          onChange={handleColumnChange}
-          className="border border-gray-300 px-3 py-1 rounded-md w-20"
-        />
+        {editMode && (
+          <button
+            onClick={() => {
+              const newDepotName = `Depot ${parkingLots.length + 1}`;
+              const newDepot = { name: newDepotName, defaultSchema: "" };
+              setParkingLots((prev) => [...prev, newDepot]);
+              selectParking(newDepotName, newDepot.defaultSchema);
+            }}
+            className="px-4 py-2 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
+          >
+            + Add Depot
+          </button>
+        )}
       </div>
 
       {/* Parking Grid */}
