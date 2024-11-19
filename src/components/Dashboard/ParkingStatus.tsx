@@ -15,6 +15,10 @@ const ParkingStatus: React.FC = () => {
   const [columns, setColumns] = useState<number>(0);
   const [rowsPerColumn, setRowsPerColumn] = useState<string[]>([]);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [addingDepot, setAddingDepot] = useState(false);
+  const [newDepotName, setNewDepotName] = useState("");
+  const [editingDepot, setEditingDepot] = useState<number | null>(null);
+  const [editingDepotName, setEditingDepotName] = useState("");
 
   const colorOccupied = "rgb(7, 142, 205)";
   const colorFree = "#D3D3D3";
@@ -176,11 +180,12 @@ const ParkingStatus: React.FC = () => {
               } else {
                 handleColumnChange(); // Add a new column only when entering edit mode
               }
+              if (addingDepot) setAddingDepot(false);
               setEditMode(!editMode); // Toggle edit mode
             }}
             className={`p-2 rounded-lg border font-semibold transition ${editMode
-                ? "bg-[#078ECD] text-white border-[#078ECD]"
-                : "bg-transparent text-black border-[#cccccc] hover:bg-[#078ECD] hover:text-white"
+              ? "bg-[#078ECD] text-white border-[#078ECD]"
+              : "bg-transparent text-black border-[#cccccc] hover:bg-[#078ECD] hover:text-white"
               }`}
           >
             {editMode ? "Save" : "Edit"}
@@ -188,18 +193,69 @@ const ParkingStatus: React.FC = () => {
         </div>
       </div>
       <div className="flex overflow-x-auto space-x-4 mb-5 scrollbar-hide">
-        {parkingLots.map((parking) => (
-          <button
-            key={parking.name}
-            onClick={() => selectParking(parking.name, parking.defaultSchema)}
-            className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
-              ? "bg-[#078ECD] text-white"
-              : "bg-black text-gray-100 hover:bg-[#078ECD] hover:text-white"
-              }`}
-          >
-            {parking.name}
-          </button>
+        {parkingLots.map((parking, index) => (
+          <div key={parking.name} className="relative flex items-center space-x-1">
+            {/* Depot Selection Button */}
+            <button
+              onClick={() => selectParking(parking.name, parking.defaultSchema)}
+              className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
+                ? "bg-[#078ECD] text-white"
+                : "bg-black text-gray-100 hover:bg-[#078ECD] hover:text-white"
+                }`}
+            >
+              {parking.name}
+            </button>
+
+            {/* Edit Name Button (Only in Edit Mode) */}
+            {editMode && (
+              <>
+                {editingDepot === index ? (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={editingDepotName}
+                      onChange={(e) => setEditingDepotName(e.target.value)}
+                      className="px-2 py-1 border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#078ECD]"
+                    />
+                    <button
+                      onClick={() => {
+                        const updatedParkingLots = [...parkingLots];
+                        updatedParkingLots[index].name = editingDepotName.trim();
+                        setParkingLots(updatedParkingLots);
+                        setEditingDepot(null); // Exit editing mode
+                        setEditingDepotName(""); // Reset input field
+                      }}
+                      className="px-3 py-1 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingDepot(null);
+                        setEditingDepotName(""); // Reset input when canceled
+                      }}
+                      className="px-2 py-1 rounded-full font-semibold text-red-600 hover:text-red-800 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditingDepot(index); // Enable editing mode for this depot
+                      setEditingDepotName(parking.name); // Pre-fill the current name
+                    }}
+                    className="px-1 py-1 text-sm rounded-full font-semibold text-black hover:bg-gray-200 transition"
+                    title="Edit Name"
+                  >
+                    <svg fill="#000000" height="15px" width="15px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 306.637 306.637" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M12.809,238.52L0,306.637l68.118-12.809l184.277-184.277l-55.309-55.309L12.809,238.52z M60.79,279.943l-41.992,7.896 l7.896-41.992L197.086,75.455l34.096,34.096L60.79,279.943z"></path> <path d="M251.329,0l-41.507,41.507l55.308,55.308l41.507-41.507L251.329,0z M231.035,41.507l20.294-20.294l34.095,34.095 L265.13,75.602L231.035,41.507z"></path> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> </g> </g></svg>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         ))}
+        {/* Add New Depot Button */}
         {editMode && (
           <button
             onClick={() => {
