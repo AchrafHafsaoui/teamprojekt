@@ -7,6 +7,7 @@ import DrivingSchedule from './components/Dashboard/DrivingSchedule';
 import Parking from './components/Dashboard/ParkingStatus';
 import ElectricitySchedule from './components/Dashboard/ElectricityCost';
 import FleetStatus from './components/Dashboard/FleetStatus';
+import ChargingSchedule from './components/Dashboard/ChargingSchedule';
 
 const App: React.FC = () => (
   <Router>
@@ -34,6 +35,7 @@ const App: React.FC = () => (
             <Route path="/parking" element={<Parking />} />
             <Route path="/electricity-schedule" element={<ElectricitySchedule />} />
             <Route path="/fleet-status" element={<FleetStatus showAllColumns={true} />} />
+            <Route path="/charging-schedule" element={<ChargingSchedule />} />
           </Routes>
         </div>
       </div>
