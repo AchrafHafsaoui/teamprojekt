@@ -1,96 +1,200 @@
-import React from "react";
+import React, { useState } from "react";
 
-type ChargingVehicle = {
-  vehicleId: string;
-  chargingPower: number; // Current power being used for charging (kW)
-  capacity: number; // Total battery capacity (kWh)
-  energyUsed: number; // Energy already charged (kWh)
-  energyRemaining: number; // Remaining energy needed to fully charge (kWh)
-};
+interface Bus {
+  id: number;
+  maxCapacity: number;
+  currentCharging: number;
+}
 
 const ChargingSchedule: React.FC = () => {
-  const vehicles: ChargingVehicle[] = [
-    { vehicleId: "V001", chargingPower: 50, capacity: 200, energyUsed: 50, energyRemaining: 150 },
-    { vehicleId: "V002", chargingPower: 40, capacity: 150, energyUsed: 30, energyRemaining: 120 },
-    { vehicleId: "V003", chargingPower: 30, capacity: 100, energyUsed: 60, energyRemaining: 40 },
-    { vehicleId: "V004", chargingPower: 70, capacity: 250, energyUsed: 100, energyRemaining: 150 },
-    { vehicleId: "V005", chargingPower: 20, capacity: 80, energyUsed: 40, energyRemaining: 40 },
+  const minChargePerBus = 0;
+  const buses: Bus[] = [
+    { id: 1, maxCapacity: 100, currentCharging: 50 },
+    { id: 2, maxCapacity: 100, currentCharging: 70 },
+    { id: 3, maxCapacity: 100, currentCharging: 60 },
+    { id: 4, maxCapacity: 100, currentCharging: 80 },
+    { id: 5, maxCapacity: 100, currentCharging: 90 },
+    { id: 6, maxCapacity: 100, currentCharging: 40 },
+    { id: 7, maxCapacity: 100, currentCharging: 0 },
+    { id: 8, maxCapacity: 100, currentCharging: 0 },
+    { id: 9, maxCapacity: 100, currentCharging: 70 },
+    { id: 10, maxCapacity: 100, currentCharging: 60 },
+    { id: 11, maxCapacity: 100, currentCharging: 80 },
+    { id: 12, maxCapacity: 100, currentCharging: 90 },
+    { id: 13, maxCapacity: 100, currentCharging: 40 },
+    { id: 14, maxCapacity: 100, currentCharging: 0 },
+    { id: 15, maxCapacity: 100, currentCharging: 0 },
   ];
 
-  // Calculate totals
-  const totalEnergyUsed = vehicles.reduce((sum, vehicle) => sum + vehicle.energyUsed, 0);
-  const totalEnergyRemaining = vehicles.reduce((sum, vehicle) => sum + vehicle.energyRemaining, 0);
-  const totalChargingPower = vehicles.reduce((sum, vehicle) => sum + vehicle.chargingPower, 0);
-  const totalCapacity = vehicles.reduce((sum, vehicle) => sum + vehicle.capacity, 0);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-  // Flexibility ratios
-  const upwardFlexibility = ((totalCapacity - totalEnergyUsed) / totalCapacity) * 100;
-  const downwardFlexibility = (totalEnergyUsed / totalCapacity) * 100;
+  // Calculate total pages and current buses
+  const totalPages = Math.ceil(buses.length / itemsPerPage);
+  const currentBuses = buses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  // Handlers for pagination
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  // Metrics calculations
+  const totalGridCapacity = buses.reduce(
+    (sum, bus) => sum + bus.maxCapacity,
+    0,
+  );
+  const currentChargingLoad = buses.reduce(
+    (sum, bus) => sum + bus.currentCharging,
+    0,
+  );
+  const upwardFlexibility = buses.reduce(
+    (sum, bus) => sum + (bus.maxCapacity - bus.currentCharging),
+    0,
+  );
+  const downwardFlexibility = buses.reduce(
+    (sum, bus) => sum + (bus.currentCharging - minChargePerBus),
+    0,
+  );
+
+  const calculatePercentage = (value: number) =>
+    Math.round((value / totalGridCapacity) * 100);
 
   return (
     <div className="bg-[#FFFFFF] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6">
       <div className="mb-4">
         <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
-        <div className="flex justify-between items-center">
-          <p className="text-lg">
-            Total Energy Used: <span className="font-bold">{totalEnergyUsed} kWh</span>
-          </p>
-          <p className="text-lg">
-            Total Energy Remaining: <span className="font-bold">{totalEnergyRemaining} kWh</span>
-          </p>
-          <p className="text-lg">
-            Total Charging Power: <span className="font-bold">{totalChargingPower} kW</span>
-          </p>
-        </div>
-      </div>
-
-      {/* Flexibility Ratios */}
-      <div className="mb-6">
-        <div className="flex items-center space-x-4">
-          <div className="flex-grow bg-gray-200 h-6 rounded-lg overflow-hidden relative">
-            <div
-              className="bg-blue-500 h-full"
-              style={{ width: `${upwardFlexibility}%` }}
-            ></div>
+        <div>
+          <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600 top-0 sticky">
+            <div className="text-center">Bus ID</div>
+            <div className="text-center">Max Capacity (kW)</div>
+            <div className="text-center">Current Charging (kW)</div>
+            <div className="text-center">Remaining Upward Flex (kW)</div>
+            <div className="text-center">Possible Downward Flex (kW)</div>
           </div>
-          <p className="text-blue-500 font-bold">
-            Upward Flexibility: {upwardFlexibility.toFixed(2)}%
-          </p>
-        </div>
-        <div className="flex items-center space-x-4 mt-2">
-          <div className="flex-grow bg-gray-200 h-6 rounded-lg overflow-hidden relative">
-            <div
-              className="bg-green-500 h-full"
-              style={{ width: `${downwardFlexibility}%` }}
-            ></div>
+          <div className="overflow-y-auto custom-scrollbar h-95">
+            <div className="space-y-3">
+              {currentBuses.map((bus) => (
+                <div
+                  key={bus.id}
+                  className="grid grid-cols-5 gap-4 items-center text-gray-800 pb-3 shadow-sm font-semibold mr-5"
+                >
+                  <span className="text-center">{bus.id}</span>
+                  <span className="text-center">{bus.maxCapacity}</span>
+                  <span className="text-center">{bus.currentCharging} kW</span>
+                  <span className="text-center">
+                    {bus.maxCapacity - bus.currentCharging} kW
+                  </span>
+                  <span className="text-center">
+                    {bus.currentCharging - minChargePerBus} kW
+                  </span>
+                </div>
+              ))}
+              {Array.from(
+                { length: itemsPerPage - currentBuses.length },
+                (_, index) => (
+                  <div
+                    key={`placeholder-${index}`}
+                    className="grid grid-cols-5 gap-4 items-center text-gray-300 pb-3"
+                  >
+                    <span className="text-center">-</span>
+                    <span className="text-center">-</span>
+                    <span className="text-center">-</span>
+                    <span className="text-center">-</span>
+                    <span className="text-center">-</span>
+                  </div>
+                ),
+              )}
+            </div>
           </div>
-          <p className="text-green-500 font-bold">
-            Downward Flexibility: {downwardFlexibility.toFixed(2)}%
-          </p>
         </div>
-      </div>
-
-      {/* Vehicle Summary */}
-      <div className="overflow-y-auto custom-scrollbar">
-        <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-4 text-gray-600 text-center">
-          <div>Vehicle ID</div>
-          <div>Charging Power (kW)</div>
-          <div>Energy Used (kWh)</div>
-          <div>Energy Remaining (kWh)</div>
-          <div>Total Capacity (kWh)</div>
-        </div>
-        {vehicles.map((vehicle) => (
-          <div
-            key={vehicle.vehicleId}
-            className="grid grid-cols-5 gap-4 items-center text-gray-800 py-2 text-center shadow-sm font-semibold"
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            className={`px-4 py-2 bg-gray-300 rounded-md ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
           >
-            <span>{vehicle.vehicleId}</span>
-            <span>{vehicle.chargingPower}</span>
-            <span>{vehicle.energyUsed}</span>
-            <span>{vehicle.energyRemaining}</span>
-            <span>{vehicle.capacity}</span>
+            Previous
+          </button>
+          <span className="text-lg font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className={`px-4 py-2 bg-gray-300 rounded-md ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+        <hr className="my-6  border-gray-300" />
+        {/* Metrics Section */}
+        <div className="space-y-4 mx-10">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">Total Depot Capacity:</span>
+            <span>{totalGridCapacity} kW</span>
           </div>
-        ))}
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">
+                Current Charging Load: {currentChargingLoad} KW
+              </span>
+              <span>{calculatePercentage(currentChargingLoad)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-blue-600 h-4 rounded-full"
+                style={{
+                  width: `${calculatePercentage(currentChargingLoad)}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">
+                Upward Flexibility: {upwardFlexibility} KW
+              </span>
+              <span>{calculatePercentage(upwardFlexibility)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-green-600 h-4 rounded-full"
+                style={{
+                  width: `${calculatePercentage(upwardFlexibility)}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">
+                Downward Flexibility: {downwardFlexibility} KW
+              </span>
+              <span>{calculatePercentage(downwardFlexibility)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-red-600 h-4 rounded-full"
+                style={{
+                  width: `${calculatePercentage(downwardFlexibility)}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
