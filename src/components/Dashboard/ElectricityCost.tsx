@@ -39,9 +39,12 @@ const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
 
   return (
     <div
-      className={`relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col transition-all duration-300 ${
-        expanded ? "p-8" : "p-6"
-      }`}
+      className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col transition-all duration-300 p-6"
+      style={{
+        backgroundImage: `url('/src/assets/cosmos.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
       onMouseEnter={() => {
         setExpanded(true);
         setHideHello(true); // Hide "Hello Benjamin!" on hover
