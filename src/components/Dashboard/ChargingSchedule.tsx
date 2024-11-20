@@ -39,6 +39,7 @@ const ChargingSchedule: React.FC = () => {
     direction: "ASC",
   });
 
+
   // Calculate total pages and current buses
   const totalPages = Math.ceil(buses.length / itemsPerPage);
   const currentBuses = buses.slice(
@@ -74,7 +75,7 @@ const ChargingSchedule: React.FC = () => {
   );
 
   const calculatePercentage = (value: number) =>
-    Math.round((value / totalGridCapacity) * 100);
+    Math.round((value / totalGridCapacity) * 90);
 
   const handleSort = (field: "1" | "2" | "3" | "4" | "5" | null) => {
     if (fieldToSort.direction === "ASC") {
@@ -88,11 +89,96 @@ const ChargingSchedule: React.FC = () => {
       <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
       <div>
         <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600 top-0 sticky">
-          <div className="text-center">Bus ID</div>
-          <div className="text-center">Max Capacity (kW)</div>
-          <div className="text-center">Current Charging (kW)</div>
-          <div className="text-center">Remaining Upward Flex (kW)</div>
-          <div className="text-center">Possible Downward Flex (kW)</div>
+          <div className="text-center">
+            Bus ID
+            {fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
+              <span
+                onClick={() => handleSort("1")}
+                className={`ml-1 ${fieldToSort.field === "1" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("1")}
+                className={`ml-1 ${fieldToSort.field === "1" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+          <div className="text-center">
+            Max Capacity (kW){" "}
+            {fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
+              <span
+                onClick={() => handleSort("2")}
+                className={`ml-1 ${fieldToSort.field === "2" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("2")}
+                className={`ml-1 ${fieldToSort.field === "2" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+          <div className="text-center">
+            Current Charging (kW)
+            {fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
+              <span
+                onClick={() => handleSort("3")}
+                className={`ml-1 ${fieldToSort.field === "3" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("3")}
+                className={`ml-1 ${fieldToSort.field === "3" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+          <div className="text-center">
+            Remaining Upward Flex (kW)
+            {fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
+              <span
+                onClick={() => handleSort("4")}
+                className={`ml-1 ${fieldToSort.field === "4" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("4")}
+                className={`ml-1 ${fieldToSort.field === "4" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+          <div className="text-center">
+            Possible Downward Flex (kW)
+            {fieldToSort.direction == "ASC" && fieldToSort.field == "5" ? (
+              <span
+                onClick={() => handleSort("5")}
+                className={`ml-1 ${fieldToSort.field === "5" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("5")}
+                className={`ml-1 ${fieldToSort.field === "5" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
         </div>
         <div className="overflow-y-auto custom-scrollbar h-95">
           <div className="space-y-3">
@@ -131,9 +217,9 @@ const ChargingSchedule: React.FC = () => {
         </div>
       </div>
       {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-end items-center mt-4 space-x-2">
         <button
-          className={`px-4 py-2 bg-gray-300 rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
             }`}
           onClick={handlePrevious}
           disabled={currentPage === 1}
@@ -141,10 +227,10 @@ const ChargingSchedule: React.FC = () => {
           Previous
         </button>
         <span className="text-lg font-medium">
-          Page {currentPage} of {totalPages}
+            {currentPage} / {totalPages}
         </span>
         <button
-          className={`px-4 py-2 bg-gray-300 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
             }`}
           onClick={handleNext}
           disabled={currentPage === totalPages}
@@ -168,7 +254,7 @@ const ChargingSchedule: React.FC = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
             <div
-              className="bg-blue-600 h-4 rounded-full"
+              className="bg-[#078ECD] h-4 rounded-full"
               style={{
                 width: `${calculatePercentage(currentChargingLoad)}%`,
               }}
@@ -184,7 +270,7 @@ const ChargingSchedule: React.FC = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
             <div
-              className="bg-green-600 h-4 rounded-full"
+              className="bg-[#078ECD] h-4 rounded-full"
               style={{
                 width: `${calculatePercentage(upwardFlexibility)}%`,
               }}
@@ -200,7 +286,7 @@ const ChargingSchedule: React.FC = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
             <div
-              className="bg-red-600 h-4 rounded-full"
+              className="bg-[#078ECD] h-4 rounded-full"
               style={{
                 width: `${calculatePercentage(downwardFlexibility)}%`,
               }}
