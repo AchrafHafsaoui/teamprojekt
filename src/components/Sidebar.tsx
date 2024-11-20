@@ -53,7 +53,7 @@ const Sidebar: React.FC = () => {
             to={item.path}
             key={item.label}
             onClick={() => setActiveButton(item.label)}
-            className="flex items-center p-1 rounded hover:ml-3 transition duration-300 relative"
+            className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
             style={{ transition: "background-color 0.3s" }}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =

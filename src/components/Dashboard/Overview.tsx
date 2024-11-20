@@ -11,7 +11,7 @@ const Overview: React.FC = () => {
   const [hideHello, setHideHello] = useState(false); // Track the visibility of "Hello Benjamin!"
 
   return (
-    <div className="grid h-full w-full gap-10 pr-10 overflow-hidden bg-cover bg-center">
+    <div className="grid h-full w-full gap-10 overflow-hidden bg-cover bg-center pl-32 pt-12 pr-12">
       {/* Define 3 rows: Upper, Middle, and Parking Status */}
       <div className="grid grid-rows-[minmax(300px,auto)_minmax(300px,auto)_1fr] h-full gap-5">
         {/* Upper Section with 3 columns */}
@@ -45,7 +45,7 @@ const Overview: React.FC = () => {
             <ElectricityCost setHideHello={setHideHello} />
           </div>
           <div className="rounded-lg overflow-hidden">
-            <DrivingSchedule />
+            <DrivingSchedule fullPage={false}/>
           </div>
           <div className="rounded-lg overflow-hidden">
             <EnergyConsumption />
@@ -55,16 +55,16 @@ const Overview: React.FC = () => {
         {/* Middle Section with 2 columns */}
         <div className="grid gap-10 lg:grid-cols-2 sm:grid-cols-1 p-4">
           <div className="rounded-lg overflow-hidden">
-            <FleetStatus showAllColumns={false} />
+            <FleetStatus fullPage={false} />
           </div>
           <div className="rounded-lg overflow-hidden">
-            <ChargingSchedule fullHeight={false} />
+            <ChargingSchedule fullPage={false} />
           </div>
         </div>
 
         {/* Parking Status Section occupying the remaining row */}
         <div className="rounded-lg overflow-hidden p-4">
-          <ParkingStatus />
+          <ParkingStatus fullPage={false} />
         </div>
       </div>
     </div>

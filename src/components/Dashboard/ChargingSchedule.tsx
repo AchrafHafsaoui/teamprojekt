@@ -68,131 +68,127 @@ const ChargingSchedule: React.FC = () => {
     Math.round((value / totalGridCapacity) * 100);
 
   return (
-    <div className="bg-[#FFFFFF] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6">
-      <div className="mb-4">
-        <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
-        <div>
-          <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600 top-0 sticky">
-            <div className="text-center">Bus ID</div>
-            <div className="text-center">Max Capacity (kW)</div>
-            <div className="text-center">Current Charging (kW)</div>
-            <div className="text-center">Remaining Upward Flex (kW)</div>
-            <div className="text-center">Possible Downward Flex (kW)</div>
-          </div>
-          <div className="overflow-y-auto custom-scrollbar h-95">
-            <div className="space-y-3">
-              {currentBuses.map((bus) => (
+    <div className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"}`}>
+      <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
+      <div>
+        <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600 top-0 sticky">
+          <div className="text-center">Bus ID</div>
+          <div className="text-center">Max Capacity (kW)</div>
+          <div className="text-center">Current Charging (kW)</div>
+          <div className="text-center">Remaining Upward Flex (kW)</div>
+          <div className="text-center">Possible Downward Flex (kW)</div>
+        </div>
+        <div className="overflow-y-auto custom-scrollbar h-95">
+          <div className="space-y-3">
+            {currentBuses.map((bus) => (
+              <div
+                key={bus.id}
+                className="grid grid-cols-5 gap-4 items-center text-gray-800 pb-3 shadow-sm font-semibold mr-5"
+              >
+                <span className="text-center">{bus.id}</span>
+                <span className="text-center">{bus.maxCapacity}</span>
+                <span className="text-center">{bus.currentCharging} kW</span>
+                <span className="text-center">
+                  {bus.maxCapacity - bus.currentCharging} kW
+                </span>
+                <span className="text-center">
+                  {bus.currentCharging - minChargePerBus} kW
+                </span>
+              </div>
+            ))}
+            {Array.from(
+              { length: itemsPerPage - currentBuses.length },
+              (_, index) => (
                 <div
-                  key={bus.id}
-                  className="grid grid-cols-5 gap-4 items-center text-gray-800 pb-3 shadow-sm font-semibold mr-5"
+                  key={`placeholder-${index}`}
+                  className="grid grid-cols-5 gap-4 items-center text-gray-300 pb-3"
                 >
-                  <span className="text-center">{bus.id}</span>
-                  <span className="text-center">{bus.maxCapacity}</span>
-                  <span className="text-center">{bus.currentCharging} kW</span>
-                  <span className="text-center">
-                    {bus.maxCapacity - bus.currentCharging} kW
-                  </span>
-                  <span className="text-center">
-                    {bus.currentCharging - minChargePerBus} kW
-                  </span>
+                  <span className="text-center">-</span>
+                  <span className="text-center">-</span>
+                  <span className="text-center">-</span>
+                  <span className="text-center">-</span>
+                  <span className="text-center">-</span>
                 </div>
-              ))}
-              {Array.from(
-                { length: itemsPerPage - currentBuses.length },
-                (_, index) => (
-                  <div
-                    key={`placeholder-${index}`}
-                    className="grid grid-cols-5 gap-4 items-center text-gray-300 pb-3"
-                  >
-                    <span className="text-center">-</span>
-                    <span className="text-center">-</span>
-                    <span className="text-center">-</span>
-                    <span className="text-center">-</span>
-                    <span className="text-center">-</span>
-                  </div>
-                ),
-              )}
-            </div>
+              ),
+            )}
           </div>
         </div>
-        {/* Pagination Controls */}
-        <div className="flex justify-between items-center mt-4">
-          <button
-            className={`px-4 py-2 bg-gray-300 rounded-md ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          className={`px-4 py-2 bg-gray-300 rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            onClick={handlePrevious}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-lg font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className={`px-4 py-2 bg-gray-300 rounded-md ${
-              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="text-lg font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className={`px-4 py-2 bg-gray-300 rounded-md ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+      <hr className="my-6  border-gray-300" />
+      {/* Metrics Section */}
+      <div className="space-y-4 mx-10">
+        <div className="flex justify-between items-center">
+          <span className="font-semibold">Total Depot Capacity:</span>
+          <span>{totalGridCapacity} kW</span>
         </div>
-        <hr className="my-6  border-gray-300" />
-        {/* Metrics Section */}
-        <div className="space-y-4 mx-10">
+        <div>
           <div className="flex justify-between items-center">
-            <span className="font-semibold">Total Depot Capacity:</span>
-            <span>{totalGridCapacity} kW</span>
+            <span className="font-semibold">
+              Current Charging Load: {currentChargingLoad} KW
+            </span>
+            <span>{calculatePercentage(currentChargingLoad)}%</span>
           </div>
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">
-                Current Charging Load: {currentChargingLoad} KW
-              </span>
-              <span>{calculatePercentage(currentChargingLoad)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-4">
-              <div
-                className="bg-blue-600 h-4 rounded-full"
-                style={{
-                  width: `${calculatePercentage(currentChargingLoad)}%`,
-                }}
-              ></div>
-            </div>
+          <div className="w-full bg-gray-200 rounded-full h-4">
+            <div
+              className="bg-blue-600 h-4 rounded-full"
+              style={{
+                width: `${calculatePercentage(currentChargingLoad)}%`,
+              }}
+            ></div>
           </div>
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">
-                Upward Flexibility: {upwardFlexibility} KW
-              </span>
-              <span>{calculatePercentage(upwardFlexibility)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-4">
-              <div
-                className="bg-green-600 h-4 rounded-full"
-                style={{
-                  width: `${calculatePercentage(upwardFlexibility)}%`,
-                }}
-              ></div>
-            </div>
+        </div>
+        <div>
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">
+              Upward Flexibility: {upwardFlexibility} KW
+            </span>
+            <span>{calculatePercentage(upwardFlexibility)}%</span>
           </div>
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">
-                Downward Flexibility: {downwardFlexibility} KW
-              </span>
-              <span>{calculatePercentage(downwardFlexibility)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-4">
-              <div
-                className="bg-red-600 h-4 rounded-full"
-                style={{
-                  width: `${calculatePercentage(downwardFlexibility)}%`,
-                }}
-              ></div>
-            </div>
+          <div className="w-full bg-gray-200 rounded-full h-4">
+            <div
+              className="bg-green-600 h-4 rounded-full"
+              style={{
+                width: `${calculatePercentage(upwardFlexibility)}%`,
+              }}
+            ></div>
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">
+              Downward Flexibility: {downwardFlexibility} KW
+            </span>
+            <span>{calculatePercentage(downwardFlexibility)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-4">
+            <div
+              className="bg-red-600 h-4 rounded-full"
+              style={{
+                width: `${calculatePercentage(downwardFlexibility)}%`,
+              }}
+            ></div>
           </div>
         </div>
       </div>

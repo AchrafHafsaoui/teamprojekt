@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 
-const ParkingStatus: React.FC = () => {
+type ParkingStatusProps = {
+  fullPage?: boolean; // Controls height and layout
+};
+
+const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
   const [parkingLots, setParkingLots] = useState([
     { name: "Darmstadt Nord", defaultSchema: "SBb-ssBs-BSB-SsSs-bsB" },
     { name: "Darmstadt Sud", defaultSchema: "SsSs-BBbs-sbBs-BbSS" },
@@ -16,7 +20,6 @@ const ParkingStatus: React.FC = () => {
   const [rowsPerColumn, setRowsPerColumn] = useState<string[]>([]);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [addingDepot, setAddingDepot] = useState(false);
-  const [newDepotName, setNewDepotName] = useState("");
   const [editingDepot, setEditingDepot] = useState<number | null>(null);
   const [editingDepotName, setEditingDepotName] = useState("");
 
@@ -164,8 +167,10 @@ const ParkingStatus: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FFFFFF] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6">
-      {/* Top Section with Fleet Status Scroll and Buttons */}
+    <div
+      className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+        }`}
+    >      {/* Top Section with Fleet Status Scroll and Buttons */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold mb-4">Fleet Status</h2>
         {/* Edit and Return Buttons */}

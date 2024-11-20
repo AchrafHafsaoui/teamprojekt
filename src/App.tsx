@@ -14,7 +14,10 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen h-full w-full">
+      <div className="flex min-h-screen h-full w-full">
+        {/* Sidebar */}
+        <Sidebar />
+
         {/* Background styling */}
         <div
           className="fixed min-h-screen min-w-full"
@@ -27,29 +30,26 @@ const App: React.FC = () => {
             backgroundBlendMode: "overlay", // Overlay to soften the image
           }}
         />
-        {/* Content wrapper with higher z-index to sit above the background */}
-        <div className="z-10 flex flex-grow h-full">
-          <Sidebar />
-          <div className="flex-grow ml-40 mt-10 mb-10 mr-10">
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route
-                path="/charging-stations"
-                element={<ChargingStations fullHeight={true} />}
-              />
-              <Route path="/driving-schedule" element={<DrivingSchedule />} />
-              <Route path="/parking" element={<Parking />} />
-              <Route
-                path="/electricity-schedule"
-                element={<ElectricityCost setHideHello={setHideHello} />} // Pass setHideHello prop
-              />
-              <Route
-                path="/fleet-status"
-                element={<FleetStatus showAllColumns={true} />}
-              />
-              <Route path="/charging-schedule" element={<ChargingSchedule />} />
-            </Routes>
-          </div>
+        {/* Content wrapper */}
+        <div className="relative flex-grow h-full ">
+          <Routes>
+            <Route path="/" element={<Overview />} />
+            <Route
+              path="/charging-stations"
+              element={<ChargingStations fullPage={true} />}
+            />
+            <Route path="/driving-schedule" element={<DrivingSchedule fullPage={true}/>} />
+            <Route path="/parking" element={<Parking fullPage={true}/>} />
+            <Route
+              path="/electricity-schedule"
+              element={<ElectricityCost setHideHello={setHideHello} />} // Pass setHideHello prop
+            />
+            <Route
+              path="/fleet-status"
+              element={<FleetStatus fullPage={true} />}
+            />
+            <Route path="/charging-schedule" element={<ChargingSchedule />} />
+          </Routes>
         </div>
       </div>
     </Router>

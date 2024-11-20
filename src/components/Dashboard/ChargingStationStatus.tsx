@@ -8,10 +8,10 @@ type ChargingStationData = {
 };
 
 type ChargingStationProps = {
-  fullHeight?: boolean; // Controls height
+  fullPage?: boolean; // Controls height
 };
 
-const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullHeight = false }) => {
+const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = false }) => {
   const stations: ChargingStationData[] = [
     { stationId: "ST01", availability: "OK", chargingPower: 100, maxPower: 300 },
     { stationId: "ST02", availability: "Down", chargingPower: 70, maxPower: 200 },
@@ -76,11 +76,15 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullHeight = fa
   };
 
   return (
-    <div className="bg-[#FFFFFF] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
-      <div className="flex items-center mb-4 w-full">
+    <div
+      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage
+        ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"
+        : "h-full"
+        }`}
+    >      <div className="flex items-center mb-4 w-full">
         <div className="flex-grow flex items-center">
           <h2 className="text-2xl font-semibold">Charging Station Status</h2>
-          {fullHeight && (
+          {fullPage && (
             <input
               type="text"
               placeholder="Search by Station ID"
@@ -106,7 +110,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullHeight = fa
         </div>
       </div>
 
-      <div className={`overflow-y-auto overflow-x-hidden ${fullHeight ? "h-4/5" : "h-80"} custom-scrollbar`}>
+      <div className={`overflow-y-auto overflow-x-hidden ${fullPage ? "h-4/5" : "h-80"} custom-scrollbar`}>
         <div className="grid grid-cols-4 gap-4 font-bold text-lg mb-2 px-2 text-gray-600">
           <div className="text-center">Station ID</div>
           <div className="text-center">Availability</div>

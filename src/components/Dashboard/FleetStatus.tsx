@@ -13,10 +13,10 @@ type VehicleData = {
 };
 
 type FleetStatusProps = {
-    showAllColumns?: boolean; // Controls whether to show all columns
+    fullPage?: boolean; // Controls whether to show all columns
 };
 
-const FleetStatus: React.FC<FleetStatusProps> = ({ showAllColumns = true }) => {
+const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
     const vehicles: VehicleData[] = [
         {
             busId: "23001",
@@ -81,15 +81,6 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ showAllColumns = true }) => {
             CAP: "15MWh",
             ENE: "50MWh",
         },
-        {
-            busId: "23456",
-            battery: 45,
-            chargingStart: "2024-11-18 08:30",
-            status: "Depot",
-            chargingLocation: "B5",
-            CAP: "0MWh",
-            ENE: "40MWh",
-        },
     ];
 
     const [filterStatus, setFilterStatus] = useState<"all" | "Depot" | "Maintenance" | "Route">("all");
@@ -98,7 +89,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ showAllColumns = true }) => {
 
     const filteredVehicles = vehicles.filter((vehicle) => {
         const matchesStatus = filterStatus === "all" || vehicle.status === filterStatus;
-        const matchesSearch = !showAllColumns ||
+        const matchesSearch = !fullPage ||
             vehicle.busId.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (vehicle.chargingLocation && vehicle.chargingLocation.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -125,11 +116,16 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ showAllColumns = true }) => {
     }, []);
 
     return (
-        <div className="bg-[#FFFFFF] bg-opacity-80 h-full flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4">
-            <div className="flex items-center mb-4 w-full">
+        <div
+            className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage
+                    ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"
+                    : "h-full"
+                }`}
+        >
+            <div className="flex items-center w-full">
                 <div className="flex-grow flex items-center">
                     <h2 className="text-2xl font-semibold">Fleet Status</h2>
-                    {showAllColumns && (
+                    {fullPage && (
                         <input
                             type="text"
                             placeholder="Search by Plate Number or Charging Point"
@@ -156,15 +152,15 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ showAllColumns = true }) => {
             </div>
 
 
-            <div className={`overflow-x-hidden ${showAllColumns ? "h-svh" : "h-80"} custom-scrollbar`}>
+            <div className={`overflow-x-hidden ${fullPage ? "h-full" : "h-80"} custom-scrollbar`}>
                 {/* Header Row */}
-                <div className={`grid gap-4 font-bold text-lg mb-2 px-2 text-gray-600 text-center ${showAllColumns ? "grid-cols-7" : "grid-cols-5"}`}>
+                <div className={`grid gap-4 font-bold text-lg mb-2 px-2 text-gray-600 text-center ${fullPage ? "grid-cols-7" : "grid-cols-5"}`}>
                     <div>Plate Number</div>
                     <div>Status</div>
                     <div>Charging Point</div>
                     <div>Session Start</div>
-                    {showAllColumns && <div>CAP</div>}
-                    {showAllColumns && <div>ENE</div>}
+                    {fullPage && <div>CAP</div>}
+                    {fullPage && <div>ENE</div>}
                     <div>Battery</div>
                 </div>
 
@@ -173,15 +169,15 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ showAllColumns = true }) => {
                     {filteredVehicles.map((vehicle, index) => (
                         <div
                             key={vehicle.busId}
-                            className={`grid gap-4 items-center text-gray-800 pb-3 shadow-sm font-semibold ${showAllColumns ? "grid-cols-7" : "grid-cols-5"
+                            className={`grid gap-4 items-center text-gray-800 pb-3 shadow-sm font-semibold ${fullPage ? "grid-cols-7" : "grid-cols-5"
                                 }`}
                         >
                             <span className="text-center">{vehicle.busId}</span>
                             <span className="text-center">{vehicle.status}</span>
                             <span className="text-center">{vehicle.chargingLocation || "N/A"}</span>
                             <span className="text-center">{vehicle.chargingStart || "N/A"}</span>
-                            {showAllColumns && <span className="text-center">{vehicle.CAP}</span>}
-                            {showAllColumns && <span className="text-center">{vehicle.ENE}</span>}
+                            {fullPage && <span className="text-center">{vehicle.CAP}</span>}
+                            {fullPage && <span className="text-center">{vehicle.ENE}</span>}
                             <div style={{ width: 75, position: "relative", margin: "0 auto" }}>
                                 <CircularProgressbar
                                     value={animatedValues[index]}
