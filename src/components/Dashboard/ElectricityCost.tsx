@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AreaChart, Area, Tooltip } from "recharts";
 
 interface ElectricityCostProps {
@@ -7,6 +7,8 @@ interface ElectricityCostProps {
 
 const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
   const [expanded, setExpanded] = useState(false);
+  const [chartWidth, setChartWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Updated hourly data
   const data = [
@@ -37,8 +39,23 @@ const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
     { hour: "24:00", price: 0.75 },
   ];
 
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setChartWidth(containerRef.current.offsetWidth * 0.9); // 90% of the parent's width
+      }
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateWidth);
+    };
+  }, []);
+
   return (
     <div
+      ref={containerRef}
       className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col transition-all duration-300 p-6"
       style={{
         backgroundImage: `url('/src/assets/cosmos.jpg')`,
@@ -55,11 +72,11 @@ const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
       }}
     >
       <p className="text-3xl leading-tight">Today’s electricity price</p>
-      <p className="text-6xl mt-8 font-bold">0.958 €/KWh</p>
+      <p className="text-6xl mt-8 font-bold">0.95 €/KWh</p>
       {expanded && (
         <div className="mt-6">
           <AreaChart
-            width={450}
+            width={chartWidth}
             height={150}
             data={data}
             margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
@@ -97,7 +114,7 @@ const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
           </AreaChart>
         </div>
       )}
-      <p className="text-lg mt-2 text-gray-300">100 kWh available</p>
+      <p className="text-lg mt-10 text-gray-300">100 kWh available</p>
     </div>
   );
 };
