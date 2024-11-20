@@ -30,6 +30,15 @@ const ChargingSchedule: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  // sorting
+  const [fieldToSort, setFieldToSort] = useState<{
+    field: "1" | "2" | "3" | "4" | "5" | null;
+    direction: "ASC" | "DSC";
+  }>({
+    field: null,
+    direction: "ASC",
+  });
+
   // Calculate total pages and current buses
   const totalPages = Math.ceil(buses.length / itemsPerPage);
   const currentBuses = buses.slice(
@@ -66,6 +75,13 @@ const ChargingSchedule: React.FC = () => {
 
   const calculatePercentage = (value: number) =>
     Math.round((value / totalGridCapacity) * 100);
+
+  const handleSort = (field: "1" | "2" | "3" | "4" | "5" | null) => {
+    if (fieldToSort.direction === "ASC") {
+      setFieldToSort({ field: field, direction: "DSC" });
+    } else setFieldToSort({ field: field, direction: "ASC" });
+    console.log(fieldToSort.direction);
+  };
 
   return (
     <div className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"}`}>

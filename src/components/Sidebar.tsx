@@ -70,9 +70,6 @@ const Sidebar: React.FC = () => {
                   ? "font-semibold text-[rgb(7, 142, 205)]"
                   : "text-gray-800"
               } text-lg tracking-wide transition-all`}
-              style={{
-                textShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)",
-              }}
             >
               {item.label}
             </span>
@@ -107,9 +104,6 @@ const Sidebar: React.FC = () => {
                   ? "font-semibold text-[rgb(7, 142, 205)]"
                   : "text-gray-800"
               } text-lg tracking-wide transition-all`}
-              style={{
-                textShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)",
-              }}
             >
               {item.label}
             </span>
