@@ -8,6 +8,7 @@ import Parking from "./components/Dashboard/ParkingStatus";
 import ElectricityCost from "./components/Dashboard/ElectricityCost";
 import FleetStatus from "./components/Dashboard/FleetStatus";
 import ChargingSchedule from "./components/Dashboard/ChargingSchedule";
+import ControlPanel from "./components/Dashboard/ControlPanel";
 
 const App: React.FC = () => {
   const [hideHello, setHideHello] = useState(false); // State for managing Hello visibility
@@ -49,6 +50,7 @@ const App: React.FC = () => {
               element={<FleetStatus fullPage={true} />}
             />
             <Route path="/charging-schedule" element={<ChargingSchedule />} />
+            <Route path="/control-panel" element={<ControlPanel />} />
           </Routes>
         </div>
       </div>
