@@ -152,7 +152,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             </div>
 
 
-            <div className={`overflow-x-hidden ${fullPage ? "h-full" : "h-80"} custom-scrollbar`}>
+            <div className={`overflow-x-hidden mt-5 ${fullPage ? "h-full" : "h-80"} custom-scrollbar`}>
                 {/* Header Row */}
                 <div className={`grid gap-4 font-bold text-lg mb-2 px-2 text-gray-600 text-center ${fullPage ? "grid-cols-7" : "grid-cols-5"}`}>
                     <div>Plate Number</div>

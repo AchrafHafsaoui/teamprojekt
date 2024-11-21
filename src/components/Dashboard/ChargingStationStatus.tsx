@@ -110,7 +110,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = fals
         </div>
       </div>
 
-      <div className={`overflow-y-auto overflow-x-hidden ${fullPage ? "h-4/5" : "h-80"} custom-scrollbar`}>
+      <div className={`overflow-y-auto overflow-x-hidden mt-5 ${fullPage ? "h-4/5" : "h-80"} custom-scrollbar`}>
         <div className="grid grid-cols-4 gap-4 font-bold text-lg mb-2 px-2 text-gray-600">
           <div className="text-center">Station ID</div>
           <div className="text-center">Availability</div>

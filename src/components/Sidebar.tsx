@@ -11,7 +11,11 @@ import AccountIcon from "../assets/icons/AccountIcon.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 
-const Sidebar: React.FC = () => {
+type SidebarProps = {
+  setIsLoggedIn: (value: boolean) => void;
+};
+
+const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
   const [activeButton, setActiveButton] = useState<string>("Overview");
 
   const menuItems = [
@@ -37,7 +41,7 @@ const Sidebar: React.FC = () => {
 
   const bottomMenuItems = [
     { label: "Control Panel", icon: ControlPanelIcon, path: "/control-panel" },
-    { label: "Account", icon: AccountIcon, path: "/account" },
+    { label: "Logout", icon: AccountIcon, action: () => setIsLoggedIn(false) },
   ];
 
   return (
@@ -85,35 +89,56 @@ const Sidebar: React.FC = () => {
 
       {/* Bottom menu part */}
       <div className="flex flex-col mb-5 space-y-5">
-        {bottomMenuItems.map((item) => (
-          <Link
-            to={item.path}
-            key={item.label}
-            onClick={() => setActiveButton(item.label)}
-            className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
-            style={{ transition: "background-color 0.3s" }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "transparent")
-            }
-          >
-            <img src={item.icon} alt={item.label} className="w-8 ml-4 mr-2" />
-            <span
-              className={`whitespace-nowrap overflow-hidden ml-4 ${activeButton === item.label
+        {/* Control Panel button with a link */}
+        <Link
+          to="/control-panel"
+          onClick={() => setActiveButton("Control Panel")}
+          className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
+          style={{ transition: "background-color 0.3s" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
+        >
+          <img
+            src={ControlPanelIcon}
+            alt="Control Panel"
+            className="w-8 ml-4 mr-2"
+          />
+          <span
+            className={`whitespace-nowrap overflow-hidden ml-4 ${activeButton === "Control Panel"
                 ? "font-semibold text-[rgb(7, 142, 205)]"
                 : "text-gray-800"
-                } text-lg tracking-wide transition-all`}
-            >
-              {item.label}
-            </span>
-            {activeButton === item.label && (
-              <div className="absolute right-0 top-0 h-full w-1 bg-black bg-opacity-50 rounded"/>
-            )}
-          </Link>
-        ))}
+              } text-lg tracking-wide transition-all`}
+          >
+            Control Panel
+          </span>
+          {activeButton === "Control Panel" && (
+            <div className="absolute right-0 top-0 h-full w-1 bg-black bg-opacity-50 rounded" />
+          )}
+        </Link>
+
+        {/* Logout button without a link */}
+        <button
+          onClick={() => setIsLoggedIn(false)} // Handle logout
+          className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
+          style={{ transition: "background-color 0.3s" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
+        >
+          <img src={AccountIcon} alt="Logout" className="w-8 ml-4 mr-2" />
+          <span className="whitespace-nowrap overflow-hidden ml-4 text-lg font-semibold text-gray-800">
+            Logout
+          </span>
+        </button>
       </div>
+
 
 
       {/* Version */}
