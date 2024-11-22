@@ -6,7 +6,7 @@ type VehicleData = {
     busId: string;
     battery: number;
     chargingStart: string | null; // Charging start time or null if not charging
-    status: "Depot" | "Maintenance" | "Route";
+    status: "In Depot" | "Maintenance" | "On Route";
     chargingLocation: string | null; // Combined charging station and point (e.g., A1, B23, A17) or null if not charging
     CAP: string;
     ENE: string;
@@ -31,7 +31,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             busId: "19101",
             battery: 60,
             chargingStart: "2024-11-18 07:45",
-            status: "Depot",
+            status: "In Depot",
             chargingLocation: "B2",
             CAP: "20MWh",
             ENE: "30MWh",
@@ -40,7 +40,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             busId: "15401",
             battery: 30,
             chargingStart: null, // Not charging
-            status: "Route",
+            status: "On Route",
             chargingLocation: null,
             CAP: "100MWh",
             ENE: "0MWh",
@@ -49,7 +49,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             busId: "18757",
             battery: 95,
             chargingStart: null,
-            status: "Route",
+            status: "On Route",
             chargingLocation: null,
             CAP: "15MWh",
             ENE: "70MWh",
@@ -58,7 +58,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             busId: "19289",
             battery: 65,
             chargingStart: "2024-11-18 08:15",
-            status: "Depot",
+            status: "In Depot",
             chargingLocation: "C3",
             CAP: "30MWh",
             ENE: "10MWh",
@@ -76,14 +76,14 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             busId: "22345",
             battery: 80,
             chargingStart: null,
-            status: "Route",
+            status: "On Route",
             chargingLocation: null,
             CAP: "15MWh",
             ENE: "50MWh",
         },
     ];
 
-    const [filterStatus, setFilterStatus] = useState<"all" | "Depot" | "Maintenance" | "Route">("all");
+    const [filterStatus, setFilterStatus] = useState<"all" | "In Depot" | "Maintenance" | "On Route">("all");
     const [animatedValues, setAnimatedValues] = useState<number[]>(Array(vehicles.length).fill(0));
     const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -135,7 +135,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                     )}
                 </div>
                 <div className="flex space-x-3">
-                    {["all", "Depot", "Maintenance", "Route"].map((status) => (
+                    {["all", "In Depot", "Maintenance", "On Route"].map((status) => (
                         <button
                             key={status}
                             onClick={() => setFilterStatus(status as typeof filterStatus)}
