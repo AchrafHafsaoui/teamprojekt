@@ -7,7 +7,7 @@ import DrivingScheduleIcon from "../assets/icons/driving schedule.svg";
 import ParkingIcon from "../assets/icons/parking.svg";
 import FleetStatusIcon from "../assets/icons/Fleet status.svg";
 import Logo from "../assets/logo.png";
-import AccountIcon from "../assets/icons/AccountIcon.svg";
+import PowerIcon from "../assets/icons/power.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 
@@ -37,11 +37,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
       path: "/charging-schedule",
     },
     { label: "Parking", icon: ParkingIcon, path: "/parking" },
-  ];
-
-  const bottomMenuItems = [
-    { label: "Control Panel", icon: ControlPanelIcon, path: "/control-panel" },
-    { label: "Logout", icon: AccountIcon, action: () => setIsLoggedIn(false) },
   ];
 
   return (
@@ -132,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
             (e.currentTarget.style.backgroundColor = "transparent")
           }
         >
-          <img src={AccountIcon} alt="Logout" className="w-8 ml-4 mr-2" />
+          <img src={PowerIcon} alt="Logout" className="w-8 ml-4 mr-2" />
           <span className="whitespace-nowrap overflow-hidden ml-4 text-lg font-semibold text-gray-800">
             Logout
           </span>
