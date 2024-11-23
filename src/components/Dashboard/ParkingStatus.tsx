@@ -70,10 +70,27 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
     return Array.from({ length: columns }).map((_, colIndex) => {
       const rowsInput = rowsPerColumn[colIndex] || "";
       const rows = rowsInput.split("");
-
+  
       return (
         <div key={colIndex} className="flex flex-col items-center space-y-2">
-          <h2 className="font-semibold text-xl">Column {colIndex + 1}</h2>
+          <div className="flex items-center space-x-2">
+            <h2 className="font-semibold text-xl">Column {colIndex + 1}</h2>
+            {/* Delete Column Button (Only in Edit Mode) */}
+            {editMode && (
+              <button
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete Column ${colIndex + 1}? This action cannot be reversed.`)) {
+                    setRowsPerColumn((prev) => prev.filter((_, index) => index !== colIndex));
+                    setColumns((prev) => prev - 1); // Decrease the column count
+                  }
+                }}
+                className="px-1 py-1 text-sm rounded-full font-semibold text-red-600 hover:bg-red-100 transition"
+                title="Delete Column"
+              >
+                ✖
+              </button>
+            )}
+          </div>
           <div
             className="flex flex-col space-y-2"
             style={{ minWidth: "100px" }}
@@ -82,7 +99,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               const slotId = `${colIndex}-${rowIndex}`;
               const isOccupied = row === "S" || row === "B";
               const isBig = row === "B" || row === "b";
-
+  
               return (
                 <div key={slotId} className="relative">
                   <div
@@ -110,7 +127,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                   >
                     {isBig ? "18m" : "12m"}
                   </div>
-
+  
                   {/* Edit Mode Buttons */}
                   {editMode && (
                     <div className="absolute top-0 right-0 flex flex-col space-y-1 mt-1 mr-1">
@@ -165,15 +182,16 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
       );
     });
   };
+  
 
   return (
     <div
       className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
-    >      {/* Top Section with Fleet Status Scroll and Buttons */}
+    >
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold mb-4">Fleet Status</h2>
-        {/* Edit and Return Buttons */}
+        <h2 className="text-2xl font-semibold mb-4">Parking Status</h2>
+        {/* Edit Button */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => {
@@ -197,13 +215,13 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           </button>
         </div>
       </div>
-      <div className="flex overflow-x-auto space-x-4 mb-5">
+      <div className="flex overflow-x-auto space-x-4 py-5">
         {parkingLots.map((parking, index) => (
           <div key={parking.name} className="relative flex items-center space-x-1">
             {/* Depot Selection Button */}
             <button
               onClick={() => selectParking(parking.name, parking.defaultSchema)}
-              className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
+              className={`p-2 my-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
                 ? "bg-[#078ECD] text-white"
                 : "bg-black text-gray-100 hover:bg-[#078ECD] hover:text-white"
                 }`}
@@ -211,7 +229,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               {parking.name}
             </button>
 
-            {/* Edit Name Button (Only in Edit Mode) */}
+            {/* Edit Mode Buttons */}
             {editMode && (
               <>
                 {editingDepot === index ? (
@@ -245,21 +263,45 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => {
-                      setEditingDepot(index); // Enable editing mode for this depot
-                      setEditingDepotName(parking.name); // Pre-fill the current name
-                    }}
-                    className="px-1 py-1 text-sm rounded-full font-semibold text-black hover:bg-gray-200 transition"
-                    title="Edit Name"
-                  >
-                    <svg fill="#000000" height="15px" width="15px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 306.637 306.637" ><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M12.809,238.52L0,306.637l68.118-12.809l184.277-184.277l-55.309-55.309L12.809,238.52z M60.79,279.943l-41.992,7.896 l7.896-41.992L197.086,75.455l34.096,34.096L60.79,279.943z"></path> <path d="M251.329,0l-41.507,41.507l55.308,55.308l41.507-41.507L251.329,0z M231.035,41.507l20.294-20.294l34.095,34.095 L265.13,75.602L231.035,41.507z"></path> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> </g> </g></svg>
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        setEditingDepot(index); // Enable editing mode for this depot
+                        setEditingDepotName(parking.name); // Pre-fill the current name
+                      }}
+                      className="px-1 py-1 text-sm rounded-full font-semibold text-black hover:bg-gray-200 transition"
+                      title="Edit Name"
+                    >
+                      <svg
+                        fill="#000000"
+                        height="15px"
+                        width="15px"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 306.637 306.637"
+                      >
+                        <path d="M12.809,238.52L0,306.637l68.118-12.809l184.277-184.277l-55.309-55.309L12.809,238.52z M60.79,279.943l-41.992,7.896 l7.896-41.992L197.086,75.455l34.096,34.096L60.79,279.943z"></path>
+                        <path d="M251.329,0l-41.507,41.507l55.308,55.308l41.507-41.507L251.329,0z M231.035,41.507l20.294-20.294l34.095,34.095 L265.13,75.602L231.035,41.507z"></path>
+                      </svg>
+                    </button>
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete "${parking.name}"? This action can not be reversed`)) {
+                          setParkingLots(parkingLots.filter((_, i) => i !== index));
+                        }
+                      }}
+                      className="px-1 py-1 text-sm rounded-full font-semibold text-red-600 hover:bg-red-100 transition"
+                      title="Delete Depot"
+                    >
+                      ✖
+                    </button>
+                  </>
                 )}
               </>
             )}
           </div>
         ))}
+
         {/* Add New Depot Button */}
         {editMode && (
           <button
@@ -269,7 +311,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               setParkingLots((prev) => [...prev, newDepot]);
               selectParking(newDepotName, newDepot.defaultSchema);
             }}
-            className="px-4 py-2 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
+            className="px-2 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
           >
             + Add Depot
           </button>

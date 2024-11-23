@@ -1,20 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* Custom scrollbar styling */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #c0c0c0;
-    border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: #a0a0a0;
-}
-
 /* Hide scrollbar for Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
     display: none;
