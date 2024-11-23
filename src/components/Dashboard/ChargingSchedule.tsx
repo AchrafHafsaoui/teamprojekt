@@ -39,7 +39,6 @@ const ChargingSchedule: React.FC = () => {
     direction: "ASC",
   });
 
-
   // Calculate total pages and current buses
   const totalPages = Math.ceil(buses.length / itemsPerPage);
   const currentBuses = buses.slice(
@@ -78,102 +77,154 @@ const ChargingSchedule: React.FC = () => {
     Math.round((value / totalGridCapacity) * 90);
 
   const handleSort = (field: "1" | "2" | "3" | "4" | "5" | null) => {
-    if (fieldToSort.direction === "ASC") {
+    if (fieldToSort.field !== field) {
+      setFieldToSort({ field: field, direction: "ASC" });
+      fetchSortedItems(field, "ASC");
+    } else if (fieldToSort.direction === "ASC") {
       setFieldToSort({ field: field, direction: "DSC" });
-    } else setFieldToSort({ field: field, direction: "ASC" });
-    console.log(fieldToSort.direction);
+      fetchSortedItems(field, "DSC");
+    } else {
+      setFieldToSort({ field: field, direction: "ASC" });
+      fetchSortedItems(field, "ASC");
+    }
+  };
+
+  const fetchSortedItems = (
+    field: "1" | "2" | "3" | "4" | "5" | null,
+    direction: "ASC" | "DSC",
+  ) => {
+    console.log(
+      "fetching items of column " + field + " in " + direction + " order.",
+    );
   };
 
   return (
-    <div className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"}`}>
+    <div
+      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"}`}
+    >
       <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
       <div>
         <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600 top-0 sticky">
           <div className="text-center">
             Bus ID
-            {fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
+            {fieldToSort.field !== "1" ? (
               <span
                 onClick={() => handleSort("1")}
-                className={`ml-1 ${fieldToSort.field === "1" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
+              <span
+                onClick={() => handleSort("1")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
               >
                 ▼
               </span>
             ) : (
               <span
                 onClick={() => handleSort("1")}
-                className={`ml-1 ${fieldToSort.field === "1" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
               >
                 ▲
               </span>
             )}
           </div>
           <div className="text-center">
-            Max Capacity (kW){" "}
-            {fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
+            Max Capacity
+            {fieldToSort.field !== "2" ? (
               <span
                 onClick={() => handleSort("2")}
-                className={`ml-1 ${fieldToSort.field === "2" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
+              <span
+                onClick={() => handleSort("2")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
               >
                 ▼
               </span>
             ) : (
               <span
                 onClick={() => handleSort("2")}
-                className={`ml-1 ${fieldToSort.field === "2" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
               >
                 ▲
               </span>
             )}
           </div>
           <div className="text-center">
-            Current Charging (kW)
-            {fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
+            Current Charging
+            {fieldToSort.field !== "3" ? (
               <span
                 onClick={() => handleSort("3")}
-                className={`ml-1 ${fieldToSort.field === "3" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
+              <span
+                onClick={() => handleSort("3")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
               >
                 ▼
               </span>
             ) : (
               <span
                 onClick={() => handleSort("3")}
-                className={`ml-1 ${fieldToSort.field === "3" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
               >
                 ▲
               </span>
             )}
           </div>
           <div className="text-center">
-            Remaining Upward Flex (kW)
-            {fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
+            Remaining Upward Flex
+            {fieldToSort.field !== "4" ? (
               <span
                 onClick={() => handleSort("4")}
-                className={`ml-1 ${fieldToSort.field === "4" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
+              <span
+                onClick={() => handleSort("4")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
               >
                 ▼
               </span>
             ) : (
               <span
                 onClick={() => handleSort("4")}
-                className={`ml-1 ${fieldToSort.field === "4" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
               >
                 ▲
               </span>
             )}
           </div>
           <div className="text-center">
-            Possible Downward Flex (kW)
-            {fieldToSort.direction == "ASC" && fieldToSort.field == "5" ? (
+            Possible Downward Flex
+            {fieldToSort.field !== "5" ? (
               <span
                 onClick={() => handleSort("5")}
-                className={`ml-1 ${fieldToSort.field === "5" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "5" ? (
+              <span
+                onClick={() => handleSort("5")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
               >
                 ▼
               </span>
             ) : (
               <span
                 onClick={() => handleSort("5")}
-                className={`ml-1 ${fieldToSort.field === "5" ? "text-gray-600" : "text-gray-300"} hover:cursor-pointer`}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
               >
                 ▲
               </span>
@@ -199,12 +250,6 @@ const ChargingSchedule: React.FC = () => {
               </div>
             ))}
 
-            {/*??????????????????????????????????
-            ?????????????????????????????????????
-            ?????????????????????????????????????
-            ?????????????????????????????????????
-            ????????????????????????????????????*/}
-            
             {Array.from(
               { length: itemsPerPage - currentBuses.length },
               (_, index) => (
@@ -226,8 +271,9 @@ const ChargingSchedule: React.FC = () => {
       {/* Pagination Controls */}
       <div className="flex justify-end items-center mt-4 space-x-2">
         <button
-          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           onClick={handlePrevious}
           disabled={currentPage === 1}
         >
@@ -237,8 +283,9 @@ const ChargingSchedule: React.FC = () => {
           {currentPage} / {totalPages}
         </span>
         <button
-          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
+            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           onClick={handleNext}
           disabled={currentPage === totalPages}
         >
