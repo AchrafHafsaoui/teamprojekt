@@ -100,176 +100,176 @@ const ChargingSchedule: React.FC = () => {
 
   return (
     <div
-      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]"}`}
+      className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}
     >
       <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
-      <div>
-        <div className="grid grid-cols-5 gap-4 font-bold text-lg mb-2 px-2 text-gray-600 top-0 sticky">
-          <div className="text-center">
-            Bus ID
-            {fieldToSort.field !== "1" ? (
-              <span
-                onClick={() => handleSort("1")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
-              <span
-                onClick={() => handleSort("1")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("1")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
-          </div>
-          <div className="text-center">
-            Max Capacity
-            {fieldToSort.field !== "2" ? (
-              <span
-                onClick={() => handleSort("2")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
-              <span
-                onClick={() => handleSort("2")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("2")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
-          </div>
-          <div className="text-center">
-            Current Charging
-            {fieldToSort.field !== "3" ? (
-              <span
-                onClick={() => handleSort("3")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
-              <span
-                onClick={() => handleSort("3")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("3")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
-          </div>
-          <div className="text-center">
-            Remaining Upward Flex
-            {fieldToSort.field !== "4" ? (
-              <span
-                onClick={() => handleSort("4")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
-              <span
-                onClick={() => handleSort("4")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("4")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
-          </div>
-          <div className="text-center">
-            Possible Downward Flex
-            {fieldToSort.field !== "5" ? (
-              <span
-                onClick={() => handleSort("5")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "5" ? (
-              <span
-                onClick={() => handleSort("5")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("5")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="overflow-y-auto custom-scrollbar h-95">
-          <div className="space-y-3">
-            {currentBuses.map((bus) => (
-              <div
-                key={bus.id}
-                className="grid grid-cols-5 gap-4 items-center text-gray-800 pb-3 shadow-sm font-semibold mr-5"
-              >
-                <span className="text-center">{bus.id}</span>
-                <span className="text-center">{bus.maxCapacity}</span>
-                <span className="text-center">{bus.currentCharging} kW</span>
-                <span className="text-center">
-                  {bus.maxCapacity - bus.currentCharging} kW
-                </span>
-                <span className="text-center">
-                  {bus.currentCharging - minChargePerBus} kW
-                </span>
-              </div>
-            ))}
 
-            {Array.from(
-              { length: itemsPerPage - currentBuses.length },
-              (_, index) => (
-                <div
-                  key={`placeholder-${index}`}
-                  className="grid grid-cols-5 gap-4 items-center text-gray-300l"
-                >
-                  <span className="text-center">-</span>
-                  <span className="text-center">-</span>
-                  <span className="text-center">-</span>
-                  <span className="text-center">-</span>
-                  <span className="text-center">-</span>
-                </div>
-              ),
-            )}
-          </div>
+      <div className="grid grid-cols-5 gap-4 font-bold text-base h-[8%] mb-2 px-2 text-gray-600 top-0 sticky ">
+        <div className="text-center">
+          Bus ID
+          {fieldToSort.field !== "1" ? (
+            <span
+              onClick={() => handleSort("1")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
+            <span
+              onClick={() => handleSort("1")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("1")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="text-center">
+          Max Capacity
+          {fieldToSort.field !== "2" ? (
+            <span
+              onClick={() => handleSort("2")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
+            <span
+              onClick={() => handleSort("2")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("2")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="text-center">
+          Current Charging
+          {fieldToSort.field !== "3" ? (
+            <span
+              onClick={() => handleSort("3")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
+            <span
+              onClick={() => handleSort("3")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("3")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="text-center">
+          Remaining Upward Flex
+          {fieldToSort.field !== "4" ? (
+            <span
+              onClick={() => handleSort("4")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
+            <span
+              onClick={() => handleSort("4")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("4")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="text-center">
+          Possible Downward Flex
+          {fieldToSort.field !== "5" ? (
+            <span
+              onClick={() => handleSort("5")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "5" ? (
+            <span
+              onClick={() => handleSort("5")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("5")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
         </div>
       </div>
+      {/* <div className="custom-scrollbar"> */}
+      {/* table body */}
+      <div className="overflow-x-hidden custom-scrollbar h-[70%] p-0 mt-3">
+        {currentBuses.map((bus) => (
+          <div
+            key={bus.id}
+            className="grid grid-cols-5 gap-4 items-center h-[12.5%] text-gray-800 p-0 shadow-sm font-semibold"
+          >
+            <span className="text-center">{bus.id}</span>
+            <span className="text-center">{bus.maxCapacity}</span>
+            <span className="text-center">{bus.currentCharging} kW</span>
+            <span className="text-center">
+              {bus.maxCapacity - bus.currentCharging} kW
+            </span>
+            <span className="text-center">
+              {bus.currentCharging - minChargePerBus} kW
+            </span>
+          </div>
+        ))}
+
+        {Array.from(
+          { length: itemsPerPage - currentBuses.length },
+          (_, index) => (
+            <div
+              key={`placeholder-${index}`}
+              className="grid grid-cols-5 gap-4 items-center text-gray-600 text-xl h-[12.5%]"
+            >
+              <span className="text-center">-</span>
+              <span className="text-center">-</span>
+              <span className="text-center">-</span>
+              <span className="text-center">-</span>
+              <span className="text-center">-</span>
+            </div>
+          ),
+        )}
+      </div>
+
       {/* Pagination Controls */}
-      <div className="flex justify-end items-center mt-4 space-x-2">
+      <div className="flex justify-end items-center mt-3 mr-3 space-x-2">
         <button
           className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -292,62 +292,63 @@ const ChargingSchedule: React.FC = () => {
           Next
         </button>
       </div>
-      <hr className="my-6  border-gray-300" />
       {/* Metrics Section */}
-      <div className="space-y-4 mx-10">
-        <div className="flex justify-between items-center">
-          <span className="font-semibold">Total Depot Capacity:</span>
-          <span>{totalGridCapacity} kW</span>
-        </div>
-        <div>
+      {/* <hr className="my-6  border-gray-300" /> */}
+      {/* <div className="space-y-4 mx-10">
           <div className="flex justify-between items-center">
-            <span className="font-semibold">
-              Current Charging Load: {currentChargingLoad} KW
-            </span>
-            <span>{calculatePercentage(currentChargingLoad)}%</span>
+            <span className="font-semibold">Total Depot Capacity:</span>
+            <span>{totalGridCapacity} kW</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-              className="bg-[#078ECD] h-4 rounded-full"
-              style={{
-                width: `${calculatePercentage(currentChargingLoad)}%`,
-              }}
-            ></div>
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">
+                Current Charging Load: {currentChargingLoad} KW
+              </span>
+              <span>{calculatePercentage(currentChargingLoad)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-[#078ECD] h-4 rounded-full"
+                style={{
+                  width: `${calculatePercentage(currentChargingLoad)}%`,
+                }}
+              ></div>
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">
-              Upward Flexibility: {upwardFlexibility} KW
-            </span>
-            <span>{calculatePercentage(upwardFlexibility)}%</span>
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">
+                Upward Flexibility: {upwardFlexibility} KW
+              </span>
+              <span>{calculatePercentage(upwardFlexibility)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-[#078ECD] h-4 rounded-full"
+                style={{
+                  width: `${calculatePercentage(upwardFlexibility)}%`,
+                }}
+              ></div>
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-              className="bg-[#078ECD] h-4 rounded-full"
-              style={{
-                width: `${calculatePercentage(upwardFlexibility)}%`,
-              }}
-            ></div>
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">
+                Downward Flexibility: {downwardFlexibility} KW
+              </span>
+              <span>{calculatePercentage(downwardFlexibility)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-[#078ECD] h-4 rounded-full"
+                style={{
+                  width: `${calculatePercentage(downwardFlexibility)}%`,
+                }}
+              ></div>
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">
-              Downward Flexibility: {downwardFlexibility} KW
-            </span>
-            <span>{calculatePercentage(downwardFlexibility)}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-              className="bg-[#078ECD] h-4 rounded-full"
-              style={{
-                width: `${calculatePercentage(downwardFlexibility)}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
     </div>
   );
 };
