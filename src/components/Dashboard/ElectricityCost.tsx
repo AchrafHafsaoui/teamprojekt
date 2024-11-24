@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AreaChart, Area, Tooltip } from "recharts";
 
-interface ElectricityCostProps {
-  setHideHello: (hide: boolean) => void;
-}
-
-const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
-  const [expanded, setExpanded] = useState(false);
+const ElectricityCost: React.FC = () => {
   const [chartWidth, setChartWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -42,7 +37,7 @@ const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setChartWidth(containerRef.current.offsetWidth * 0.9); // 90% of the parent's width
+        setChartWidth(containerRef.current.offsetWidth);
       }
     };
     updateWidth();
@@ -56,65 +51,54 @@ const ElectricityCost: React.FC<ElectricityCostProps> = ({ setHideHello }) => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col transition-all duration-300 p-6"
+      className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col transition-all duration-300 pt-6"
       style={{
         backgroundImage: `url('/src/assets/cosmos.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
-      onMouseEnter={() => {
-        setExpanded(true);
-        setHideHello(true); // Hide "Hello Benjamin!" on hover
-      }}
-      onMouseLeave={() => {
-        setExpanded(false);
-        setHideHello(false); // Show "Hello Benjamin!" when not hovered
-      }}
     >
-      <p className="text-3xl leading-tight">Today’s electricity price</p>
-      <p className="text-6xl mt-8 font-bold">0.95 €/KWh</p>
-      {expanded && (
-        <div className="mt-6">
-          <AreaChart
-            width={chartWidth}
-            height={150}
-            data={data}
-            margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#078ECD" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#078ECD" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Tooltip
-              contentStyle={{
-                background: "transparent",
-                border: "none",
-                boxShadow: "none",
-              }}
-              labelStyle={{
-                color: "#fff",
-                fontWeight: "bold",
-                fontSize: "14px",
-              }}
-              itemStyle={{
-                color: "#078ECD",
-                fontWeight: "bold",
-                fontSize: "12px",
-              }}
-            />
-            <Area
-              type="linear" // Straight triangular lines
-              dataKey="price"
-              stroke="#078ECD"
-              fill="url(#colorPrice)"
-              strokeWidth={2}
-            />
-          </AreaChart>
-        </div>
-      )}
-      <p className="text-lg mt-10 text-gray-300">100 kWh available</p>
+      <p className="text-2xl leading-tight pl-6">Today’s electricity price</p>
+      <p className="text-5xl font-bold pl-6">0.95 €/KWh</p>
+      <div>
+        <AreaChart
+          width={chartWidth}
+          height={150}
+          data={data}
+          margin={{ top: 10, right: 20, left: 20, bottom: 0 }}
+        >
+          <defs>
+            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#078ECD" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#078ECD" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <Tooltip
+            contentStyle={{
+              background: "transparent",
+              border: "none",
+              boxShadow: "none",
+            }}
+            labelStyle={{
+              color: "#fff",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+            itemStyle={{
+              color: "#078ECD",
+              fontWeight: "bold",
+              fontSize: "12px",
+            }}
+          />
+          <Area
+            type="linear" // Straight triangular lines
+            dataKey="price"
+            stroke="#078ECD"
+            fill="url(#colorPrice)"
+            strokeWidth={2}
+          />
+        </AreaChart>
+      </div>
     </div>
   );
 };

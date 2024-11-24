@@ -22,9 +22,23 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
   const [addingDepot, setAddingDepot] = useState(false);
   const [editingDepot, setEditingDepot] = useState<number | null>(null);
   const [editingDepotName, setEditingDepotName] = useState("");
+  const [direction, setDirection] = useState<"Arrival" | "Departure">("Arrival");
 
   const colorOccupied = "rgb(7, 142, 205)";
   const colorFree = "#D3D3D3";
+
+  const changeDirection = () => {
+    setDirection((prev) => (prev === "Arrival" ? "Departure" : "Arrival"));
+    setRowsPerColumn((prev) =>
+      prev.map((column) => reverseColumn(column) // Reverse only the selected column
+      )
+    );
+  };
+
+  const reverseColumn = (column: string) => {
+    // Reverse the string of the column
+    return column.split("").reverse().join("");
+  };
 
   const selectParking = (parkingName: string, defaultSchema: string) => {
     setSelectedParking(parkingName);
@@ -73,7 +87,41 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
 
       return (
         <div key={colIndex} className="flex flex-col items-center space-y-2">
-          <h2 className="font-semibold text-xl">Column {colIndex + 1}</h2>
+          <div className={`flex items-center ${editMode ? "ml-4" : "ml-2"}`}>
+            <h2 className="font-semibold text-xl mr-2">Column {colIndex + 1}</h2>
+            {direction === "Arrival" ? <span
+              onClick={() => changeDirection()}
+              className={`hover:cursor-pointer text-black`}
+            >
+              <svg width="20" fill="currentColor" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"></path>
+              </svg>
+            </span> :
+              <span
+                onClick={() => changeDirection()}
+                className={`hover:cursor-pointer text-black`}
+              >
+                <svg width="20" fill="currentColor" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"></path>
+                </svg>
+              </span>}
+
+            {/* Remove Column Button (Only in Edit Mode) */}
+            {editMode && (
+              <button
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to remove Column ${colIndex + 1}? This action cannot be reversed.`)) {
+                    setRowsPerColumn((prev) => prev.filter((_, index) => index !== colIndex));
+                    setColumns((prev) => prev - 1); // Decrease the column count
+                  }
+                }}
+                className="p-1 text-sm rounded-full font-semibold hover:bg-gray-200 transition"
+                title="Remove Column"
+              >
+                <svg width="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12L17 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <circle cx="12" cy="12" r="9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle> </g></svg>
+              </button>
+            )}
+          </div>
           <div
             className="flex flex-col space-y-2"
             style={{ minWidth: "100px" }}
@@ -126,7 +174,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                         className="bg-white bg-opacity-50 border border-gray-500 text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
                         title="Remove Slot"
                       >
-                        ✖
+                        <svg width="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12L17 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <circle cx="12" cy="12" r="9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle> </g></svg>
                       </button>
                       {/* Change Slot Size Button */}
                       <button
@@ -141,8 +189,9 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                         className="bg-white bg-opacity-50 border border-gray-500 text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
                         title="Change Slot Size"
                       >
-                        ⇔
-                      </button>
+                        {row==="S"||row==="s"?<svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize</title> <path d="M25.99 6.042l-0.004 9.735-3.732-3.733-4.454 4.455-2.665-2.665 4.454-4.454-3.384-3.383 9.785 0.045zM11.494 22.805l3.238 3.182-9.722 0.017 0.004-9.68 3.815 3.815 4.925-4.924 2.665 2.665-4.925 4.925z"></path> </g></svg>
+                        :<svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize1</title> <path d="M27.407 7.882l-2.665-2.665-4.925 4.925-3.815-3.815-0.004 9.68 9.723-0.017-3.238-3.183 4.924-4.925zM8.577 20.383l-4.453 4.453 2.665 2.666 4.453-4.455 3.732 3.732 0.004-9.734-9.784-0.045 3.383 3.383z"></path> </g></svg>
+                      }</button>
                     </div>
                   )}
                 </div>
@@ -166,14 +215,15 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
     });
   };
 
+
   return (
     <div
       className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
-    >      {/* Top Section with Fleet Status Scroll and Buttons */}
+    >
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold mb-4">Fleet Status</h2>
-        {/* Edit and Return Buttons */}
+        <h2 className="text-2xl font-semibold mb-4">Parking Status</h2>
+        {/* Edit Button */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => {
@@ -197,13 +247,13 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           </button>
         </div>
       </div>
-      <div className="flex overflow-x-auto space-x-4 mb-5">
+      <div className="flex overflow-x-auto space-x-4 py-5">
         {parkingLots.map((parking, index) => (
           <div key={parking.name} className="relative flex items-center space-x-1">
             {/* Depot Selection Button */}
             <button
               onClick={() => selectParking(parking.name, parking.defaultSchema)}
-              className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
+              className={`p-2 my-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
                 ? "bg-[#078ECD] text-white"
                 : "bg-black text-gray-100 hover:bg-[#078ECD] hover:text-white"
                 }`}
@@ -211,7 +261,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               {parking.name}
             </button>
 
-            {/* Edit Name Button (Only in Edit Mode) */}
+            {/* Edit Mode Buttons */}
             {editMode && (
               <>
                 {editingDepot === index ? (
@@ -245,21 +295,45 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => {
-                      setEditingDepot(index); // Enable editing mode for this depot
-                      setEditingDepotName(parking.name); // Pre-fill the current name
-                    }}
-                    className="px-1 py-1 text-sm rounded-full font-semibold text-black hover:bg-gray-200 transition"
-                    title="Edit Name"
-                  >
-                    <svg fill="#000000" height="15px" width="15px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 306.637 306.637" ><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M12.809,238.52L0,306.637l68.118-12.809l184.277-184.277l-55.309-55.309L12.809,238.52z M60.79,279.943l-41.992,7.896 l7.896-41.992L197.086,75.455l34.096,34.096L60.79,279.943z"></path> <path d="M251.329,0l-41.507,41.507l55.308,55.308l41.507-41.507L251.329,0z M231.035,41.507l20.294-20.294l34.095,34.095 L265.13,75.602L231.035,41.507z"></path> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> </g> </g></svg>
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        setEditingDepot(index); // Enable editing mode for this depot
+                        setEditingDepotName(parking.name); // Pre-fill the current name
+                      }}
+                      className="px-1 py-1 text-sm rounded-full font-semibold text-black hover:bg-gray-200 transition"
+                      title="Edit Name"
+                    >
+                      <svg
+                        fill="#000000"
+                        height="15px"
+                        width="15px"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 306.637 306.637"
+                      >
+                        <path d="M12.809,238.52L0,306.637l68.118-12.809l184.277-184.277l-55.309-55.309L12.809,238.52z M60.79,279.943l-41.992,7.896 l7.896-41.992L197.086,75.455l34.096,34.096L60.79,279.943z"></path>
+                        <path d="M251.329,0l-41.507,41.507l55.308,55.308l41.507-41.507L251.329,0z M231.035,41.507l20.294-20.294l34.095,34.095 L265.13,75.602L231.035,41.507z"></path>
+                      </svg>
+                    </button>
+                    {/* Remove Button */}
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to remove "${parking.name}"? This action can not be reversed`)) {
+                          setParkingLots(parkingLots.filter((_, i) => i !== index));
+                        }
+                      }}
+                      className="px-1 py-1 text-sm rounded-full font-semibold text-red-600 hover:bg-gray-200 transition"
+                      title="Remove Depot"
+                    >
+                      <svg width="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12L17 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <circle cx="12" cy="12" r="9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle> </g></svg>
+                    </button>
+                  </>
                 )}
               </>
             )}
           </div>
         ))}
+
         {/* Add New Depot Button */}
         {editMode && (
           <button
@@ -269,7 +343,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               setParkingLots((prev) => [...prev, newDepot]);
               selectParking(newDepotName, newDepot.defaultSchema);
             }}
-            className="px-4 py-2 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
+            className="px-2 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
           >
             + Add Depot
           </button>

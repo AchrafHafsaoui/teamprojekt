@@ -13,8 +13,7 @@ import Logo from "./assets/logo.png";
 
 
 const App: React.FC = () => {
-  const [hideHello, setHideHello] = useState(false); // State for managing Hello visibility
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State for login status
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // State for login status
   const [email, setEmail] = useState(""); // State for email input
   const [password, setPassword] = useState(""); // State for password input
 
@@ -124,7 +123,7 @@ const App: React.FC = () => {
             <Route path="/parking" element={<Parking fullPage={true} />} />
             <Route
               path="/electricity-schedule"
-              element={<ElectricityCost setHideHello={setHideHello} />} // Pass setHideHello prop
+              element={<ElectricityCost/>} 
             />
             <Route
               path="/fleet-status"
