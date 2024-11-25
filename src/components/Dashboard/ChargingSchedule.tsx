@@ -102,10 +102,17 @@ const ChargingSchedule: React.FC = () => {
     <div
       className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}
     >
-      <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
-
-      <div className="grid grid-cols-5 gap-4 font-bold text-base h-[8%] mb-2 px-2 text-gray-600 top-0 sticky ">
-        <div className="text-center">
+      <div className="flex-grow flex items-center max-h-[10%]">
+        <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
+        <input
+          type="text"
+          placeholder="Search by Station ID"
+          className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+          onChange={(e) => console.log(e.target.value)}
+        />
+      </div>
+      <div className="grid grid-cols-5 gap-4 font-bold text-base h-[7%] px-2 text-gray-600 top-0 sticky ">
+        <div className="flex items-center justify-center text-center">
           Bus ID
           {fieldToSort.field !== "1" ? (
             <span
@@ -130,7 +137,7 @@ const ChargingSchedule: React.FC = () => {
             </span>
           )}
         </div>
-        <div className="text-center">
+        <div className="flex items-center justify-center text-center">
           Max Capacity
           {fieldToSort.field !== "2" ? (
             <span
@@ -155,7 +162,7 @@ const ChargingSchedule: React.FC = () => {
             </span>
           )}
         </div>
-        <div className="text-center">
+        <div className="flex items-center justify-center text-center">
           Current Charging
           {fieldToSort.field !== "3" ? (
             <span
@@ -180,7 +187,7 @@ const ChargingSchedule: React.FC = () => {
             </span>
           )}
         </div>
-        <div className="text-center">
+        <div className="flex items-center justify-center text-center">
           Remaining Upward Flex
           {fieldToSort.field !== "4" ? (
             <span
@@ -205,7 +212,7 @@ const ChargingSchedule: React.FC = () => {
             </span>
           )}
         </div>
-        <div className="text-center">
+        <div className="flex items-center justify-center text-center">
           Possible Downward Flex
           {fieldToSort.field !== "5" ? (
             <span
@@ -233,7 +240,7 @@ const ChargingSchedule: React.FC = () => {
       </div>
       {/* <div className="custom-scrollbar"> */}
       {/* table body */}
-      <div className="overflow-x-hidden custom-scrollbar h-[70%] p-0 mt-3">
+      <div className="overflow-x-hidden custom-scrollbar h-[70%] p-0 ">
         {currentBuses.map((bus) => (
           <div
             key={bus.id}
