@@ -4,9 +4,8 @@ import { AreaChart, Area, Tooltip, XAxis, YAxis } from "recharts";
 const ElectricityCost: React.FC = () => {
   const [chartWidth, setChartWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState("Day");
 
-  const data = [
+  const hourlyData = [
     { hour: "0", price: 0.85 },
     { hour: "1", price: 0.91 },
     { hour: "2", price: 0.86 },
@@ -34,6 +33,25 @@ const ElectricityCost: React.FC = () => {
     { hour: "24", price: 0.75 },
   ];
 
+  const weeklyData = [
+    { day: "Mo", price: 0.95 },
+    { day: "Tu", price: 1.02 },
+    { day: "We", price: 0.88 },
+    { day: "Th", price: 1.15 },
+    { day: "Fr", price: 0.97 },
+    { day: "Sa", price: 0.78 },
+    { day: "Su", price: 0.82 },
+  ];
+
+  const monthlyData = Array.from({ length: 31 }, (_, i) => ({
+    day: `${i + 1}`,
+    price: (Math.random() * (1.2 - 0.7) + 0.7).toFixed(2), // Generate random filter for 31 days
+  }));
+
+  const [filter, setFilter] = useState<
+    "hourly" | "weekly" | "monthly"
+  >("hourly");
+
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
@@ -48,31 +66,6 @@ const ElectricityCost: React.FC = () => {
     };
   }, []);
 
-  const getFilteredData = () => {
-    if (selectedPeriod === "Day") {
-      return data; // First 24 hours (default data)
-    } else if (selectedPeriod === "Week") {
-      return [
-        { day: "Mo", price: 0.95 },
-        { day: "Tu", price: 1.02 },
-        { day: "We", price: 0.88 },
-        { day: "Th", price: 1.15 },
-        { day: "Fr", price: 0.97 },
-        { day: "Sa", price: 0.78 },
-        { day: "Su", price: 0.82 },
-      ]; // Example weekly data
-    } else if (selectedPeriod === "Month") {
-      return Array.from({ length: 31 }, (_, i) => ({
-        day: `${i}/11`,
-        price: (Math.random() * (1.2 - 0.7) + 0.7).toFixed(2), // Generate random data for 30 days
-      }));
-    }
-    return data;
-  };
-
-  const filteredData = getFilteredData();
-
-
   return (
     <div
       ref={containerRef}
@@ -84,46 +77,48 @@ const ElectricityCost: React.FC = () => {
       }}
     >
       {/* Centered Heading */}
-      <p className="text-2xl font-semibold ml-16">Today’s Electricity Price</p>
+      {/* Centered Heading with Buttons */}
+      <div className="flex justify-between items-center px-4">
+        {/* Heading */}
+        <p className="text-2xl font-semibold">Electricity Cost</p>
 
-      {/* Buttons for time period */}
-      <div className="flex mt-3 space-x-4 ml-16">
-        <button
-          onClick={() => setSelectedPeriod("Day")}
-          className={`py-1 px-4 text-sm font-semibold rounded-full transition ${selectedPeriod === "Day"
-            ? "border border-black bg-[#078ECD] text-white"
-            : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-            }`}
-        >
-          Day
-        </button>
-        <button
-          onClick={() => setSelectedPeriod("Week")}
-          className={`py-1 px-4 text-sm font-semibold rounded-full transition ${selectedPeriod === "Week"
-            ? "border border-black bg-[#078ECD] text-white"
-            : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-            }`}
-        >
-          Week
-        </button>
-        <button
-          onClick={() => setSelectedPeriod("Month")}
-          className={`py-1 px-4 text-sm font-semibold rounded-full transition ${selectedPeriod === "Month"
-            ? "border border-black bg-[#078ECD] text-white"
-            : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-            }`}
-        >
-          Month
-        </button>
+        {/* Buttons for time period */}
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setFilter("hourly")}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "hourly"
+              ? "border border-black bg-[#078ECD] text-white"
+              : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+              }`}
+          >
+            Day
+          </button>
+          <button
+            onClick={() => setFilter("weekly")}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "weekly"
+              ? "border border-black bg-[#078ECD] text-white"
+              : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+              }`}
+          >
+            Week
+          </button>
+          <button
+            onClick={() => setFilter("monthly")}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "monthly"
+              ? "border border-black bg-[#078ECD] text-white"
+              : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+              }`}
+          >
+            Month
+          </button>
+        </div>
       </div>
-
-
       {/* Graph */}
       <div className="mt-2 flex justify-center">
         <AreaChart
           width={chartWidth}
-          height={170}
-          data={filteredData}
+          height={200}
+          data={filter==="hourly"?hourlyData:filter==="weekly"?weeklyData:monthlyData}
           margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
         >
           <defs>
@@ -133,19 +128,19 @@ const ElectricityCost: React.FC = () => {
             </linearGradient>
           </defs>
           <XAxis
-            dataKey={selectedPeriod === "Day" ? "hour" : "day"} // Dynamically choose the key
+            dataKey={filter === "hourly" ? "hour" : "day"} // Dynamically choose the key
             tick={{ fill: "#fff", fontSize: 12 }}
             axisLine={{ stroke: "#ccc" }}
             tickLine={false}
             ticks={
-              selectedPeriod === "Day"
-                ? data.filter((_, index) => index % 2 === 0).map((entry) => entry.hour) // Filter to skip every 2 hours
-                : undefined // For "Week" or "Month", use default ticks
+              (filter === "hourly")
+                ? hourlyData.filter((_, index) => index % 2 === 0).map((entry) => entry.hour)
+                : (filter === "monthly") ? monthlyData.filter((_, index) => index % 2 === 0).map((entry) => entry.day) : undefined
             }
           />
           <YAxis
             domain={[0.5, 1.5]}
-            ticks={[1, 1.5]}
+            ticks={[0.75, 1, 1.25]}
             tick={{ fill: "#fff", fontSize: 12 }}
             tickLine={false}
             axisLine={false}
