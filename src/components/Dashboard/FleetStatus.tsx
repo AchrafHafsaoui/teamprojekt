@@ -92,7 +92,40 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = fullPage ? 5 : 3;
+  const itemsPerPage = fullPage ? 6 : 3;
+
+  // sorting
+  const [fieldToSort, setFieldToSort] = useState<{
+    field: "1" | "2" | "3" | "4" | "5" | "6" | "7" | null;
+    direction: "ASC" | "DSC";
+  }>({
+    field: null,
+    direction: "ASC",
+  });
+
+  const handleSort = (
+    field: "1" | "2" | "3" | "4" | "5" | "6" | "7" | null,
+  ) => {
+    if (fieldToSort.field !== field) {
+      setFieldToSort({ field: field, direction: "ASC" });
+      fetchSortedItems(field, "ASC");
+    } else if (fieldToSort.direction === "ASC") {
+      setFieldToSort({ field: field, direction: "DSC" });
+      fetchSortedItems(field, "DSC");
+    } else {
+      setFieldToSort({ field: field, direction: "ASC" });
+      fetchSortedItems(field, "ASC");
+    }
+  };
+
+  const fetchSortedItems = (
+    field: "1" | "2" | "3" | "4" | "5" | "6" | "7" | null,
+    direction: "ASC" | "DSC",
+  ) => {
+    console.log(
+      "fetching items of column " + field + " in " + direction + " order.",
+    );
+  };
 
   // Handlers for pagination
   const handlePrevious = () => {
@@ -190,25 +223,195 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
 
       {/* Header Row */}
       <div
-        className={`grid gap-4 font-bold mb-2 h-[8%] text-gray-600 text-center pt-3 top-0 sticky ${fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"}`}
+        className={`grid gap-4 font-bold mb-2 h-[7%] text-gray-600 text-center pt-3 top-0 sticky ${fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"}`}
       >
-        <div>Plate Number</div>
-        <div>Status</div>
-        <div>Charging Point</div>
-        <div>Session Start</div>
-        {fullPage && <div>CAP</div>}
-        {fullPage && <div>ENE</div>}
-        <div>Battery</div>
+        <div className="flex items-center justify-center text-center">
+          Plate Number
+          {fieldToSort.field !== "1" ? (
+            <span
+              onClick={() => handleSort("1")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
+            <span
+              onClick={() => handleSort("1")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("1")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-center text-center">
+          Status
+          {fieldToSort.field !== "2" ? (
+            <span
+              onClick={() => handleSort("2")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
+            <span
+              onClick={() => handleSort("2")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("2")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-center text-center">
+          Charging Point
+          {fieldToSort.field !== "3" ? (
+            <span
+              onClick={() => handleSort("3")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
+            <span
+              onClick={() => handleSort("3")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("3")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-center text-center">
+          Session Start
+          {fieldToSort.field !== "4" ? (
+            <span
+              onClick={() => handleSort("4")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
+            <span
+              onClick={() => handleSort("4")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("4")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
+        {fullPage && (
+          <div className="flex items-center justify-center text-center">
+            CAP
+            {fieldToSort.field !== "5" ? (
+              <span
+                onClick={() => handleSort("5")}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "5" ? (
+              <span
+                onClick={() => handleSort("5")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("5")}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+        )}
+        {fullPage && (
+          <div className="flex items-center justify-center text-center">
+            ENE
+            {fieldToSort.field !== "6" ? (
+              <span
+                onClick={() => handleSort("6")}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "6" ? (
+              <span
+                onClick={() => handleSort("6")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("6")}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+        )}
+        <div className="flex items-center justify-center text-center">
+          Battery
+          {fieldToSort.field !== "7" ? (
+            <span
+              onClick={() => handleSort("7")}
+              className={`ml-1 text-gray-300 hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "7" ? (
+            <span
+              onClick={() => handleSort("7")}
+              className={`ml-1 text-gray-600" hover:cursor-pointer`}
+            >
+              ▼
+            </span>
+          ) : (
+            <span
+              onClick={() => handleSort("7")}
+              className={`ml-1 text-gray-600 hover:cursor-pointer`}
+            >
+              ▲
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Data Rows */}
-      <div
-        className={`overflow-x-hidden custom-scrollbar h-[calc(90%-6rem)] pt-4`}
-      >
+      <div className={`overflow-x-hidden custom-scrollbar h-[65%] pt-4`}>
         {currentBuses.map((vehicle, index) => (
           <div
             key={vehicle.busId}
-            className={`grid gap-4 items-center text-gray-800 pb-3 h-[20%] shadow-sm font-semibold ${
+            className={`grid gap-4 items-center text-gray-800 pb-3 min-h-14  ${fullPage ? "h-[16%]" : "h-[33.3%]"}  shadow-sm font-semibold ${
               fullPage ? "grid-cols-7" : "grid-cols-5"
             }`}
           >
@@ -222,7 +425,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             </span>
             {fullPage && <span className="text-center">{vehicle.CAP}</span>}
             {fullPage && <span className="text-center">{vehicle.ENE}</span>}
-            <div className="relative my-0 mx-auto w-14">
+            <div className="relative my-2 mx-auto w-[30%]">
               <CircularProgressbar
                 value={animatedValues[index]}
                 maxValue={100}
