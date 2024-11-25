@@ -54,7 +54,7 @@ const EnergyConsumption: React.FC = () => {
         backgroundColor: currentMonthData.values.map((value) =>
           value === highestValue || value === lowestValue
             ? "rgb(7, 142, 205)"
-            : "rgba(0,0,0,0.7)",
+            : "rgba(255,255,255, 0.7)",
         ),
         borderRadius: 15,
         borderSkipped: false,
@@ -80,17 +80,21 @@ const EnergyConsumption: React.FC = () => {
         grid: {
           display: false,
         },
+        ticks: {
+          callback: (value: any, index: number) => {
+            // Show only every 3rd tick
+            return index % 2 === 0 ? value : "";
+          },
+          color: "#FFF", // Optional: Customize tick color
+        },
       },
       y: {
         beginAtZero: true,
-        ticks: {
+        grid: {
           display: false,
         },
-        grid: {
-          drawTicks: true,
-          color: "#e5e5e5",
-          lineWidth: 1,
-          borderDash: [5, 5],
+        ticks: {
+          display: false,
         },
         border: {
           display: false,
@@ -103,6 +107,7 @@ const EnergyConsumption: React.FC = () => {
       delay: (context: any) => context.dataIndex * 20,
     },
   };
+
 
   const handleNextPage = () => {
     if (currentPage < monthlyData.length - 1) {
@@ -117,9 +122,15 @@ const EnergyConsumption: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-opacity-80 flex flex-col bg-[#FFFFFF] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1">
+    <div className="h-full flex flex-col bg-[#FFFFFF] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
+      style={{
+        backgroundImage: `url('/src/assets/panel_background_flipped.png')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}>
+
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Energy Consumption</h2>
+        <h2 className="text-2xl font-semibold text-white">Energy Consumption</h2>
         <div className="flex space-x-4">
           <button
             onClick={handlePreviousPage}
