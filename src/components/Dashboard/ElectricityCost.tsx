@@ -1,42 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AreaChart, Area, Tooltip } from "recharts";
+import { AreaChart, Area, Tooltip, XAxis, YAxis } from "recharts";
 
 const ElectricityCost: React.FC = () => {
   const [chartWidth, setChartWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState("Day");
 
   const data = [
-    { hour: "00:00", price: 0.85 },
-    { hour: "01:00", price: 0.91 },
-    { hour: "02:00", price: 0.86 },
-    { hour: "03:00", price: 0.78 },
-    { hour: "04:00", price: 0.89 },
-    { hour: "05:00", price: 0.95 },
-    { hour: "06:00", price: 0.98 },
-    { hour: "07:00", price: 1.15 },
-    { hour: "08:00", price: 0.91 },
-    { hour: "09:00", price: 1.18 },
-    { hour: "10:00", price: 1.10 },
-    { hour: "11:00", price: 1.12 },
-    { hour: "12:00", price: 0.97 },
-    { hour: "13:00", price: 1.05 },
-    { hour: "14:00", price: 1.00 },
-    { hour: "15:00", price: 0.98 },
-    { hour: "16:00", price: 0.95 },
-    { hour: "17:00", price: 1.00 },
-    { hour: "18:00", price: 0.97 },
-    { hour: "19:00", price: 0.94 },
-    { hour: "20:00", price: 0.85 },
-    { hour: "21:00", price: 0.82 },
-    { hour: "22:00", price: 0.80 },
-    { hour: "23:00", price: 0.78 },
-    { hour: "24:00", price: 0.75 },
+    { hour: "0", price: 0.85 },
+    { hour: "1", price: 0.91 },
+    { hour: "2", price: 0.86 },
+    { hour: "3", price: 0.78 },
+    { hour: "4", price: 0.89 },
+    { hour: "5", price: 0.95 },
+    { hour: "6", price: 0.98 },
+    { hour: "7", price: 1.15 },
+    { hour: "8", price: 0.91 },
+    { hour: "9", price: 1.18 },
+    { hour: "10", price: 1.10 },
+    { hour: "11", price: 1.12 },
+    { hour: "12", price: 0.97 },
+    { hour: "13", price: 1.05 },
+    { hour: "14", price: 1.00 },
+    { hour: "15", price: 0.98 },
+    { hour: "16", price: 0.95 },
+    { hour: "17", price: 1.00 },
+    { hour: "18", price: 0.97 },
+    { hour: "19", price: 0.94 },
+    { hour: "20", price: 0.85 },
+    { hour: "21", price: 0.82 },
+    { hour: "22", price: 0.80 },
+    { hour: "23", price: 0.78 },
+    { hour: "24", price: 0.75 },
   ];
 
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setChartWidth(containerRef.current.offsetWidth - 40); // Adjust for padding
+        setChartWidth(containerRef.current.offsetWidth); // Adjust for padding
       }
     };
     updateWidth();
@@ -47,49 +48,108 @@ const ElectricityCost: React.FC = () => {
     };
   }, []);
 
+  const getFilteredData = () => {
+    if (selectedPeriod === "Day") {
+      return data; // First 24 hours (default data)
+    } else if (selectedPeriod === "Week") {
+      return [
+        { day: "Mo", price: 0.95 },
+        { day: "Tu", price: 1.02 },
+        { day: "We", price: 0.88 },
+        { day: "Th", price: 1.15 },
+        { day: "Fr", price: 0.97 },
+        { day: "Sa", price: 0.78 },
+        { day: "Su", price: 0.82 },
+      ]; // Example weekly data
+    } else if (selectedPeriod === "Month") {
+      return Array.from({ length: 31 }, (_, i) => ({
+        day: `${i}/11`,
+        price: (Math.random() * (1.2 - 0.7) + 0.7).toFixed(2), // Generate random data for 30 days
+      }));
+    }
+    return data;
+  };
+
+  const filteredData = getFilteredData();
+
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col transition-all duration-300 pt-6"
+      className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col pt-4"
       style={{
-        backgroundImage: `url('/src/assets/cosmos.jpg')`,
+        backgroundImage: `url('/src/assets/panel_background_flipped.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
       {/* Centered Heading */}
-      <div className="text-center">
-        <p className="text-lg font-semibold">Today’s Electricity Price</p>
-        <p className="text-4xl font-bold mt-1">0.95 €/KWh</p>
-      </div>
+      <p className="text-2xl font-semibold ml-16">Today’s Electricity Price</p>
 
       {/* Buttons for time period */}
-      <div className="flex justify-center mt-4 space-x-4">
-        <button className="py-1 px-4 text-sm font-semibold text-[#078ECD] border border-[#078ECD] rounded-full hover:bg-[#078ECD] hover:text-white transition">
+      <div className="flex mt-3 space-x-4 ml-16">
+        <button
+          onClick={() => setSelectedPeriod("Day")}
+          className={`py-1 px-4 text-sm font-semibold rounded-full transition ${selectedPeriod === "Day"
+            ? "border border-black bg-[#078ECD] text-white"
+            : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+            }`}
+        >
           Day
         </button>
-        <button className="py-1 px-4 text-sm font-semibold text-white border border-gray-400 rounded-full hover:bg-[#078ECD] hover:text-white transition">
+        <button
+          onClick={() => setSelectedPeriod("Week")}
+          className={`py-1 px-4 text-sm font-semibold rounded-full transition ${selectedPeriod === "Week"
+            ? "border border-black bg-[#078ECD] text-white"
+            : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+            }`}
+        >
           Week
         </button>
-        <button className="py-1 px-4 text-sm font-semibold text-white border border-gray-400 rounded-full hover:bg-[#078ECD] hover:text-white transition">
+        <button
+          onClick={() => setSelectedPeriod("Month")}
+          className={`py-1 px-4 text-sm font-semibold rounded-full transition ${selectedPeriod === "Month"
+            ? "border border-black bg-[#078ECD] text-white"
+            : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+            }`}
+        >
           Month
         </button>
       </div>
 
+
       {/* Graph */}
-      <div className="mt-6 flex justify-center">
+      <div className="mt-2 flex justify-center">
         <AreaChart
           width={chartWidth}
-          height={200}
-          data={data}
-          margin={{ top: 0, right: 20, left: 20, bottom: 0 }}
+          height={170}
+          data={filteredData}
+          margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#078ECD" stopOpacity={0.8} />
+              <stop offset="5%" stopColor="#078ECD" stopOpacity={0.5} />
               <stop offset="95%" stopColor="#078ECD" stopOpacity={0} />
             </linearGradient>
           </defs>
+          <XAxis
+            dataKey={selectedPeriod === "Day" ? "hour" : "day"} // Dynamically choose the key
+            tick={{ fill: "#fff", fontSize: 12 }}
+            axisLine={{ stroke: "#ccc" }}
+            tickLine={false}
+            ticks={
+              selectedPeriod === "Day"
+                ? data.filter((_, index) => index % 2 === 0).map((entry) => entry.hour) // Filter to skip every 2 hours
+                : undefined // For "Week" or "Month", use default ticks
+            }
+          />
+          <YAxis
+            domain={[0.5, 1.5]}
+            ticks={[1, 1.5]}
+            tick={{ fill: "#fff", fontSize: 12 }}
+            tickLine={false}
+            axisLine={false}
+          />
           <Tooltip
             contentStyle={{
               background: "transparent",
@@ -97,14 +157,12 @@ const ElectricityCost: React.FC = () => {
               boxShadow: "none",
             }}
             labelStyle={{
-              color: "#fff",
-              fontWeight: "bold",
-              fontSize: "14px",
+              color: "transparent",
             }}
             itemStyle={{
-              color: "#078ECD",
-              fontWeight: "bold",
-              fontSize: "12px",
+              color: "#FFF",
+              fontWeight: "semibold",
+              fontSize: "15px",
             }}
           />
           <Area
@@ -112,7 +170,7 @@ const ElectricityCost: React.FC = () => {
             dataKey="price"
             stroke="#078ECD"
             fill="url(#colorPrice)"
-            strokeWidth={5} // Wider stroke for the graph
+            strokeWidth={4} // Wider stroke for the graph
           />
         </AreaChart>
       </div>
