@@ -97,13 +97,13 @@ const App: React.FC = () => {
 
         {/* Background styling */}
         <div
-          className="fixed min-h-screen min-w-full"
+          className="fixed min-h-screen min-w-full animated-bg"
           style={{
             backgroundImage: `url('/src/assets/blue_background_abstract.jpg')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            backgroundColor: "rgba(255, 255, 255, 0.8)", // Light overlay
+            backgroundColor: "rgba(255, 255, 255, 0.7)", // Light overlay
             backgroundBlendMode: "overlay", // Overlay to soften the image
           }}
         />

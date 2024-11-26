@@ -54,7 +54,7 @@ const EnergyConsumption: React.FC = () => {
         backgroundColor: currentMonthData.values.map((value) =>
           value === highestValue || value === lowestValue
             ? "rgb(7, 142, 205)"
-            : "rgba(255,255,255, 0.7)",
+            : "rgba(255,255,255, 0.8)",
         ),
         borderRadius: 15,
         borderSkipped: false,
@@ -122,12 +122,10 @@ const EnergyConsumption: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#FFFFFF] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
-      style={{
-        backgroundImage: `url('/src/assets/panel_background_flipped.png')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}>
+    <div className="h-full flex flex-col bg-black bg-opacity-80 border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
+    style={{
+      background: 'linear-gradient(45deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 80%)',
+    }}>
 
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold text-white">Energy Consumption</h2>

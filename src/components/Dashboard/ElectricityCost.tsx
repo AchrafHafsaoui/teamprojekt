@@ -69,18 +69,16 @@ const ElectricityCost: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full text-white bg-black bg-opacity-90 shadow-lg rounded-3xl flex flex-col pt-4"
+      className="h-full bg-opacity-90 flex flex-col bg-[#FFFFFF] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
       style={{
-        backgroundImage: `url('/src/assets/panel_background_flipped.png')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        background: 'linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 80%)',
       }}
     >
       {/* Centered Heading */}
       {/* Centered Heading with Buttons */}
       <div className="flex justify-between items-center px-4">
         {/* Heading */}
-        <p className="text-2xl font-semibold">Electricity Cost</p>
+        <p className="text-2xl font-semibold text-white">Electricity Cost</p>
 
         {/* Buttons for time period */}
         <div className="flex space-x-4">
@@ -118,7 +116,7 @@ const ElectricityCost: React.FC = () => {
         <AreaChart
           width={chartWidth}
           height={200}
-          data={filter==="hourly"?hourlyData:filter==="weekly"?weeklyData:monthlyData}
+          data={filter === "hourly" ? hourlyData : filter === "weekly" ? weeklyData : monthlyData}
           margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
         >
           <defs>

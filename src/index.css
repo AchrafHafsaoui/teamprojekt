@@ -12,3 +12,19 @@ body {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
+@keyframes moveUp {
+  0% {
+    background-position: top;
+  }
+  100% {
+    background-position: bottom ;
+  }
+}
+
+.animated-bg {
+  background-image: url('/src/assets/blue_background_abstract.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
+  animation: moveUp 20s linear infinite;
+}
