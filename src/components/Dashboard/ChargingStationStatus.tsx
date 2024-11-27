@@ -431,25 +431,32 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     );
   };
 
+  const [expandedRow, setExpandedRow] = useState<string | null>(null); // Track the expanded row
+
+  const handleRowClick = (stationId: string) => {
+    // Toggle expanded state
+    setExpandedRow((prev) => (prev === stationId ? null : stationId));
+  };
+
   return (
     <div
       className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${
         fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
       }`}
     >
-      <div className="flex items-center w-full">
-        <div className="flex-grow flex items-center">
-          <h2 className="text-2xl font-semibold">Charging Station Status</h2>
-          {fullPage && (
-            <input
-              type="text"
-              placeholder="Search by Station ID"
-              className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          )}
-        </div>
-        <div className="flex space-x-3 h-[10%]">
+      <div className="flex items-center w-full h-[10%] justify-between">
+        <h2 className="text-2xl font-semibold 2xl:text-xl md:text-lg sm:text-xs">
+          Charging Station Status
+        </h2>
+        {fullPage && (
+          <input
+            type="text"
+            placeholder="Search by Station ID"
+            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        )}
+        <div className="flex space-x-3">
           {["all", "OK", "Down", "Maintenance"].map((status) => (
             <button
               key={status}
@@ -457,7 +464,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
                 setFilterStatus(status as typeof filterStatus);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1 text-xs rounded-lg border font-semibold border-[#cccccc] ${
+              className={`2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none px-3 py-2 text-xs rounded-lg border font-semibold border-[#cccccc] ${
                 filterStatus === status
                   ? "text-white"
                   : "bg-[#ededed] text-gray-800"
@@ -474,174 +481,178 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
           ))}
         </div>
       </div>
-      {/* Header Row */}
-      <div
-        className={`grid gap-4 font-bold mb-2 h-[7%] text-gray-600 text-center pt-3 top-0 sticky grid-cols-4`}
-      >
-        <div className="flex items-center justify-center text-center">
-          Station ID
-          {fieldToSort.field !== "1" ? (
-            <span
-              onClick={() => handleSort("1")}
-              className={`ml-1 text-gray-300 hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
-            <span
-              onClick={() => handleSort("1")}
-              className={`ml-1 text-gray-600" hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : (
-            <span
-              onClick={() => handleSort("1")}
-              className={`ml-1 text-gray-600 hover:cursor-pointer`}
-            >
-              ▲
-            </span>
-          )}
-        </div>
-        <div className="flex items-center justify-center text-center">
-          Availability
-          {fieldToSort.field !== "2" ? (
-            <span
-              onClick={() => handleSort("2")}
-              className={`ml-1 text-gray-300 hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
-            <span
-              onClick={() => handleSort("2")}
-              className={`ml-1 text-gray-600" hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : (
-            <span
-              onClick={() => handleSort("2")}
-              className={`ml-1 text-gray-600 hover:cursor-pointer`}
-            >
-              ▲
-            </span>
-          )}
-        </div>
-        <div className="flex items-center justify-center text-center">
-          Max Capacity
-          {fieldToSort.field !== "3" ? (
-            <span
-              onClick={() => handleSort("3")}
-              className={`ml-1 text-gray-300 hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
-            <span
-              onClick={() => handleSort("3")}
-              className={`ml-1 text-gray-600" hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : (
-            <span
-              onClick={() => handleSort("3")}
-              className={`ml-1 text-gray-600 hover:cursor-pointer`}
-            >
-              ▲
-            </span>
-          )}
-        </div>
-        <div className="flex items-center justify-center text-center">
-          Charging Power
-          {fieldToSort.field !== "4" ? (
-            <span
-              onClick={() => handleSort("4")}
-              className={`ml-1 text-gray-300 hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
-            <span
-              onClick={() => handleSort("4")}
-              className={`ml-1 text-gray-600" hover:cursor-pointer`}
-            >
-              ▼
-            </span>
-          ) : (
-            <span
-              onClick={() => handleSort("4")}
-              className={`ml-1 text-gray-600 hover:cursor-pointer`}
-            >
-              ▲
-            </span>
-          )}
-        </div>
-      </div>
-      {/* Data Rows */}
-      <div className={`overflow-x-hidden custom-scrollbar h-[65%]`}>
-        {currentStations.map((station, index) => (
-          <div
-            key={station.stationId}
-            className={`grid grid-cols-4 gap-4 items-center text-gray-800 ${fullPage ? "h-[16%]" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5`}
-          >
-            <span className="text-center">{station.stationId}</span>
-            <span className="text-center">{station.availability}</span>
-            <span className="text-center">{station.maxPower} kW</span>
-            <div className="w-full ">
-              {renderGraduatedBar(
-                station.chargingPower,
-                station.maxPower,
-                index,
-              )}
-              <div className="text-center font-semibold mt-1 text-sm">
-                {station.chargingPower} kW
-              </div>
-            </div>
+      <div className="w-full h-[80%]">
+        {/* Header Row */}
+        <div
+          className={`grid gap-4 font-bold h-[10%] text-gray-600 text-center top-0 sticky grid-cols-4`}
+        >
+          <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+            Station ID
+            {fieldToSort.field !== "1" ? (
+              <span
+                onClick={() => handleSort("1")}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
+              <span
+                onClick={() => handleSort("1")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("1")}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
           </div>
-        ))}
-        {Array.from(
-          { length: itemsPerPage - currentStations.length },
-          (_, index) => (
+          <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+            Availability
+            {fieldToSort.field !== "2" ? (
+              <span
+                onClick={() => handleSort("2")}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
+              <span
+                onClick={() => handleSort("2")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("2")}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+          <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+            Max Capacity
+            {fieldToSort.field !== "3" ? (
+              <span
+                onClick={() => handleSort("3")}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
+              <span
+                onClick={() => handleSort("3")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("3")}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+          <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+            Charging Power
+            {fieldToSort.field !== "4" ? (
+              <span
+                onClick={() => handleSort("4")}
+                className={`ml-1 text-gray-300 hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
+              <span
+                onClick={() => handleSort("4")}
+                className={`ml-1 text-gray-600" hover:cursor-pointer`}
+              >
+                ▼
+              </span>
+            ) : (
+              <span
+                onClick={() => handleSort("4")}
+                className={`ml-1 text-gray-600 hover:cursor-pointer`}
+              >
+                ▲
+              </span>
+            )}
+          </div>
+        </div>
+        {/* Data Rows */}
+        <div className={`overflow-x-hidden custom-scrollbar h-[90%]`}>
+          {currentStations.map((station, index) => (
             <div
-              key={`placeholder-${index}`}
-              className="grid grid-cols-5 gap-4 items-center text-gray-600 h-[16%] shadow-sm text-xl"
-            >
-              <span className="text-center">-</span>
-              <span className="text-center">-</span>
-              <span className="text-center">-</span>
-              <span className="text-center">-</span>
-              <span className="text-center">-</span>
+              key={station.stationId}
+              onClick={() => {
+                if (fullPage) handleRowClick(station.stationId); // Only allow expansion if fullPage is true
+              }}
+              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${fullPage ? "cursor-pointer" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5 ${expandedRow === station.stationId ? "bg-blue-100" : ""
+              }`}
+           >
+              <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+                {station.stationId}
+              </span>
+              <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+                {station.availability}
+              </span>
+              <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+                {station.maxPower} kW
+              </span>
+              <div className="w-full ">
+                {renderGraduatedBar(
+                  station.chargingPower,
+                  station.maxPower,
+                  index,
+                )}
+                <div className="text-center font-semibold mt-1 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+                  {station.chargingPower} kW
+                </div>
+              </div>
+              {expandedRow === station.stationId && (
+                <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
+                  <p>Additional Details for {station.stationId}</p>
+                  <p>Maximum Charging Power: {station.maxPower} KWh</p>
+                  <p>Current Charging Power: {station.chargingPower} KWh</p>
+                </div>
+              )}
             </div>
-          ),
-        )}
+          ))}
+        </div>
       </div>
-      {/* Pagination Controls */}
-      <div
-        className={`flex justify-end items-center mt-3 mr-3 space-x-3 ${fullPage ? "text-base" : "text-xs"}`}
-      >
-        <button
-          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
-            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span className="text-lg font-medium">
-          {currentPage} / {totalPages}
-        </span>
-        <button
-          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
-            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+      <div className="w-full h-[10%] flex justify-end items-center">
+        {/* Pagination Controls */}
+        <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
+          <button
+            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-lg font-medium">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
