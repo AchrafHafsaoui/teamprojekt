@@ -10,7 +10,7 @@ type ScheduleEntry = {
 };
 
 type DrivingScheduleProps = {
-  fullPage?: boolean; // Controls height
+  fullPage?: boolean;
 };
 
 const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
@@ -63,15 +63,17 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
       className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
     >
-      <h2 className="text-2xl font-semibold mb-4">Driving Schedule</h2>
-      <div className="relative">
-        {/* Button to open the panel */}
-        <button
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold mb-4">Driving Schedule</h2>
+        {/* Select Date Button */}
+        {fullPage && (<button
           onClick={handlePanelToggle}
           className="bg-[#078ECD] text-white px-4 py-2 rounded-lg hover:bg-[#066a97] transition-all font-semibold"
         >
           Select Date & Time
-        </button>
+        </button>)}
+      </div>
+      <div className="relative">
 
         {/* Overlay Panel */}
         {isPanelOpen && (
@@ -87,34 +89,32 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
 
               {/* Panel Header */}
               <h2 className="text-xl font-bold text-gray-800 text-center">Select Date & Time</h2>
-              <div className="flex items-center space-x-2 my-4 justify-center">
-      {/* Departure Button */}
-      <button
-        onClick={() => setActiveButton("Departure")}
-        className={`py-1 px-3 rounded-full text-sm font-semibold transition ${
-          activeButton === "Departure"
-            ? "bg-[#078ECD] text-white"
-            : "border border-gray-300 text-gray-700 hover:bg-gray-200"
-        }`}
-      >
-        Departure
-      </button>
+              <div className="flex space-x-2 my-4 justify-center">
+                {/* Departure Button */}
+                <button
+                  onClick={() => setActiveButton("Departure")}
+                  className={`py-1 px-3 rounded-full text-sm font-semibold transition ${activeButton === "Departure"
+                    ? "bg-[#078ECD] text-white"
+                    : "border border-gray-300 text-gray-700 hover:bg-gray-200"
+                    }`}
+                >
+                  Departure
+                </button>
 
-      {/* Arrival Button */}
-      <button
-        onClick={() => setActiveButton("Arrival")}
-        className={`py-1 px-3 rounded-full text-sm font-semibold transition ${
-          activeButton === "Arrival"
-            ? "bg-[#078ECD] text-white"
-            : "border border-gray-300 text-gray-700 hover:bg-gray-200"
-        }`}
-      >
-        Arrival
-      </button>
-    </div>
+                {/* Arrival Button */}
+                <button
+                  onClick={() => setActiveButton("Arrival")}
+                  className={`py-1 px-3 rounded-full text-sm font-semibold transition ${activeButton === "Arrival"
+                    ? "bg-[#078ECD] text-white"
+                    : "border border-gray-300 text-gray-700 hover:bg-gray-200"
+                    }`}
+                >
+                  Arrival
+                </button>
+              </div>
 
               {/* Customized Calendar */}
-              <div className="mb-4 mx-14">
+              <div className="mb-4 mx-6">
                 <DatePicker
                   selected={selectedDate}
                   onChange={(date) => setSelectedDate(date)}
@@ -124,8 +124,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
               </div>
 
               {/* Time Picker */}
-              {/* Time Picker */}
-              <div className="mb-6 mx-14">
+              <div className="mb-6 mx-6">
                 <div className="flex items-center space-x-4">
                   {/* Decrease Time Button */}
                   <button
@@ -136,13 +135,13 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                         setTime(updatedTime);
                       }
                     }}
-                    className="text-[#078ECD] text-lg font-bold px-2 hover:opacity-80"
+                    className="text-[#078ECD] text-2xl font-bold px-2 hover:opacity-80"
                   >
                     −
                   </button>
 
                   {/* Time Display */}
-                  <div className="text-lg font-medium text-gray-800 underline">
+                  <div className="text-xl font-medium text-gray-800 underline">
                     {time ? time.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "00:00"}
                   </div>
 
@@ -155,7 +154,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                         setTime(updatedTime);
                       }
                     }}
-                    className="text-[#078ECD] text-lg font-bold px-2 hover:opacity-80"
+                    className="text-[#078ECD] text-2xl font-bold px-2 hover:opacity-80"
                   >
                     +
                   </button>
@@ -163,7 +162,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                   {/* Now Button */}
                   <button
                     onClick={() => setTime(new Date())}
-                    className="py-1 px-5 border border-gray-300 text-gray-700 font-semibold rounded-md hover:bg-[#078ECD] hover:text-white transition"
+                    className="py-1 px-5 border border-gray-300 text-gray-700 font-semibold rounded-full hover:bg-[#078ECD] hover:text-white transition"
                   >
                     Now
                   </button>
@@ -172,7 +171,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
               {/* Apply Button */}
               <button
                 onClick={handlePanelToggle}
-                className="w-full py-3 rounded-lg font-semibold bg-[#078ECD] text-white hover:bg-[#066a97] transition text-lg"
+                className="w-60 py-3 mx-6 rounded-full font-semibold bg-[#078ECD] text-white hover:bg-[#066a97] transition text-lg"
               >
                 Apply
               </button>
@@ -183,42 +182,38 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
       </div>
       {/* Filtered Schedule */}
       <div className="flex justify-between mb-4 px-2 text-lg font-semibold">
-        <div className="text-center w-1/2">Departure</div>
         <div className="text-center w-1/2">Arrival</div>
+        <div className="text-center w-1/2">Departure</div>
       </div>
       <div className={`flex overflow-y-auto ${fullPage ? "h-4/5" : "h-60"} custom-scrollbar`}>
-        <div className="w-1/2 pr-4">
-          <div className="flex flex-col items-start space-y-3">
+        <div className="w-1/2 pl-4 mr-5">
+          <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
             {filterSchedule().map((entry) => {
               const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
               return (
                 <div key={entry.id} className="flex justify-between w-full">
-                  <div>
-                    <span className="font-semibold text-gray-700">{entry.id}</span>
-                    <span className="block text-sm text-gray-500">{type}</span>
-                    <span className="block text-sm text-gray-500">{batteryCapacity}</span>
-                    <span className="block text-sm text-gray-500">{length}</span>
-                  </div>
-                  <span className="font-medium text-gray-700">{entry.departureTime}</span>
+                  <span className="font-semibold text-gray-700">{entry.id}</span>
+                  {fullPage && (<span className="block text-sm text-gray-500">{type}</span>)}
+                  {fullPage && (<span className="block text-sm text-gray-500">{batteryCapacity}</span>)}
+                  {fullPage && (<span className="block text-sm text-gray-500">{length}</span>)}
+                  <span className="font-medium text-gray-700">{entry.arrivalTime}</span>
                 </div>
               );
             })}
           </div>
         </div>
         <div className="border-l-2 border-gray-300 sticky top-0 h-full"></div>
-        <div className="w-1/2 pl-4 mr-5">
-          <div className="flex flex-col items-start space-y-3">
+        <div className="w-1/2 ml-4">
+          <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
             {filterSchedule().map((entry) => {
               const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
               return (
                 <div key={entry.id} className="flex justify-between w-full">
-                  <div>
-                    <span className="font-semibold text-gray-700">{entry.id}</span>
-                    <span className="block text-sm text-gray-500">{type}</span>
-                    <span className="block text-sm text-gray-500">{batteryCapacity}</span>
-                    <span className="block text-sm text-gray-500">{length}</span>
-                  </div>
-                  <span className="font-medium text-gray-700">{entry.arrivalTime}</span>
+                  <span className="font-semibold text-gray-700">{entry.id}</span>
+                  {fullPage && (<span className="block text-sm text-gray-500">{type}</span>)}
+                  {fullPage && (<span className="block text-sm text-gray-500">{batteryCapacity}</span>)}
+                  {fullPage && (<span className="block text-sm text-gray-500">{length}</span>)}
+                  <span className="font-medium text-gray-700">{entry.departureTime}</span>
                 </div>
               );
             })}
