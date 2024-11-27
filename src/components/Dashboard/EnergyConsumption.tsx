@@ -56,7 +56,7 @@ const EnergyConsumption: React.FC = () => {
             ? "rgb(7, 142, 205)"
             : "rgba(255,255,255, 0.8)",
         ),
-        borderRadius: 15,
+        borderRadius: 5,
         borderSkipped: false,
       },
     ],

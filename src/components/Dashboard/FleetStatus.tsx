@@ -425,7 +425,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             </span>
             {fullPage && <span className="text-center">{vehicle.CAP}</span>}
             {fullPage && <span className="text-center">{vehicle.ENE}</span>}
-            <div className="relative my-2 mx-auto w-[30%]">
+            <div className={`relative mx-auto ${fullPage ? "w-[30%]" : "w-[50%]"}`}>
               <CircularProgressbar
                 value={animatedValues[index]}
                 maxValue={100}
