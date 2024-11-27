@@ -202,7 +202,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                 setFilterStatus(status as typeof filterStatus);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1 text-xs rounded-lg border font-semibold border-[#cccccc] ${
+              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-[#cccccc] ${
                 filterStatus === status
                   ? "text-white"
                   : "bg-[#ededed] text-gray-800"
@@ -220,7 +220,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         </div>
       </div>
 
-      <div className="w-full h-[75%]">
+      <div className="w-full h-[80%]">
         {/* Header Row */}
         <div
           className={`grid gap-4 font-bold h-[10%] text-gray-600 text-center top-0 sticky ${fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"}`}
@@ -437,7 +437,9 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   {vehicle.ENE}
                 </span>
               )}
-              <div className={`relative my-2 mx-auto ${fullPage?"w-[30%]":"w-[50%]"}`}>
+              <div
+                className={`relative my-2 mx-auto ${fullPage ? "w-[30%]" : "w-[50%]"}`}
+              >
                 <CircularProgressbar
                   value={animatedValues[index]}
                   maxValue={100}
@@ -477,28 +479,11 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
               </div>
             </div>
           ))}
-          {Array.from(
-            { length: itemsPerPage - currentBuses.length },
-            (_, index) => (
-              <div
-                key={`placeholder-${index}`}
-                className="grid grid-cols-5 gap-4 items-center text-gray-600 h-16 shadow-sm text-xl"
-              >
-                <span className="text-center">-</span>
-                <span className="text-center">-</span>
-                <span className="text-center">-</span>
-                <span className="text-center">-</span>
-                <span className="text-center">-</span>
-              </div>
-            ),
-          )}
         </div>
       </div>
       <div className="w-full h-[10%] flex justify-end items-center">
         {/* Pagination Controls */}
-        <div
-          className={` mt-3 mr-3 space-x-3 ${fullPage ? "text-base" : "text-xs"}`}
-        >
+        <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
             className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
               currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
