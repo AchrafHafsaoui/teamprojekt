@@ -431,6 +431,13 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     );
   };
 
+  const [expandedRow, setExpandedRow] = useState<string | null>(null); // Track the expanded row
+
+  const handleRowClick = (stationId: string) => {
+    // Toggle expanded state
+    setExpandedRow((prev) => (prev === stationId ? null : stationId));
+  };
+
   return (
     <div
       className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${
@@ -585,8 +592,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
           {currentStations.map((station, index) => (
             <div
               key={station.stationId}
-              className={`grid grid-cols-4 gap-4 items-center text-gray-800 ${fullPage ? "h-[16%]" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5`}
-            >
+              onClick={() => {
+                if (fullPage) handleRowClick(station.stationId); // Only allow expansion if fullPage is true
+              }}
+              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${fullPage ? "cursor-pointer" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5 ${expandedRow === station.stationId ? "bg-blue-100" : ""
+              }`}
+           >
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {station.stationId}
               </span>
@@ -606,6 +617,13 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
                   {station.chargingPower} kW
                 </div>
               </div>
+              {expandedRow === station.stationId && (
+                <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
+                  <p>Additional Details for {station.stationId}</p>
+                  <p>Maximum Charging Power: {station.maxPower} KWh</p>
+                  <p>Current Charging Power: {station.chargingPower} KWh</p>
+                </div>
+              )}
             </div>
           ))}
         </div>

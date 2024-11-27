@@ -176,11 +176,17 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
     });
   }, []);
 
+  const [expandedRow, setExpandedRow] = useState<string | null>(null); // Track the expanded row
+
+  const handleRowClick = (busId: string) => {
+    // Toggle expanded state
+    setExpandedRow((prev) => (prev === busId ? null : busId));
+  };
+
   return (
     <div
-      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${
-        fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
-      }`}
+      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+        }`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">
         <h2 className="text-2xl font-semibold 2xl:text-xl md:text-lg sm:text-xs">
@@ -407,13 +413,16 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         </div>
 
         {/* Data Rows */}
-        <div className={`overflow-x-hidden custom-scrollbar h-[90%]`}>
+        <div className={`overflow-y-auto custom-scrollbar h-[90%]`}>
           {currentBuses.map((vehicle, index) => (
             <div
               key={vehicle.busId}
-              className={`grid gap-4 items-center text-gray-800 pb-3 min-h-14  ${fullPage ? "h-[16%]" : "h-[33.3%]"}  shadow-sm font-semibold ${
-                fullPage ? "grid-cols-7" : "grid-cols-5"
-              }`}
+              onClick={() => {
+                if (fullPage) handleRowClick(vehicle.busId); // Only allow expansion if fullPage is true
+              }}
+              className={`grid gap-4 items-center pb-3 rounded-2xl ${fullPage ? "grid-cols-7 cursor-pointer" : "grid-cols-5 h-[33.3%]"
+                } text-gray-800 shadow-sm font-semibold ${expandedRow === vehicle.busId ? "bg-blue-100" : ""
+                }`}
             >
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {vehicle.busId}
@@ -437,9 +446,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   {vehicle.ENE}
                 </span>
               )}
-              <div
-                className={`relative my-2 mx-auto ${fullPage ? "w-[30%]" : "w-[50%]"}`}
-              >
+              <div className={`relative my-2 mx-auto ${fullPage?"w-[30%]":"w-[50%]"}`}>
                 <CircularProgressbar
                   value={animatedValues[index]}
                   maxValue={100}
@@ -477,6 +484,16 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   </div>
                 )}
               </div>
+              {expandedRow === vehicle.busId && (
+                <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
+                  <p>Additional Details for {vehicle.busId}</p>
+                  <p>Battery: {vehicle.battery}%</p>
+                  <p>Charging Start: {vehicle.chargingStart || "N/A"}</p>
+                  <p>Charging Location: {vehicle.chargingLocation || "N/A"}</p>
+                  <p>CAP: {vehicle.CAP}</p>
+                  <p>ENE: {vehicle.ENE}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>
