@@ -476,6 +476,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
           ),
         )}
       </div>
+
       {/* Pagination Controls */}
       <div
         className={`flex justify-end items-center mt-3 mr-3 space-x-3 ${fullPage ? "text-base" : "text-xs"}`}

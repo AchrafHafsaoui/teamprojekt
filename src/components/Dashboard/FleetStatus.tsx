@@ -494,10 +494,10 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
           )}
         </div>
       </div>
-      <div className="w-full h-[15%]">
+      <div className="w-full h-[15%] flex justify-end items-center">
         {/* Pagination Controls */}
         <div
-          className={`flex justify-end items-center mt-3 mr-3 space-x-3 ${fullPage ? "text-base" : "text-xs"}`}
+          className={` mt-3 mr-3 space-x-3 ${fullPage ? "text-base" : "text-xs"}`}
         >
           <button
             className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
