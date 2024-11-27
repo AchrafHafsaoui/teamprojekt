@@ -16,19 +16,19 @@ const ElectricityCost: React.FC = () => {
     { hour: "7", price: 1.15 },
     { hour: "8", price: 0.91 },
     { hour: "9", price: 1.18 },
-    { hour: "10", price: 1.10 },
+    { hour: "10", price: 1.1 },
     { hour: "11", price: 1.12 },
     { hour: "12", price: 0.97 },
     { hour: "13", price: 1.05 },
-    { hour: "14", price: 1.00 },
+    { hour: "14", price: 1.0 },
     { hour: "15", price: 0.98 },
     { hour: "16", price: 0.95 },
-    { hour: "17", price: 1.00 },
+    { hour: "17", price: 1.0 },
     { hour: "18", price: 0.97 },
     { hour: "19", price: 0.94 },
     { hour: "20", price: 0.85 },
     { hour: "21", price: 0.82 },
-    { hour: "22", price: 0.80 },
+    { hour: "22", price: 0.8 },
     { hour: "23", price: 0.78 },
     { hour: "24", price: 0.75 },
   ];
@@ -48,9 +48,9 @@ const ElectricityCost: React.FC = () => {
     price: (Math.random() * (1.2 - 0.7) + 0.7).toFixed(2), // Generate random filter for 31 days
   }));
 
-  const [filter, setFilter] = useState<
-    "hourly" | "weekly" | "monthly"
-  >("hourly");
+  const [filter, setFilter] = useState<"hourly" | "weekly" | "monthly">(
+    "hourly",
+  );
 
   useEffect(() => {
     const updateWidth = () => {
@@ -71,7 +71,8 @@ const ElectricityCost: React.FC = () => {
       ref={containerRef}
       className="h-full bg-opacity-90 flex flex-col bg-[#FFFFFF] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
       style={{
-        background: 'linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 80%)',
+        background:
+          "linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 90%)",
       }}
     >
       {/* Centered Heading */}
@@ -84,28 +85,31 @@ const ElectricityCost: React.FC = () => {
         <div className="flex space-x-4">
           <button
             onClick={() => setFilter("hourly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "hourly"
-              ? "border border-black bg-[#078ECD] text-white"
-              : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-              }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${
+              filter === "hourly"
+                ? "border border-black bg-[#078ECD] text-white"
+                : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+            }`}
           >
             Day
           </button>
           <button
             onClick={() => setFilter("weekly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "weekly"
-              ? "border border-black bg-[#078ECD] text-white"
-              : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-              }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${
+              filter === "weekly"
+                ? "border border-black bg-[#078ECD] text-white"
+                : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+            }`}
           >
             Week
           </button>
           <button
             onClick={() => setFilter("monthly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "monthly"
-              ? "border border-black bg-[#078ECD] text-white"
-              : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-              }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${
+              filter === "monthly"
+                ? "border border-black bg-[#078ECD] text-white"
+                : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
+            }`}
           >
             Month
           </button>
@@ -116,7 +120,13 @@ const ElectricityCost: React.FC = () => {
         <AreaChart
           width={chartWidth}
           height={200}
-          data={filter === "hourly" ? hourlyData : filter === "weekly" ? weeklyData : monthlyData}
+          data={
+            filter === "hourly"
+              ? hourlyData
+              : filter === "weekly"
+                ? weeklyData
+                : monthlyData
+          }
           margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
         >
           <defs>
@@ -131,9 +141,15 @@ const ElectricityCost: React.FC = () => {
             axisLine={{ stroke: "#ccc" }}
             tickLine={false}
             ticks={
-              (filter === "hourly")
-                ? hourlyData.filter((_, index) => index % 2 === 0).map((entry) => entry.hour)
-                : (filter === "monthly") ? monthlyData.filter((_, index) => index % 2 === 0).map((entry) => entry.day) : undefined
+              filter === "hourly"
+                ? hourlyData
+                    .filter((_, index) => index % 2 === 0)
+                    .map((entry) => entry.hour)
+                : filter === "monthly"
+                  ? monthlyData
+                      .filter((_, index) => index % 2 === 0)
+                      .map((entry) => entry.day)
+                  : undefined
             }
           />
           <YAxis

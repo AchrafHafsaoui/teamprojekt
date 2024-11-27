@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import OverviewIcon from "../assets/icons/overview.svg";
-import ChargingStationIcon from "../assets/icons/charging stations.svg";
+import ChargingStationIcon from "../assets/icons/chargingstation.svg";
 import ChargingScheduleIcon from "../assets/icons/charging schedule.svg";
-import DrivingScheduleIcon from "../assets/icons/driving schedule.svg";
+import DrivingScheduleIcon from "../assets/icons/schedule.svg";
 import ParkingIcon from "../assets/icons/parking.svg";
-import FleetStatusIcon from "../assets/icons/Fleet status.svg";
+import FleetStatusIcon from "../assets/icons/Fleet.svg";
 import Logo from "../assets/logo.png";
 import PowerIcon from "../assets/icons/power.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
@@ -59,8 +59,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
             className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
             style={{ transition: "background-color 0.3s" }}
             onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              "rgba(7, 142, 205, 0.35)")
+              (e.currentTarget.style.backgroundColor =
+                "rgba(7, 142, 205, 0.35)")
             }
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "transparent")
@@ -68,10 +68,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
           >
             <img src={item.icon} alt={item.label} className="w-12 ml-2" />
             <span
-              className={`whitespace-nowrap overflow-hidden ml-4 ${activeButton === item.label
-                ? "font-semibold text-[rgb(7, 142, 205)]"
-                : "text-gray-800"
-                } text-lg tracking-wide transition-all`}
+              className={`whitespace-nowrap overflow-hidden ml-4 ${
+                activeButton === item.label
+                  ? "font-semibold text-[rgb(7, 142, 205)]"
+                  : "text-gray-800"
+              } text-lg tracking-wide transition-all`}
             >
               {item.label}
             </span>
@@ -103,10 +104,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
             className="w-8 ml-4 mr-2"
           />
           <span
-            className={`whitespace-nowrap overflow-hidden ml-4 ${activeButton === "Control Panel"
+            className={`whitespace-nowrap overflow-hidden ml-4 ${
+              activeButton === "Control Panel"
                 ? "font-semibold text-[rgb(7, 142, 205)]"
                 : "text-gray-800"
-              } text-lg tracking-wide transition-all`}
+            } text-lg tracking-wide transition-all`}
           >
             Control Panel
           </span>
@@ -133,8 +135,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
           </span>
         </button>
       </div>
-
-
 
       {/* Version */}
       <div className="text-xs text-center mb-5 text-black">v 0.0.1</div>
