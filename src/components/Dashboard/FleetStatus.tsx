@@ -189,7 +189,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         }`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">
-        <h2 className="text-2xl font-bold text-[#078ECD]">
+        <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-[#078ECD] mb-2">
           Fleet Status
         </h2>
         {fullPage && (
@@ -475,7 +475,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                 {vehicle.status == "Maintenance" && (
                   <div className="absolute bottom-1 text-center font-bold w-5 ">
                     <svg
-                      className="2xl:w-[0.95rem] md:w-[0.7rem] sm:w-[0.6rem] "
+                      className="w-[1.5rem]"
                       fill="#000000"
                       viewBox="0 0 512 512"
                     >

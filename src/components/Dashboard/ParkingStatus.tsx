@@ -222,7 +222,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-[#078ECD]">Parking Status</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-[#078ECD] ">Parking Status</h2>
         {/* Edit Button */}
         <div className="flex items-center space-x-4">
           <button
@@ -357,7 +357,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         <div
           className="grid gap-4"
           style={{
-            gridTemplateColumns: `repeat(${Math.min(columns, 8)}, minmax(80px, 1fr))`, // Limit to max 8 columns
+            gridTemplateColumns: `repeat(${Math.min(columns, fullPage?8:5)}, minmax(80px, 1fr))`, // Limit to max 8 columns
           }}
         >
           {renderGrid()}

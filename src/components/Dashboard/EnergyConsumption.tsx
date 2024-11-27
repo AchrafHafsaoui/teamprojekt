@@ -128,7 +128,7 @@ const EnergyConsumption: React.FC = () => {
     }}>
 
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-white">Energy Consumption</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-white mb-2">Energy Consumption</h2>
         <div className="flex space-x-4">
           <button
             onClick={handlePreviousPage}

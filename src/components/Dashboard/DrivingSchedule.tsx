@@ -64,7 +64,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
         }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold mb-4 text-[#078ECD]">Driving Schedule</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-[#078ECD]">Driving Schedule</h2>
         {/* Select Date Button */}
         {fullPage && (<button
           onClick={handlePanelToggle}
@@ -88,7 +88,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
               </button>
 
               {/* Panel Header */}
-              <h2 className="text-xl font-bold text-gray-800 text-center">Select Date & Time</h2>
+              <h2 className="text-xl font-bold text-[#078ECD] text-center">Select Date & Time</h2>
               <div className="flex space-x-2 my-4 justify-center">
                 {/* Departure Button */}
                 <button

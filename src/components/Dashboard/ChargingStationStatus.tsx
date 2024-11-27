@@ -445,7 +445,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
       }`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">
-        <h2 className="text-2xl font-bold text-[#078ECD]">
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl mb-2 font-bold text-[#078ECD]">
           Charging Station Status
         </h2>
         {fullPage && (

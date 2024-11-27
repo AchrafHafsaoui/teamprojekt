@@ -79,7 +79,7 @@ const ElectricityCost: React.FC = () => {
       {/* Centered Heading with Buttons */}
       <div className="flex justify-between items-center px-4">
         {/* Heading */}
-        <p className="text-2xl font-bold text-white">Electricity Cost</p>
+        <p className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-white">Electricity Cost</p>
 
         {/* Buttons for time period */}
         <div className="flex space-x-4">
