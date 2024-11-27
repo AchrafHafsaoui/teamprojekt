@@ -222,7 +222,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold mb-4">Parking Status</h2>
+        <h2 className="text-2xl font-bold text-[#078ECD]">Parking Status</h2>
         {/* Edit Button */}
         <div className="flex items-center space-x-4">
           <button

@@ -68,10 +68,10 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
           >
             <img src={item.icon} alt={item.label} className="w-12 ml-2" />
             <span
-              className={`whitespace-nowrap overflow-hidden ml-4 ${
+              className={`whitespace-nowrap overflow-hidden ml-4  ${
                 activeButton === item.label
-                  ? "font-semibold text-[rgb(7, 142, 205)]"
-                  : "text-gray-800"
+                  ? "font-bold text-[rgb(7, 142, 205)]"
+                  : "font-semibold text-gray-800"
               } text-lg tracking-wide transition-all`}
             >
               {item.label}
@@ -106,8 +106,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
           <span
             className={`whitespace-nowrap overflow-hidden ml-4 ${
               activeButton === "Control Panel"
-                ? "font-semibold text-[rgb(7, 142, 205)]"
-                : "text-gray-800"
+                ? "font-bold text-[rgb(7, 142, 205)]"
+                : "font-semibold text-gray-800"
             } text-lg tracking-wide transition-all`}
           >
             Control Panel

@@ -105,7 +105,7 @@ const ChargingSchedule: React.FC = () => {
       className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">
-        <h2 className="text-2xl font-semibold mb-2">Charging Schedule</h2>
+        <h2 className="text-2xl font-bold text-[#078ECD]">Charging Schedule</h2>
         {!seeStats && (
           <input
             type="text"
