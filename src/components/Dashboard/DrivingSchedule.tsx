@@ -15,8 +15,9 @@ type DrivingScheduleProps = {
 
 const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [endTime, setEndTime] = useState<Date | null>(null);
+  const [time, setTime] = useState<Date>(new Date());
+  const [isPanelOpen, setIsPanelOpen] = useState(false); // State for panel visibility
+  const [activeButton, setActiveButton] = useState("Departure"); // Default active button
 
   const scheduleData: ScheduleEntry[] = [
     { id: "10190", departureTime: "06:15", arrivalTime: "08:30", vehicleCode: "T300L18" },
@@ -37,24 +38,24 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
   };
 
   const filterSchedule = () => {
-    if (!startTime || !endTime) return scheduleData; // No filter if no start or end time selected
+    if (!time) return scheduleData; // No filter if no start or end time selected
 
-    const startHours = startTime.getHours();
-    const startMinutes = startTime.getMinutes();
-    const endHours = endTime.getHours();
-    const endMinutes = endTime.getMinutes();
+    const startHours = time.getHours();
+    const startMinutes = time.getMinutes();
 
     return scheduleData.filter((entry) => {
       const [entryHours, entryMinutes] = entry.departureTime.split(":").map(Number);
 
       // Check if the departure time is within the range
-      const isAfterStartTime =
+      const isAfterTime =
         entryHours > startHours || (entryHours === startHours && entryMinutes >= startMinutes);
-      const isBeforeEndTime =
-        entryHours < endHours || (entryHours === endHours && entryMinutes <= endMinutes);
 
-      return isAfterStartTime && isBeforeEndTime;
+      return isAfterTime;
     });
+  };
+
+  const handlePanelToggle = () => {
+    setIsPanelOpen(!isPanelOpen); // Toggle panel visibility
   };
 
   return (
@@ -63,43 +64,122 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
         }`}
     >
       <h2 className="text-2xl font-semibold mb-4">Driving Schedule</h2>
-      {/* Date and Time Picker */}
-      <div className="flex items-center gap-4 mb-4">
-        <div>
-          <label className="block font-medium text-gray-700">Select Date:</label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            dateFormat="yyyy/MM/dd"
-            className="border rounded-md p-2 w-full"
-          />
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700">Start Time:</label>
-          <DatePicker
-            selected={startTime}
-            onChange={(time) => setStartTime(time)}
-            showTimeSelect
-            showTimeSelectOnly
-            timeIntervals={15} // Allows selection in 15-minute intervals
-            timeCaption="Start Time"
-            dateFormat="HH:mm" // 24-hour format without AM/PM
-            className="border rounded-md p-2 w-full"
-          />
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700">End Time:</label>
-          <DatePicker
-            selected={endTime}
-            onChange={(time) => setEndTime(time)}
-            showTimeSelect
-            showTimeSelectOnly
-            timeIntervals={15} // Allows selection in 15-minute intervals
-            timeCaption="End Time"
-            dateFormat="HH:mm" // 24-hour format without AM/PM
-            className="border rounded-md p-2 w-full"
-          />
-        </div>
+      <div className="relative">
+        {/* Button to open the panel */}
+        <button
+          onClick={handlePanelToggle}
+          className="bg-[#078ECD] text-white px-4 py-2 rounded-lg hover:bg-[#066a97] transition-all font-semibold"
+        >
+          Select Date & Time
+        </button>
+
+        {/* Overlay Panel */}
+        {isPanelOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-xl p-6 relative">
+              {/* Close Button */}
+              <button
+                onClick={handlePanelToggle}
+                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+
+              {/* Panel Header */}
+              <h2 className="text-xl font-bold text-gray-800 text-center">Select Date & Time</h2>
+              <div className="flex items-center space-x-2 my-4 justify-center">
+      {/* Departure Button */}
+      <button
+        onClick={() => setActiveButton("Departure")}
+        className={`py-1 px-3 rounded-full text-sm font-semibold transition ${
+          activeButton === "Departure"
+            ? "bg-[#078ECD] text-white"
+            : "border border-gray-300 text-gray-700 hover:bg-gray-200"
+        }`}
+      >
+        Departure
+      </button>
+
+      {/* Arrival Button */}
+      <button
+        onClick={() => setActiveButton("Arrival")}
+        className={`py-1 px-3 rounded-full text-sm font-semibold transition ${
+          activeButton === "Arrival"
+            ? "bg-[#078ECD] text-white"
+            : "border border-gray-300 text-gray-700 hover:bg-gray-200"
+        }`}
+      >
+        Arrival
+      </button>
+    </div>
+
+              {/* Customized Calendar */}
+              <div className="mb-4 mx-14">
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  inline
+                  className="custom-calendar"
+                />
+              </div>
+
+              {/* Time Picker */}
+              {/* Time Picker */}
+              <div className="mb-6 mx-14">
+                <div className="flex items-center space-x-4">
+                  {/* Decrease Time Button */}
+                  <button
+                    onClick={() => {
+                      if (time) {
+                        const updatedTime = new Date(time);
+                        updatedTime.setMinutes(updatedTime.getMinutes() - 15); // Decrease by 15 minutes
+                        setTime(updatedTime);
+                      }
+                    }}
+                    className="text-[#078ECD] text-lg font-bold px-2 hover:opacity-80"
+                  >
+                    −
+                  </button>
+
+                  {/* Time Display */}
+                  <div className="text-lg font-medium text-gray-800 underline">
+                    {time ? time.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "00:00"}
+                  </div>
+
+                  {/* Increase Time Button */}
+                  <button
+                    onClick={() => {
+                      if (time) {
+                        const updatedTime = new Date(time);
+                        updatedTime.setMinutes(updatedTime.getMinutes() + 15); // Increase by 15 minutes
+                        setTime(updatedTime);
+                      }
+                    }}
+                    className="text-[#078ECD] text-lg font-bold px-2 hover:opacity-80"
+                  >
+                    +
+                  </button>
+
+                  {/* Now Button */}
+                  <button
+                    onClick={() => setTime(new Date())}
+                    className="py-1 px-5 border border-gray-300 text-gray-700 font-semibold rounded-md hover:bg-[#078ECD] hover:text-white transition"
+                  >
+                    Now
+                  </button>
+                </div>
+              </div>
+              {/* Apply Button */}
+              <button
+                onClick={handlePanelToggle}
+                className="w-full py-3 rounded-lg font-semibold bg-[#078ECD] text-white hover:bg-[#066a97] transition text-lg"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
       {/* Filtered Schedule */}
       <div className="flex justify-between mb-4 px-2 text-lg font-semibold">
