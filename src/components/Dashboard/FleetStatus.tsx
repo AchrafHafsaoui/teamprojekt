@@ -190,7 +190,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
           <input
             type="text"
             placeholder="Search by Plate Number or Charging Point"
-            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-base md:text-sm sm:text-xs"
+            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#078ECD] focus:border-transparent text-base md:text-sm sm:text-xs"
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         )}
@@ -223,7 +223,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
       <div className="w-full h-[75%]">
         {/* Header Row */}
         <div
-          className={`grid gap-4 font-bold mb-2 h-[10%] text-gray-600 text-center pt-3 top-0 sticky ${fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"}`}
+          className={`grid gap-4 font-bold h-[10%] text-gray-600 text-center top-0 sticky ${fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"}`}
         >
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Plate Number
@@ -407,7 +407,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         </div>
 
         {/* Data Rows */}
-        <div className={`overflow-x-hidden custom-scrollbar h-[90%] pt-4`}>
+        <div className={`overflow-x-hidden custom-scrollbar h-[90%]`}>
           {currentBuses.map((vehicle, index) => (
             <div
               key={vehicle.busId}
@@ -437,7 +437,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   {vehicle.ENE}
                 </span>
               )}
-              <div className="relative my-2 mx-auto w-[30%]">
+              <div className={`relative my-2 mx-auto ${fullPage?"w-[30%]":"w-[50%]"}`}>
                 <CircularProgressbar
                   value={animatedValues[index]}
                   maxValue={100}
@@ -494,13 +494,13 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
           )}
         </div>
       </div>
-      <div className="w-full h-[15%] flex justify-end items-center">
+      <div className="w-full h-[10%] flex justify-end items-center">
         {/* Pagination Controls */}
         <div
           className={` mt-3 mr-3 space-x-3 ${fullPage ? "text-base" : "text-xs"}`}
         >
           <button
-            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
+            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
               currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={handlePrevious}
@@ -512,7 +512,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
+            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
               currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={handleNext}

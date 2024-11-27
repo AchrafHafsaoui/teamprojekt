@@ -110,15 +110,15 @@ const ChargingSchedule: React.FC = () => {
           <input
             type="text"
             placeholder="Search by Station ID"
-            className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#078ECD] focus:border-transparent"
             onChange={(e) => console.log(e.target.value)}
           />
         )}
         <button
-          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white`}
+          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white`}
           onClick={() => setSeeStats(!seeStats)}
         >
-          {seeStats ? "return" : "see Stats"}
+          {seeStats ? "Return" : "See Stats"}
         </button>
       </div>
       {!seeStats ? (
@@ -290,7 +290,7 @@ const ChargingSchedule: React.FC = () => {
           {/* Pagination Controls */}
           <div className="flex justify-end items-center mt-3 mr-3 space-x-2">
             <button
-              className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
+              className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
                 currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
               }`}
               onClick={handlePrevious}
@@ -302,7 +302,7 @@ const ChargingSchedule: React.FC = () => {
               {currentPage} / {totalPages}
             </span>
             <button
-              className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white ${
+              className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
                 currentPage === totalPages
                   ? "opacity-50 cursor-not-allowed"
                   : ""
