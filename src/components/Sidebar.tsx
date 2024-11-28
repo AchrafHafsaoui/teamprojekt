@@ -137,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
       </div>
 
       {/* Version */}
-      <div className="text-xs text-center mb-5 text-black">v 0.0.1</div>
+      <div className="text-xs text-center mb-5 text-black">v 0.0.2</div>
     </div>
   );
 };
