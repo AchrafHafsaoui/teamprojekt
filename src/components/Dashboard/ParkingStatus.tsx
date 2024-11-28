@@ -246,11 +246,11 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
 
   return (
     <div
-      className={`bg-[#FFFFFF] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      className={`bg-[#e8f4ff] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-[#078ECD] ">Parking Status</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryLightColor ">Parking Status</h2>
         {/* Edit Button */}
         {fullPage && (<div className="flex items-center space-x-4">
           <button

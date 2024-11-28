@@ -54,7 +54,7 @@ const EnergyConsumption: React.FC = () => {
         backgroundColor: currentMonthData.values.map((value) =>
           value === highestValue || value === lowestValue
             ? "rgb(7, 142, 205)"
-            : "rgba(255,255,255, 0.8)",
+            : "rgba(232, 244, 255, 1)",
         ),
         borderRadius: 5,
         borderSkipped: false,
@@ -128,7 +128,7 @@ const EnergyConsumption: React.FC = () => {
     }}>
 
       <div className="flex justify-between items-center mb-4">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-white mb-2">Energy Consumption</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-[#e8f4ff]">Energy Consumption</h2>
         <div className="flex space-x-4">
           <button
             onClick={handlePreviousPage}

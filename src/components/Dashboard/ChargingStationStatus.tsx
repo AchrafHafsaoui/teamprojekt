@@ -440,7 +440,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
 
   return (
     <div
-      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${
+      className={`bg-[#e8f4ff] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${
         fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
       }`}
     >

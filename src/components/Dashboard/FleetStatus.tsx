@@ -185,7 +185,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
 
   return (
     <div
-      className={`bg-[#FFFFFF] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      className={`bg-[#e8f4ff] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">

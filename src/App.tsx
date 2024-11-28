@@ -101,9 +101,7 @@ const App: React.FC = () => {
             background: `lurl('/src/assets/blue_background_abstract.jpg')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
             backgroundBlendMode: "overlay",
-            backgroundColor: "rgba(255, 255, 255, 0.6)", // Light overlay
           }}
         />
 

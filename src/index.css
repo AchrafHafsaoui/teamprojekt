@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary-light-color: #078ECD; /* Example light blue */
+  --secondary-light-color: #078ECD; /* Example light yellow */
+  --dark-primary-color: #0d47a1; /* Example dark blue */
+  --dark-secondary-color: #f57c00; /* Example dark orange */
+}
+
+
 /* Hide scrollbar for IE, Edge, and Firefox */
 html,
 body {
@@ -13,7 +21,7 @@ body {
   width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -40,6 +48,8 @@ body {
   background-repeat: no-repeat;
   background-blend-mode: overlay;
   animation: moveUp 20s linear infinite;
+  background-color: rgba(255, 255, 255, 0.6); /* Light overlay */
+
 }
 
 

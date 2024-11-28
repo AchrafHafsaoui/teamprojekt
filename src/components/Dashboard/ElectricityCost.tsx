@@ -69,47 +69,43 @@ const ElectricityCost: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="h-full bg-opacity-90 flex flex-col bg-[#FFFFFF] border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
+      className="h-full bg-opacity-90 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
       style={{
         background:
           "linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 90%)",
       }}
     >
-      {/* Centered Heading */}
       {/* Centered Heading with Buttons */}
       <div className="flex justify-between items-center px-4">
         {/* Heading */}
-        <p className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-white">Electricity Cost</p>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-[#e8f4ff]">Electricity Cost</h2>
 
         {/* Buttons for time period */}
         <div className="flex space-x-4">
           <button
             onClick={() => setFilter("hourly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${
-              filter === "hourly"
-                ? "border border-black bg-[#078ECD] text-white"
-                : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-            }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "hourly"
+                ? "border border-black bg-[#e8f4ff] text-black"
+                : "text-white border border-gray-400 hover:bg-[#e8f4ff] hover:text-black"
+              }`}
           >
             Day
           </button>
           <button
             onClick={() => setFilter("weekly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${
-              filter === "weekly"
-                ? "border border-black bg-[#078ECD] text-white"
-                : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-            }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "weekly"
+                ? "border border-black bg-[#e8f4ff] text-black"
+                : "text-white border border-gray-400 hover:bg-[#e8f4ff] hover:text-black"
+              }`}
           >
             Week
           </button>
           <button
             onClick={() => setFilter("monthly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${
-              filter === "monthly"
-                ? "border border-black bg-[#078ECD] text-white"
-                : "text-white border border-gray-400 hover:bg-[#078ECD] hover:text-white"
-            }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "monthly"
+                ? "border border-black bg-[#e8f4ff] text-black"
+                : "text-white border border-gray-400 hover:bg-[#e8f4ff] hover:text-black"
+              }`}
           >
             Month
           </button>
@@ -131,8 +127,8 @@ const ElectricityCost: React.FC = () => {
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#078ECD" stopOpacity={0.5} />
-              <stop offset="95%" stopColor="#078ECD" stopOpacity={0} />
+              <stop offset="5%" stopColor="#e8f4ff" stopOpacity={0.5} />
+              <stop offset="95%" stopColor="#e8f4ff" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis
@@ -143,12 +139,12 @@ const ElectricityCost: React.FC = () => {
             ticks={
               filter === "hourly"
                 ? hourlyData
-                    .filter((_, index) => index % 2 === 0)
-                    .map((entry) => entry.hour)
+                  .filter((_, index) => index % 2 === 0)
+                  .map((entry) => entry.hour)
                 : filter === "monthly"
                   ? monthlyData
-                      .filter((_, index) => index % 2 === 0)
-                      .map((entry) => entry.day)
+                    .filter((_, index) => index % 2 === 0)
+                    .map((entry) => entry.day)
                   : undefined
             }
           />
@@ -177,7 +173,7 @@ const ElectricityCost: React.FC = () => {
           <Area
             type="monotone" // Smooth sinusoidal lines
             dataKey="price"
-            stroke="#078ECD"
+            stroke="#e8f4ff"
             fill="url(#colorPrice)"
             strokeWidth={4} // Wider stroke for the graph
           />
