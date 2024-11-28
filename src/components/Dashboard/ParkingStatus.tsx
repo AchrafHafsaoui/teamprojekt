@@ -81,6 +81,34 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
 
 
   const renderGrid = () => {
+    if (!fullPage) {
+      // Show in one row for non-full-page mode
+      return (
+        <div className="overflow-x-auto custom-scrollbar py-5">
+          <div className="flex space-x-4 min-w-max">
+            {rowsPerColumn.flatMap((column) =>
+              column.split("").map((row, rowIndex) => {
+                const isOccupied = row === "S" || row === "B";
+                const isBig = row === "B" || row === "b";
+    
+                return (
+                  <div
+                    key={rowIndex}
+                    className={`flex items-center justify-center border rounded-xl border-gray-500 font-semibold text-lg ${isBig ? "w-40 h-20" : "w-20 h-20"}`}
+                    style={{
+                      backgroundColor: isOccupied ? colorOccupied : colorFree,
+                    }}
+                  >
+                    {isBig ? "18m" : "12m"}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      );
+    }
+    
     return Array.from({ length: columns }).map((_, colIndex) => {
       const rowsInput = rowsPerColumn[colIndex] || "";
       const rows = rowsInput.split("");
@@ -189,9 +217,9 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                         className="bg-white bg-opacity-50 border border-gray-500 text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
                         title="Change Slot Size"
                       >
-                        {row==="S"||row==="s"?<svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize</title> <path d="M25.99 6.042l-0.004 9.735-3.732-3.733-4.454 4.455-2.665-2.665 4.454-4.454-3.384-3.383 9.785 0.045zM11.494 22.805l3.238 3.182-9.722 0.017 0.004-9.68 3.815 3.815 4.925-4.924 2.665 2.665-4.925 4.925z"></path> </g></svg>
-                        :<svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize1</title> <path d="M27.407 7.882l-2.665-2.665-4.925 4.925-3.815-3.815-0.004 9.68 9.723-0.017-3.238-3.183 4.924-4.925zM8.577 20.383l-4.453 4.453 2.665 2.666 4.453-4.455 3.732 3.732 0.004-9.734-9.784-0.045 3.383 3.383z"></path> </g></svg>
-                      }</button>
+                        {row === "S" || row === "s" ? <svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize</title> <path d="M25.99 6.042l-0.004 9.735-3.732-3.733-4.454 4.455-2.665-2.665 4.454-4.454-3.384-3.383 9.785 0.045zM11.494 22.805l3.238 3.182-9.722 0.017 0.004-9.68 3.815 3.815 4.925-4.924 2.665 2.665-4.925 4.925z"></path> </g></svg>
+                          : <svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize1</title> <path d="M27.407 7.882l-2.665-2.665-4.925 4.925-3.815-3.815-0.004 9.68 9.723-0.017-3.238-3.183 4.924-4.925zM8.577 20.383l-4.453 4.453 2.665 2.666 4.453-4.455 3.732 3.732 0.004-9.734-9.784-0.045 3.383 3.383z"></path> </g></svg>
+                        }</button>
                     </div>
                   )}
                 </div>
@@ -224,7 +252,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
       <div className="flex justify-between items-center">
         <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-[#078ECD] ">Parking Status</h2>
         {/* Edit Button */}
-        <div className="flex items-center space-x-4">
+        {fullPage && (<div className="flex items-center space-x-4">
           <button
             onClick={() => {
               if (editMode) {
@@ -245,9 +273,9 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           >
             {editMode ? "Save" : "Edit"}
           </button>
-        </div>
+        </div>)}
       </div>
-      <div className="flex overflow-x-auto space-x-4 py-5">
+      {fullPage &&<div className="flex overflow-x-auto space-x-4 py-5">
         {parkingLots.map((parking, index) => (
           <div key={parking.name} className="relative flex items-center space-x-1">
             {/* Depot Selection Button */}
@@ -349,7 +377,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           </button>
         )}
       </div>
-
+}
       {/* Parking Grid */}
       <div
         className="overflow-x-auto custom-scrollbar" // Enables horizontal scrolling
@@ -357,7 +385,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         <div
           className="grid gap-4"
           style={{
-            gridTemplateColumns: `repeat(${Math.min(columns, fullPage?8:5)}, minmax(80px, 1fr))`, // Limit to max 8 columns
+            gridTemplateColumns: `repeat(${Math.min(columns, fullPage ? 8 : 1)}, minmax(80px, 1fr))`, // Limit to max 8 columns
           }}
         >
           {renderGrid()}

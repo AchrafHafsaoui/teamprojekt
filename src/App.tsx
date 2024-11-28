@@ -11,7 +11,6 @@ import ChargingSchedule from "./components/Dashboard/ChargingSchedule";
 import ControlPanel from "./components/Dashboard/ControlPanel";
 import Logo from "./assets/logo.png";
 
-
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // State for login status
   const [email, setEmail] = useState(""); // State for email input
@@ -99,40 +98,39 @@ const App: React.FC = () => {
         <div
           className="fixed min-h-screen min-w-full animated-bg"
           style={{
-            backgroundImage: `url('/src/assets/blue_background_abstract.jpg')`,
+            background: `lurl('/src/assets/blue_background_abstract.jpg')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            backgroundColor: "rgba(255, 255, 255, 0.7)", // Light overlay
-            backgroundBlendMode: "overlay", // Overlay to soften the image
+            backgroundBlendMode: "overlay",
+            backgroundColor: "rgba(255, 255, 255, 0.6)", // Light overlay
           }}
         />
 
         {/* Content wrapper */}
-        {isLoggedIn && <div className="relative flex-grow h-full ">
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route
-              path="/charging-stations"
-              element={<ChargingStations fullPage={true} />}
-            />
-            <Route
-              path="/driving-schedule"
-              element={<DrivingSchedule fullPage={true} />}
-            />
-            <Route path="/parking" element={<Parking fullPage={true} />} />
-            <Route
-              path="/electricity-schedule"
-              element={<ElectricityCost/>} 
-            />
-            <Route
-              path="/fleet-status"
-              element={<FleetStatus fullPage={true} />}
-            />
-            <Route path="/charging-schedule" element={<ChargingSchedule />} />
-            <Route path="/control-panel" element={<ControlPanel />} />
-          </Routes>
-        </div>}
+        {isLoggedIn && (
+          <div className="relative flex-grow h-full ">
+            <Routes>
+              <Route path="/" element={<Overview />} />
+              <Route
+                path="/charging-stations"
+                element={<ChargingStations fullPage={true} />}
+              />
+              <Route
+                path="/driving-schedule"
+                element={<DrivingSchedule fullPage={true} />}
+              />
+              <Route path="/parking" element={<Parking fullPage={true} />} />
+              <Route path="/electricity-schedule" element={<ElectricityCost />} />
+              <Route
+                path="/fleet-status"
+                element={<FleetStatus fullPage={true} />}
+              />
+              <Route path="/charging-schedule" element={<ChargingSchedule />} />
+              <Route path="/control-panel" element={<ControlPanel />} />
+            </Routes>
+          </div>
+        )}
       </div>
     </Router>
   );
