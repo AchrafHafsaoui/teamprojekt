@@ -94,7 +94,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                 return (
                   <div
                     key={rowIndex}
-                    className={`flex items-center justify-center border rounded-xl border-gray-500 font-semibold text-lg ${isBig ? "w-40 h-20" : "w-20 h-20"}`}
+                    className={`flex items-center justify-center border rounded-xl border-borderColor font-semibold text-lg ${isBig ? "w-40 h-20" : "w-20 h-20"}`}
                     style={{
                       backgroundColor: isOccupied ? colorOccupied : colorFree,
                     }}
@@ -162,7 +162,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               return (
                 <div key={slotId} className="relative">
                   <div
-                    className={`flex items-center justify-center border rounded-xl border-gray-500 font-semibold text-lg ${isBig ? "h-40" : "h-20"
+                    className={`flex items-center justify-center border rounded-xl border-borderColor font-semibold text-lg ${isBig ? "h-40" : "h-20"
                       }`}
                     style={{
                       backgroundColor: isOccupied ? colorOccupied : colorFree,
@@ -199,7 +199,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                           updatedRowsPerColumn[colIndex] = updatedRows.join("");
                           setRowsPerColumn(updatedRowsPerColumn);
                         }}
-                        className="bg-white bg-opacity-50 border border-gray-500 text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
+                        className="bg-white bg-opacity-50 border border-borderColor text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
                         title="Remove Slot"
                       >
                         <svg width="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12L17 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <circle cx="12" cy="12" r="9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle> </g></svg>
@@ -214,7 +214,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                           updatedRowsPerColumn[colIndex] = updatedRows.join("");
                           setRowsPerColumn(updatedRowsPerColumn);
                         }}
-                        className="bg-white bg-opacity-50 border border-gray-500 text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
+                        className="bg-white bg-opacity-50 border border-borderColor text-black rounded-full p-1 text-xs hover:bg-gray-300 transition"
                         title="Change Slot Size"
                       >
                         {row === "S" || row === "s" ? <svg width="15" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>resize</title> <path d="M25.99 6.042l-0.004 9.735-3.732-3.733-4.454 4.455-2.665-2.665 4.454-4.454-3.384-3.383 9.785 0.045zM11.494 22.805l3.238 3.182-9.722 0.017 0.004-9.68 3.815 3.815 4.925-4.924 2.665 2.665-4.925 4.925z"></path> </g></svg>
@@ -228,7 +228,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
             {editMode && (
               <button
                 onClick={() => addNewSlot(colIndex)}
-                className={`flex items-center justify-center border rounded-xl border-gray-500 h-20 opacity-50 hover:opacity-80 transition`}
+                className={`flex items-center justify-center border rounded-xl border-borderColor h-20 opacity-50 hover:opacity-80 transition`}
                 style={{
                   backgroundColor: colorFree,
                   cursor: "pointer",
@@ -246,11 +246,11 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
 
   return (
     <div
-      className={`bg-[#e8f4ff] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-6 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryLightColor ">Parking Status</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryColor">Parking Status</h2>
         {/* Edit Button */}
         {fullPage && (<div className="flex items-center space-x-4">
           <button
@@ -267,8 +267,8 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               setEditMode(!editMode); // Toggle edit mode
             }}
             className={`p-2 rounded-lg border font-semibold transition ${editMode
-              ? "bg-[#078ECD] text-white border-[#078ECD]"
-              : "bg-transparent text-black border-[#cccccc] hover:bg-[#078ECD] hover:text-white"
+              ? "bg-primaryColor text-white border-borderColor"
+              : "bg-componentsColor text-black border-borderColor hover:bg-primaryColor hover:text-white"
               }`}
           >
             {editMode ? "Save" : "Edit"}
@@ -282,8 +282,8 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
             <button
               onClick={() => selectParking(parking.name, parking.defaultSchema)}
               className={`p-2 my-2 rounded-full font-semibold whitespace-nowrap transition ${parking.name === selectedParking
-                ? "bg-[#078ECD] text-white"
-                : "bg-black text-gray-100 hover:bg-[#078ECD] hover:text-white"
+                ? "bg-primaryColor text-white"
+                : "bg-black text-gray-100 hover:bg-primaryColor hover:text-white"
                 }`}
             >
               {parking.name}
@@ -298,7 +298,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                       type="text"
                       value={editingDepotName}
                       onChange={(e) => setEditingDepotName(e.target.value)}
-                      className="px-2 py-1 border border-gray-300 rounded-md text-black focus:outline-none focus:border-[#078ECD]"
+                      className="px-2 py-1 border border-borderColor rounded-md text-black focus:outline-none focus:border-primaryColor"
                     />
                     <button
                       onClick={() => {
@@ -308,7 +308,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                         setEditingDepot(null); // Exit editing mode
                         setEditingDepotName(""); // Reset input field
                       }}
-                      className="px-3 py-1 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
+                      className="px-3 py-1 rounded-full font-semibold whitespace-nowrap border border-borderColor bg-white text-black hover:bg-primaryColor hover:text-white transition"
                     >
                       Save
                     </button>
@@ -371,7 +371,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               setParkingLots((prev) => [...prev, newDepot]);
               selectParking(newDepotName, newDepot.defaultSchema);
             }}
-            className="px-2 rounded-full font-semibold whitespace-nowrap border border-gray-300 bg-white text-black hover:bg-[#078ECD] hover:text-white transition"
+            className="px-2 my-2 rounded-full font-semibold whitespace-nowrap border border-borderColor bg-componentsColor text-black hover:bg-primaryColor hover:text-white transition"
           >
             + Add Depot
           </button>

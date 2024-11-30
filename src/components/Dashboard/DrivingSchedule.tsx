@@ -60,15 +60,15 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
 
   return (
     <div
-      className={`bg-[#e8f4ff] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
         }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-[#078ECD]">Driving Schedule</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-primaryColor">Driving Schedule</h2>
         {/* Select Date Button */}
         {fullPage && (<button
           onClick={handlePanelToggle}
-          className="bg-[#078ECD] text-white px-4 py-2 rounded-lg hover:bg-[#066a97] transition-all font-semibold"
+          className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
         >
           Select Date & Time
         </button>)}
@@ -88,14 +88,14 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
               </button>
 
               {/* Panel Header */}
-              <h2 className="text-xl font-bold text-[#078ECD] text-center">Select Date & Time</h2>
+              <h2 className="text-xl font-bold text-primaryColor text-center">Select Date & Time</h2>
               <div className="flex space-x-2 my-4 justify-center">
                 {/* Departure Button */}
                 <button
                   onClick={() => setActiveButton("Departure")}
-                  className={`py-1 px-3 rounded-full text-sm font-semibold transition ${activeButton === "Departure"
-                    ? "bg-[#078ECD] text-white"
-                    : "border border-gray-300 text-gray-700 hover:bg-gray-200"
+                  className={`py-1 px-3 rounded-lg text-sm font-semibold transition ${activeButton === "Departure"
+                    ? "bg-primaryColor text-white"
+                    : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
                     }`}
                 >
                   Departure
@@ -104,9 +104,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                 {/* Arrival Button */}
                 <button
                   onClick={() => setActiveButton("Arrival")}
-                  className={`py-1 px-3 rounded-full text-sm font-semibold transition ${activeButton === "Arrival"
-                    ? "bg-[#078ECD] text-white"
-                    : "border border-gray-300 text-gray-700 hover:bg-gray-200"
+                  className={`py-1 px-3 rounded-lg text-sm font-semibold transition ${activeButton === "Arrival"
+                    ? "bg-primaryColor text-white"
+                    : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
                     }`}
                 >
                   Arrival
@@ -135,7 +135,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                         setTime(updatedTime);
                       }
                     }}
-                    className="text-[#078ECD] text-2xl font-bold px-2 hover:opacity-80"
+                    className="text-primaryColor text-2xl font-bold px-2 hover:opacity-80"
                   >
                     −
                   </button>
@@ -154,7 +154,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                         setTime(updatedTime);
                       }
                     }}
-                    className="text-[#078ECD] text-2xl font-bold px-2 hover:opacity-80"
+                    className="text-primaryColor text-2xl font-bold px-2 hover:opacity-80"
                   >
                     +
                   </button>
@@ -162,7 +162,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                   {/* Now Button */}
                   <button
                     onClick={() => setTime(new Date())}
-                    className="py-1 px-5 border border-gray-300 text-gray-700 font-semibold rounded-full hover:bg-[#078ECD] hover:text-white transition"
+                    className="py-1 px-5 border border-borderColor bg-componentsColor text-black font-semibold rounded-lg hover:bg-primaryColor hover:text-white transition"
                   >
                     Now
                   </button>
@@ -171,7 +171,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
               {/* Apply Button */}
               <button
                 onClick={handlePanelToggle}
-                className="w-60 py-3 mx-6 rounded-full font-semibold bg-[#078ECD] text-white hover:bg-[#066a97] transition text-lg"
+                className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
               >
                 Apply
               </button>
@@ -202,7 +202,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
             })}
           </div>
         </div>
-        <div className="border-l-2 border-gray-300 sticky top-0 h-full"></div>
+        <div className="border-l-2 border-borderColor sticky top-0 h-full"></div>
         <div className="w-1/2 ml-4">
           <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
             {filterSchedule().map((entry) => {

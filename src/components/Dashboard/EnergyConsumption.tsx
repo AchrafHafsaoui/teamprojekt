@@ -38,11 +38,7 @@ const monthlyData = [
 
 const EnergyConsumption: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
-
   const currentMonthData = monthlyData[currentPage];
-  const highestValue = Math.max(...currentMonthData.values);
-  const lowestValue = Math.min(...currentMonthData.values);
-
   const data = {
     labels: currentMonthData.values.map(
       (_, index) => `${currentMonthData.month} ${index + 1}`,
@@ -51,11 +47,7 @@ const EnergyConsumption: React.FC = () => {
       {
         label: "Electricity Consumption (kWh)",
         data: currentMonthData.values,
-        backgroundColor: currentMonthData.values.map((value) =>
-          value === highestValue || value === lowestValue
-            ? "rgb(7, 142, 205)"
-            : "rgba(232, 244, 255, 1)",
-        ),
+        backgroundColor: "rgb(232, 244, 255)",
         borderRadius: 5,
         borderSkipped: false,
       },
@@ -122,13 +114,13 @@ const EnergyConsumption: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-black bg-opacity-80 border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
-    style={{
-      background: 'linear-gradient(45deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 80%)',
-    }}>
+    <div className="h-full bg-opacity-90 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 flex-1"
+      style={{
+        background: 'linear-gradient(45deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 80%)',
+      }}>
 
       <div className="flex justify-between items-center mb-4">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-[#e8f4ff]">Energy Consumption</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-secondaryColor">Energy Consumption</h2>
         <div className="flex space-x-4">
           <button
             onClick={handlePreviousPage}

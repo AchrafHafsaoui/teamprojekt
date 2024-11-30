@@ -184,19 +184,16 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   };
 
   return (
-    <div
-      className={`bg-[#e8f4ff] bg-opacity-80 flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
-        }`}
-    >
+    <div className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"}`}>
       <div className="flex items-center w-full h-[10%] justify-between">
-        <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-[#078ECD] mb-2">
+        <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
           Fleet Status
         </h2>
         {fullPage && (
           <input
             type="text"
             placeholder="Search by Plate Number or Charging Point"
-            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#078ECD] focus:border-transparent text-base md:text-sm sm:text-xs"
+            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 bg-componentsColor border border-borderColor rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent text-base md:text-sm sm:text-xs"
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         )}
@@ -208,17 +205,10 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                 setFilterStatus(status as typeof filterStatus);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-[#cccccc] ${
-                filterStatus === status
-                  ? "text-white"
-                  : "bg-[#ededed] text-gray-800"
-              } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
-              style={{
-                backgroundColor:
-                  filterStatus === status
-                    ? "rgba(7, 142, 205, 0.8)"
-                    : undefined,
-              }}
+              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${filterStatus === status
+                ? "bg-primaryColor text-white"
+                : "border border-borderColor text-black bg-componentsColor hover:bg-primaryColor hover:text-white"
+                } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
             >
               {status === "all" ? "All" : status}
             </button>
@@ -446,7 +436,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   {vehicle.ENE}
                 </span>
               )}
-              <div className={`relative my-2 mx-auto ${fullPage?"w-[30%]":"w-[50%]"}`}>
+              <div className={`relative my-2 mx-auto ${fullPage ? "w-[30%]" : "w-[50%]"}`}>
                 <CircularProgressbar
                   value={animatedValues[index]}
                   maxValue={100}
@@ -467,7 +457,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                     style={{ animationDuration: "1.5s" }}
                   >
                     <div
-                      className="w-6 h-6 rounded-full opacity-50"
+                      className="w-6 h-6 rounded-lg opacity-50"
                       style={{ backgroundColor: "rgb(7, 142, 205)" }}
                     ></div>
                   </div>
@@ -502,9 +492,8 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
-            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={handlePrevious}
             disabled={currentPage === 1}
           >
@@ -514,9 +503,8 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
-              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={handleNext}
             disabled={currentPage === totalPages}
           >

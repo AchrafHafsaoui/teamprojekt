@@ -69,7 +69,7 @@ const ElectricityCost: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="h-full bg-opacity-90 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 flex-1"
+      className="h-full bg-opacity-90 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 flex-1"
       style={{
         background:
           "linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 90%)",
@@ -78,34 +78,34 @@ const ElectricityCost: React.FC = () => {
       {/* Centered Heading with Buttons */}
       <div className="flex justify-between items-center px-4">
         {/* Heading */}
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-[#e8f4ff]">Electricity Cost</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-secondaryColor">Electricity Cost</h2>
 
         {/* Buttons for time period */}
         <div className="flex space-x-4">
           <button
             onClick={() => setFilter("hourly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "hourly"
-                ? "border border-black bg-[#e8f4ff] text-black"
-                : "text-white border border-gray-400 hover:bg-[#e8f4ff] hover:text-black"
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition border border-tertiaryColor ${filter === "hourly"
+                ? "bg-secondaryColor"
+                : "text-secondaryColor hover:bg-secondaryColor hover:text-black"
               }`}
           >
             Day
           </button>
           <button
             onClick={() => setFilter("weekly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "weekly"
-                ? "border border-black bg-[#e8f4ff] text-black"
-                : "text-white border border-gray-400 hover:bg-[#e8f4ff] hover:text-black"
-              }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition border border-tertiaryColor ${filter === "weekly"
+              ? "bg-secondaryColor"
+              : "text-secondaryColor hover:bg-secondaryColor hover:text-black"
+            }`}
           >
             Week
           </button>
           <button
             onClick={() => setFilter("monthly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition ${filter === "monthly"
-                ? "border border-black bg-[#e8f4ff] text-black"
-                : "text-white border border-gray-400 hover:bg-[#e8f4ff] hover:text-black"
-              }`}
+            className={`py-1 px-4 text-sm font-semibold rounded-full transition border border-tertiaryColor ${filter === "monthly"
+              ? "bg-secondaryColor"
+              : "text-secondaryColor hover:bg-secondaryColor hover:text-black"
+            }`}
           >
             Month
           </button>

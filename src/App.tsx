@@ -54,7 +54,7 @@ const App: React.FC = () => {
                     id="username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#078ECD] transition-all"
+                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
                   />
                 </div>
                 <div className="mb-6">
@@ -69,21 +69,21 @@ const App: React.FC = () => {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#078ECD] transition-all"
+                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
                   />
                 </div>
                 <div className="flex justify-center">
                   <button
                     onClick={handleLogin}
                     type="submit"
-                    className="w-full py-3 px-4 bg-[#078ECD] text-white font-semibold rounded-lg hover:bg-[#078ECD] focus:outline-none focus:ring-2 focus:ring-[#078ECD] transition-all duration-300 transform hover:scale-105"
+                    className="w-full py-3 px-4 bg-primaryColor text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all duration-300 transform hover:scale-105"
                   >
                     Login
                   </button>
                 </div>
               </form>
               <div className="mt-4 text-center">
-                <a href="/forgot-password" className="text-[#078ECD] hover:underline">
+                <a href="/forgot-password" className="text-primaryColor hover:underline">
                   Forgot your password?
                 </a>
               </div>

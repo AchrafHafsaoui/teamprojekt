@@ -88,8 +88,8 @@ const ControlPanel: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
         {/* Login/Logout Logs */}
-        <div className="flex flex-col bg-gray-100 rounded-3xl shadow p-4">
-          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-[#078ECD]">Login/Logout Logs</h3>
+        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4">
+          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">Login/Logout Logs</h3>
           <div className="overflow-y-auto custom-scrollbar">
             {sampleLoginLogs.map((log, index) => (
               <div
@@ -107,8 +107,8 @@ const ControlPanel: React.FC = () => {
         </div>
 
         {/* Edits Logs */}
-        <div className="flex flex-col bg-gray-100 rounded-3xl shadow p-4">
-          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-[#078ECD]">Edit Logs</h3>
+        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4">
+          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">Edit Logs</h3>
           <div className="overflow-y-auto custom-scrollbar">
             {sampleEditLogs.map((log, index) => {
               return (
@@ -122,7 +122,7 @@ const ControlPanel: React.FC = () => {
                       {log.action} -{" "}
                       <Link
                         to={pageRoutes[log.page] || "/"}
-                        className="text-[#078ECD] underline hover:text-[#066a97] transition"
+                        className="text-primaryColor underline hover:text-[#066a97] transition"
                       >
                         {log.page}
                       </Link>
@@ -136,14 +136,14 @@ const ControlPanel: React.FC = () => {
         </div>
 
         {/* Member Management */}
-        <div className="flex flex-col bg-gray-100 rounded-3xl shadow p-4 relative">
+        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 relative">
           <div className="flex justify-between items-center">
-            <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-[#078ECD]">
+            <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
               Member Management
             </h3>
             <button
               onClick={() => setIsPanelOpen(true)}
-              className="px-4 py-2 bg-[#078ECD] text-white font-semibold rounded-lg hover:bg-[#066a97] transition"
+              className="bg-secondaryColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
             >
               Add User
             </button>
@@ -161,7 +161,7 @@ const ControlPanel: React.FC = () => {
                 <select
                   value={member.role}
                   onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                  className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#078ECD] bg-white"
+                  className="px-2 py-1 border border-borderColor rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor bg-secondaryColor"
                 >
                   <option value="Admin">Admin</option>
                   <option value="Active User">Active User</option>
@@ -181,7 +181,7 @@ const ControlPanel: React.FC = () => {
                 >
                   ×
                 </button>
-                <h3 className="text-2xl font-bold mb-4 text-[#078ECD]">
+                <h3 className="text-2xl font-bold mb-4 text-primaryColor">
                   Generate New User
                 </h3>
                 {/* Username and Password Display */}
@@ -193,7 +193,7 @@ const ControlPanel: React.FC = () => {
                     type="text"
                     readOnly
                     value={newUsername}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-4 py-2 border border-borderColor rounded-md"
                   />
                 </div>
                 <div className="mb-6 mx-6">
@@ -204,20 +204,20 @@ const ControlPanel: React.FC = () => {
                     type="text"
                     readOnly
                     value={newPassword}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-4 py-2 border border-borderColor rounded-md"
                   />
                 </div>
                 {/* Generate Button */}
                 <button
                   onClick={handleGenerateCredentials}
-                  className="w-60 py-3 mx-6 rounded-full font-semibold bg-[#078ECD] text-white hover:bg-[#066a97] transition text-lg"
+                  className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
                 >
                   Generate
                 </button>
                 {/* Add User Button */}
                 <button
                   onClick={handleAddNewUser}
-                  className="w-60 py-3 mx-6 rounded-full font-semibold bg-[#078ECD] text-white hover:bg-[#066a97] transition text-lg"
+                  className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
                 >
                   Add User
                 </button>

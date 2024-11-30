@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --primary-light-color: #078ECD; /* Example light blue */
-  --secondary-light-color: #078ECD; /* Example light yellow */
-  --dark-primary-color: #0d47a1; /* Example dark blue */
-  --dark-secondary-color: #f57c00; /* Example dark orange */
+  --primary-color: #078ECD; 
+  --secondary-color: #e8f4ff;
+  --components-color: #F5F5F5; 
+  --border-color: #BBBBBB; 
 }
 
 

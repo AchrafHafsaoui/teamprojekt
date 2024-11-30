@@ -6,10 +6,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primaryLightColor: "var(--primary-light-color)",
-        secondaryLightColor: "var(--secondary-light-color)",
-        darkPrimaryColor: "var(--dark-primary-color)",
-        darkSecondaryColor: "var(--dark-secondary-color)",
+        primaryColor: "var(--primary-color)",
+        secondaryColor: "var(--secondary-color)",
+        componentsColor: "var(--components-color)",
+        borderColor: "var(--border-color)",
       },
     },
   },

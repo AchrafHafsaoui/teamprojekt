@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
   ];
 
   return (
-    <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-[#e8f4ff] group z-10">
+    <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-secondaryColor group z-10">
       {/* Top menu part */}
       <div className="flex flex-col space-y-5 mt-4 flex-grow">
         <div className="flex mb-8">

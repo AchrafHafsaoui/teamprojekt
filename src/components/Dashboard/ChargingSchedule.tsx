@@ -102,20 +102,20 @@ const ChargingSchedule: React.FC = () => {
 
   return (
     <div
-      className={`bg-[#e8f4ff] bg-opacity-80 flex flex-col border border-[#D3D3D3] shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}
+      className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-[#078ECD] mb-2">Charging Schedule</h2>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryColor mb-2">Charging Schedule</h2>
         {!seeStats && (
           <input
             type="text"
             placeholder="Search by Station ID"
-            className="px-3 py-2 w-2/3 ml-10 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#078ECD] focus:border-transparent"
+            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 bg-componentsColor border border-borderColor rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent text-base md:text-sm sm:text-xs"
             onChange={(e) => console.log(e.target.value)}
           />
         )}
         <button
-          className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white`}
+          className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
           onClick={() => setSeeStats(!seeStats)}
         >
           {seeStats ? "Return" : "See Stats"}
@@ -291,7 +291,7 @@ const ChargingSchedule: React.FC = () => {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-4">
                 <div
-                  className="bg-[#078ECD] h-4 rounded-full"
+                  className="bg-primaryColor h-4 rounded-full"
                   style={{
                     width: `${calculatePercentage(currentChargingLoad)}%`,
                   }}
@@ -307,7 +307,7 @@ const ChargingSchedule: React.FC = () => {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-4">
                 <div
-                  className="bg-[#078ECD] h-4 rounded-full"
+                  className="bg-primaryColor h-4 rounded-full"
                   style={{
                     width: `${calculatePercentage(upwardFlexibility)}%`,
                   }}
@@ -323,7 +323,7 @@ const ChargingSchedule: React.FC = () => {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-4">
                 <div
-                  className="bg-[#078ECD] h-4 rounded-full"
+                  className="bg-primaryColor h-4 rounded-full"
                   style={{
                     width: `${calculatePercentage(downwardFlexibility)}%`,
                   }}
@@ -337,9 +337,8 @@ const ChargingSchedule: React.FC = () => {
         {/* Pagination Controls */}
         <div className="space-x-2 text-base">
           <button
-            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={handlePrevious}
             disabled={currentPage === 1}
           >
@@ -349,9 +348,8 @@ const ChargingSchedule: React.FC = () => {
             {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 bg-gray-300 rounded-md hover:bg-[#078ECD] hover:text-white ${
-              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={handleNext}
             disabled={currentPage === totalPages}
           >
