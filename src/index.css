@@ -3,32 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --primary-color: #078ECD; 
+  /*Titles, items hovered on and graphs on light panels*/
+  --primary-color: #078ECD;
+  /*Light panels background and styling color in dark panels*/
   --secondary-color: #e8f4ff;
-  --components-color: #F5F5F5; 
-  --border-color: #BBBBBB; 
+  /*Buttons and searchbars*/
+  --components-color: #F5F5F5;
+  /*Borders*/
+  --border-color: #BBBBBB;
 }
 
 
 /* Hide scrollbar for IE, Edge, and Firefox */
 html,
 body {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: #c0c0c0;
   border-radius: 10px;
-  border: 2px solid #f1f1f1; /* creates padding around thumb */
+  border: 2px solid #f1f1f1;
+  /* creates padding around thumb */
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #a0a0a0;
 }
@@ -37,8 +47,9 @@ body {
   0% {
     background-position: top;
   }
+
   100% {
-    background-position: bottom ;
+    background-position: bottom;
   }
 }
 
@@ -48,8 +59,7 @@ body {
   background-repeat: no-repeat;
   background-blend-mode: overlay;
   animation: moveUp 20s linear infinite;
-  background-color: rgba(255, 255, 255, 0.6); /* Light overlay */
+  background-color: rgba(255, 255, 255, 0.6);
+  /* Light overlay */
 
 }
-
-

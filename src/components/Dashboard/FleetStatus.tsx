@@ -457,7 +457,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                     style={{ animationDuration: "1.5s" }}
                   >
                     <div
-                      className="w-6 h-6 rounded-lg opacity-50"
+                      className="w-6 h-6 rounded-full opacity-50"
                       style={{ backgroundColor: "rgb(7, 142, 205)" }}
                     ></div>
                   </div>
