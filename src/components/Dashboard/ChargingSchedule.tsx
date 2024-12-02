@@ -1,362 +1,228 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+// SVG for the bus
+const BusSVG = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="#078ECD"
+    viewBox="0 0 24 24"
+    className="w-9 h-9"
+  >
+    <path d="M20 3H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1a3 3 0 1 0 6 0h2a3 3 0 1 0 6 0h1a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM4 9V7h6v2Zm10 0V7h6v2Zm-6 4v-2h6v2Z" />
+  </svg>
+);
 
 interface Bus {
   id: number;
+  station: string;
   maxCapacity: number;
   currentCharging: number;
+  remainingTime: number;
+  scheduledStart: Date;
 }
 
 const ChargingSchedule: React.FC = () => {
-  const minChargePerBus = 0;
-  const buses: Bus[] = [
-    { id: 1, maxCapacity: 100, currentCharging: 50 },
-    { id: 2, maxCapacity: 100, currentCharging: 70 },
-    { id: 3, maxCapacity: 100, currentCharging: 60 },
-    { id: 4, maxCapacity: 100, currentCharging: 80 },
-    { id: 5, maxCapacity: 100, currentCharging: 90 },
-    { id: 6, maxCapacity: 100, currentCharging: 40 },
-    { id: 7, maxCapacity: 100, currentCharging: 0 },
-    { id: 8, maxCapacity: 100, currentCharging: 0 },
-    { id: 9, maxCapacity: 100, currentCharging: 70 },
-    { id: 10, maxCapacity: 100, currentCharging: 60 },
-    { id: 11, maxCapacity: 100, currentCharging: 80 },
-    { id: 12, maxCapacity: 100, currentCharging: 90 },
-    { id: 13, maxCapacity: 100, currentCharging: 40 },
-    { id: 14, maxCapacity: 100, currentCharging: 0 },
-    { id: 15, maxCapacity: 100, currentCharging: 0 },
+  const stations = [
+    { id: "A", chargingPoints: 8 },
+    { id: "B", chargingPoints: 8 },
+    { id: "C", chargingPoints: 8 },
+    { id: "D", chargingPoints: 8 },
+    { id: "E", chargingPoints: 8 },
+    { id: "F", chargingPoints: 8 },
+    { id: "G", chargingPoints: 8 },
+    { id: "H", chargingPoints: 8 },
   ];
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  const [seeStats, setSeeStats] = useState<boolean>(false);
-
-  // sorting
-  const [fieldToSort, setFieldToSort] = useState<{
-    field: "1" | "2" | "3" | "4" | "5" | null;
-    direction: "ASC" | "DSC";
+  const [chargingPoints, setChargingPoints] = useState<{
+    [key: string]: (number | null)[];
   }>({
-    field: null,
-    direction: "ASC",
+    A: [10091, null, 12307, null, null, null, null, null],
+    B: [16785, null, 14311, null, 15006, null, null, null],
+    C: [null, 16220, null, null, null, null, null, null],
+    D: [17899, null, null, null, null, null, null, null],
+    E: [18456, null, null, null, null, null, null, null],
+    F: [19422, null, null, null, null, null, null, null],
+    G: [null, null, 20311, null, null, null, null, null],
+    H: [21290, null, null, null, null, null, null, null],
   });
 
-  // Calculate total pages and current buses
-  const totalPages = Math.ceil(buses.length / itemsPerPage);
-  const currentBuses = buses.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const [buses, setBuses] = useState<Bus[]>([
+    {
+      id: 10091,
+      station: "A",
+      maxCapacity: 100,
+      currentCharging: 50,
+      remainingTime: 50,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes from now
+    },
+    {
+      id: 12307,
+      station: "A",
+      maxCapacity: 100,
+      currentCharging: 70,
+      remainingTime: 30,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 10), // 10 minutes from now
+    },
+    {
+      id: 16785,
+      station: "B",
+      maxCapacity: 100,
+      currentCharging: 60,
+      remainingTime: 40,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
+    },
+    {
+      id: 14311,
+      station: "B",
+      maxCapacity: 100,
+      currentCharging: 80,
+      remainingTime: 20,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 8), // 8 minutes from now
+    },
+    {
+      id: 15006,
+      station: "C",
+      maxCapacity: 100,
+      currentCharging: 90,
+      remainingTime: 10,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 20), // 20 minutes from now
+    },
+    {
+      id: 16220,
+      station: "C",
+      maxCapacity: 100,
+      currentCharging: 40,
+      remainingTime: 60,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 12), // 12 minutes from now
+    },
+    {
+      id: 17899,
+      station: "D",
+      maxCapacity: 100,
+      currentCharging: 0,
+      remainingTime: 100,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 18), // 18 minutes from now
+    },
+    {
+      id: 18456,
+      station: "D",
+      maxCapacity: 100,
+      currentCharging: 20,
+      remainingTime: 80,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
+    },
+  ]);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBuses((prevBuses) =>
+        prevBuses.map((bus) =>
+          bus.remainingTime > 0
+            ? {
+                ...bus,
+                remainingTime: bus.remainingTime - 1,
+                currentCharging: Math.min(bus.currentCharging + 1, bus.maxCapacity),
+              }
+            : bus
+        )
+      );
+    }, 1000); // Exact 1-second interval
+  
+    return () => clearInterval(interval);
+  }, []);
+  
+  const renderStations = () => {
+    return stations.map((station) => (
+      <div
+        key={station.id}
+        className="bg-secondaryColor border border-borderColor p-2 rounded-2xl shadow-xl relative w-full flex flex-col items-center"
+      >
+        <h3 className="text-lg font-semibold mb-6 text-center">
+          Station {station.id}
+        </h3>
+        <div className="grid grid-cols-8 gap-4">
+          {Array.from({ length: station.chargingPoints }).map((_, index) => {
+            const busId = chargingPoints[station.id][index];
+            const bus = buses.find((b) => b.id === busId);
+            const remainingTime =
+              bus && bus.currentCharging < bus.maxCapacity
+                ? ((bus.maxCapacity - bus.currentCharging) / 5) * 3 // time in seconds
+                : 0;
 
-  // Handlers for pagination
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+            return (
+              <div
+                key={index}
+                className="flex flex-col items-center justify-center bg-gray-200 rounded-full w-12 h-12 border border-borderColor relative"
+              >
+                {busId && (
+                  <>
+                    <span className="absolute -top-6 text-sm font-semibold">
+                      {busId}
+                    </span>
+                    <BusSVG />
+                    <span className="absolute -bottom-6 text-xs text-gray-700">
+                      {remainingTime > 0
+                        ? `${Math.floor(remainingTime / 60)}m ${remainingTime % 60}s`
+                        : "Done"}
+                    </span>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    ));
   };
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
 
-  // Metrics calculations
-  const totalGridCapacity = buses.reduce(
-    (sum, bus) => sum + bus.maxCapacity,
-    0,
-  );
-  const currentChargingLoad = buses.reduce(
-    (sum, bus) => sum + bus.currentCharging,
-    0,
-  );
-  const upwardFlexibility = buses.reduce(
-    (sum, bus) => sum + (bus.maxCapacity - bus.currentCharging),
-    0,
-  );
-  const downwardFlexibility = buses.reduce(
-    (sum, bus) => sum + (bus.currentCharging - minChargePerBus),
-    0,
-  );
-
-  const calculatePercentage = (value: number) =>
-    Math.round((value / totalGridCapacity) * 90);
-
-  const handleSort = (field: "1" | "2" | "3" | "4" | "5" | null) => {
-    if (fieldToSort.field !== field) {
-      setFieldToSort({ field: field, direction: "ASC" });
-      fetchSortedItems(field, "ASC");
-    } else if (fieldToSort.direction === "ASC") {
-      setFieldToSort({ field: field, direction: "DSC" });
-      fetchSortedItems(field, "DSC");
-    } else {
-      setFieldToSort({ field: field, direction: "ASC" });
-      fetchSortedItems(field, "ASC");
-    }
-  };
-
-  const fetchSortedItems = (
-    field: "1" | "2" | "3" | "4" | "5" | null,
-    direction: "ASC" | "DSC",
-  ) => {
-    console.log(
-      "fetching items of column " + field + " in " + direction + " order.",
+  const renderChargingQueue = () => {
+    return (
+      <div className="w-1/6 flex flex-col shadow-lg rounded-2xl py-4 px-2 border border-borderColor"
+        style={{
+          background:
+            "linear-gradient(0deg, rgba(0, 0, 0, 1) 10%, rgba(7, 68, 84, 1) 60%)",
+        }}>
+        <h3 className="text-2xl font-semibold mb-4 text-center text-secondaryColor">
+          Charging Queue
+        </h3>
+        <div className="flex flex-col justify-center gap-4">
+          {buses.map((bus) => (
+            <div
+              key={bus.id}
+              className="flex flex-row justify-between items-center rounded-lg pl-1 text-secondaryColor hover:text-primaryColor hover:bg-secondaryColor py-2 px-4"
+            >
+              <div className="flex items-center">
+                <div className="flex items-center justify-center bg-secondaryColor rounded-full w-12 h-12 mr-4">
+                  <BusSVG />
+                </div>
+                <h2 className="text-lg font-bold">{bus.id}</h2>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold">
+                  Starts:{" "}
+                  {bus.scheduledStart.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   };
 
   return (
-    <div
-      className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}
-    >
-      <div className="flex items-center w-full h-[10%] justify-between">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryColor mb-2">Charging Schedule</h2>
-        {!seeStats && (
-          <input
-            type="text"
-            placeholder="Search by Station ID"
-            className="max-w-[50%] px-3 py-2 w-2/3 ml-10 bg-componentsColor border border-borderColor rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent text-base md:text-sm sm:text-xs"
-            onChange={(e) => console.log(e.target.value)}
-          />
-        )}
-        <button
-          className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
-          onClick={() => setSeeStats(!seeStats)}
-        >
-          {seeStats ? "Return" : "See Stats"}
-        </button>
+    <div className={`flex ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]}`}>
+      {/* Left Panel */}
+      <div className="flex-grow grid grid-cols-2 gap-4 rounded-2xl mr-4">
+        {renderStations()}
       </div>
-      <div className="w-full h-[80%]">
-        {!seeStats ? (
-          <div className="h-[100%]">
-            <div className="grid grid-cols-5 gap-4 font-bold text-base h-[10%] px-2 text-gray-600 top-0 sticky ">
-              <div className="flex items-center justify-center text-center">
-                Bus ID
-                {fieldToSort.field !== "1" ? (
-                  <span
-                    onClick={() => handleSort("1")}
-                    className={`ml-1 text-gray-300 hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : fieldToSort.direction == "ASC" &&
-                  fieldToSort.field == "1" ? (
-                  <span
-                    onClick={() => handleSort("1")}
-                    className={`ml-1 text-gray-600" hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : (
-                  <span
-                    onClick={() => handleSort("1")}
-                    className={`ml-1 text-gray-600 hover:cursor-pointer`}
-                  >
-                    ▲
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-center text-center">
-                Max Capacity
-                {fieldToSort.field !== "2" ? (
-                  <span
-                    onClick={() => handleSort("2")}
-                    className={`ml-1 text-gray-300 hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : fieldToSort.direction == "ASC" &&
-                  fieldToSort.field == "2" ? (
-                  <span
-                    onClick={() => handleSort("2")}
-                    className={`ml-1 text-gray-600" hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : (
-                  <span
-                    onClick={() => handleSort("2")}
-                    className={`ml-1 text-gray-600 hover:cursor-pointer`}
-                  >
-                    ▲
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-center text-center">
-                Current Charging
-                {fieldToSort.field !== "3" ? (
-                  <span
-                    onClick={() => handleSort("3")}
-                    className={`ml-1 text-gray-300 hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : fieldToSort.direction == "ASC" &&
-                  fieldToSort.field == "3" ? (
-                  <span
-                    onClick={() => handleSort("3")}
-                    className={`ml-1 text-gray-600" hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : (
-                  <span
-                    onClick={() => handleSort("3")}
-                    className={`ml-1 text-gray-600 hover:cursor-pointer`}
-                  >
-                    ▲
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-center text-center">
-                Remaining Upward Flex
-                {fieldToSort.field !== "4" ? (
-                  <span
-                    onClick={() => handleSort("4")}
-                    className={`ml-1 text-gray-300 hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : fieldToSort.direction == "ASC" &&
-                  fieldToSort.field == "4" ? (
-                  <span
-                    onClick={() => handleSort("4")}
-                    className={`ml-1 text-gray-600" hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : (
-                  <span
-                    onClick={() => handleSort("4")}
-                    className={`ml-1 text-gray-600 hover:cursor-pointer`}
-                  >
-                    ▲
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-center text-center">
-                Possible Downward Flex
-                {fieldToSort.field !== "5" ? (
-                  <span
-                    onClick={() => handleSort("5")}
-                    className={`ml-1 text-gray-300 hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : fieldToSort.direction == "ASC" &&
-                  fieldToSort.field == "5" ? (
-                  <span
-                    onClick={() => handleSort("5")}
-                    className={`ml-1 text-gray-600" hover:cursor-pointer`}
-                  >
-                    ▼
-                  </span>
-                ) : (
-                  <span
-                    onClick={() => handleSort("5")}
-                    className={`ml-1 text-gray-600 hover:cursor-pointer`}
-                  >
-                    ▲
-                  </span>
-                )}
-              </div>
-            </div>
-            {/* table body */}
-            <div className="overflow-x-hidden custom-scrollbar h-[90%] p-0 ">
-              {currentBuses.map((bus) => (
-                <div
-                  key={bus.id}
-                  className="grid grid-cols-5 gap-4 items-center h-[12.5%] text-gray-800 p-0 shadow-sm font-semibold"
-                >
-                  <span className="text-center">{bus.id}</span>
-                  <span className="text-center">{bus.maxCapacity}</span>
-                  <span className="text-center">{bus.currentCharging} kW</span>
-                  <span className="text-center">
-                    {bus.maxCapacity - bus.currentCharging} kW
-                  </span>
-                  <span className="text-center">
-                    {bus.currentCharging - minChargePerBus} kW
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4 mx-10 h-[100%]">
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">Total Depot Capacity:</span>
-              <span>{totalGridCapacity} kW</span>
-            </div>
-            <div>
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">
-                  Current Charging Load: {currentChargingLoad} KW
-                </span>
-                <span>{calculatePercentage(currentChargingLoad)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-primaryColor h-4 rounded-full"
-                  style={{
-                    width: `${calculatePercentage(currentChargingLoad)}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">
-                  Upward Flexibility: {upwardFlexibility} KW
-                </span>
-                <span>{calculatePercentage(upwardFlexibility)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-primaryColor h-4 rounded-full"
-                  style={{
-                    width: `${calculatePercentage(upwardFlexibility)}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">
-                  Downward Flexibility: {downwardFlexibility} KW
-                </span>
-                <span>{calculatePercentage(downwardFlexibility)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-primaryColor h-4 rounded-full"
-                  style={{
-                    width: `${calculatePercentage(downwardFlexibility)}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="w-full h-[10%] flex justify-end items-center">
-        {/* Pagination Controls */}
-        <div className="space-x-2 text-base">
-          <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            onClick={handlePrevious}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-lg font-medium">
-            {currentPage} / {totalPages}
-          </span>
-          <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+
+      {/* Right Panel */}
+      {renderChargingQueue()}
     </div>
   );
 };
