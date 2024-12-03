@@ -33,7 +33,7 @@ const ChargingSchedule: React.FC = () => {
     { id: "H", chargingPoints: 8 },
   ];
 
-  const [chargingPoints, setChargingPoints] = useState<{
+  const [chargingPoints] = useState<{
     [key: string]: (number | null)[];
   }>({
     A: [10091, null, 12307, null, null, null, null, null],
@@ -81,7 +81,7 @@ const ChargingSchedule: React.FC = () => {
     },
     {
       id: 15006,
-      station: "C",
+      station: "B",
       maxCapacity: 100,
       currentCharging: 90,
       remainingTime: 10,
@@ -111,44 +111,74 @@ const ChargingSchedule: React.FC = () => {
       remainingTime: 80,
       scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
     },
+    {
+      id: 19422,
+      station: "F",
+      maxCapacity: 100,
+      currentCharging: 20,
+      remainingTime: 80,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
+    },
+    {
+      id: 20311,
+      station: "G",
+      maxCapacity: 100,
+      currentCharging: 20,
+      remainingTime: 80,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
+    },
+    {
+      id: 21290,
+      station: "H",
+      maxCapacity: 100,
+      currentCharging: 20,
+      remainingTime: 80,
+      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
+    },
   ]);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setBuses((prevBuses) =>
         prevBuses.map((bus) =>
           bus.remainingTime > 0
             ? {
-                ...bus,
-                remainingTime: bus.remainingTime - 1,
-                currentCharging: Math.min(bus.currentCharging + 1, bus.maxCapacity),
-              }
+              ...bus,
+              remainingTime: bus.remainingTime - 1,
+              currentCharging: Math.min(bus.currentCharging + 1, bus.maxCapacity),
+            }
             : bus
         )
       );
     }, 1000); // Exact 1-second interval
-  
+
     return () => clearInterval(interval);
   }, []);
-  
+
   const renderStations = () => {
     return stations.map((station) => (
       <div
         key={station.id}
         className="bg-secondaryColor border border-borderColor p-2 rounded-2xl shadow-xl relative w-full flex flex-col items-center"
       >
-        <h3 className="text-lg font-semibold mb-6 text-center">
+        <h3 className="text-2xl text-primaryColor font-semibold mb-8 text-center">
           Station {station.id}
         </h3>
         <div className="grid grid-cols-8 gap-4">
           {Array.from({ length: station.chargingPoints }).map((_, index) => {
             const busId = chargingPoints[station.id][index];
             const bus = buses.find((b) => b.id === busId);
-            const remainingTime =
-              bus && bus.currentCharging < bus.maxCapacity
-                ? ((bus.maxCapacity - bus.currentCharging) / 5) * 3 // time in seconds
-                : 0;
-
+            const remainingTime = bus?.remainingTime;
+            let formattedTime = "";
+            if (remainingTime !== undefined) {
+              if (remainingTime < 60) {
+                formattedTime = `${remainingTime}s`; // Seconds
+              } else if (remainingTime < 3600) {
+                formattedTime = `${Math.floor(remainingTime / 60)}m`; // Minutes
+              } else {
+                formattedTime = `${Math.floor(remainingTime / 3600)}h`; // Hours
+              }
+            }
             return (
               <div
                 key={index}
@@ -161,9 +191,7 @@ const ChargingSchedule: React.FC = () => {
                     </span>
                     <BusSVG />
                     <span className="absolute -bottom-6 text-xs text-gray-700">
-                      {remainingTime > 0
-                        ? `${Math.floor(remainingTime / 60)}m ${remainingTime % 60}s`
-                        : "Done"}
+                      {formattedTime}
                     </span>
                   </>
                 )}
@@ -178,7 +206,7 @@ const ChargingSchedule: React.FC = () => {
 
   const renderChargingQueue = () => {
     return (
-      <div className="w-1/6 flex flex-col shadow-lg rounded-2xl py-4 px-2 border border-borderColor"
+      <div className="w-1/6 flex flex-col shadow-lg rounded-2xl py-4 px-2 border border-borderColor overflow-y-auto custom-scrollbar h-[80%]"
         style={{
           background:
             "linear-gradient(0deg, rgba(0, 0, 0, 1) 10%, rgba(7, 68, 84, 1) 60%)",

@@ -1,6 +1,0 @@
-number,status,state_of_charge,electric_capacity,blocked,date_of_fabrication,port
-Bus001,Charging,45.0,300.0,No,2020-05-01,1
-Bus002,In Transit,80.5,400.0,Yes,2019-08-15,2
-Bus003,Idle,60.0,350.0,No,2021-02-20,3
-Bus004,Maintenance,20.0,280.0,Yes,2018-11-10,4
-Bus005,Charging,75.0,320.0,No,2020-09-05,5
