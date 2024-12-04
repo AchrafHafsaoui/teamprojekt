@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import Overview from "./components/Dashboard/Overview";
-import ChargingStations from "./components/Dashboard/ChargingStationStatus";
-import DrivingSchedule from "./components/Dashboard/DrivingSchedule";
-import Parking from "./components/Dashboard/ParkingStatus";
-import ElectricityCost from "./components/Dashboard/ElectricityCost";
-import FleetStatus from "./components/Dashboard/FleetStatus";
-import ChargingSchedule from "./components/Dashboard/ChargingSchedule";
-import ControlPanel from "./components/Dashboard/ControlPanel";
+import Overview from "./components/Overview";
+import ChargingStations from "./components/ChargingStationStatus";
+import DrivingSchedule from "./components/DrivingSchedule";
+import Parking from "./components/ParkingStatus";
+import ElectricityCost from "./components/ElectricityCost";
+import FleetStatus from "./components/FleetStatus";
+import ChargingSchedule from "./components/ChargingSchedule";
+import ControlPanel from "./components/ControlPanel";
 import Logo from "./assets/logo.png";
 
 const App: React.FC = () => {
