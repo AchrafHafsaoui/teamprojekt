@@ -22,8 +22,8 @@ const deleteStation = async (id: string) => {
 type StationData = {
   station_id: string;
   availability: "OK" | "Down" | "Maintenance";
-  chargingPower: number;
-  maxPower: number;
+  charging_power: number;
+  max_power: number;
 };
 
 
@@ -69,6 +69,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   const segmentCount = 20; // Number of segments in the bar
 
   useEffect(() => {
+    const intervals: NodeJS.Timeout[] = [];
     stations.forEach((_, stationIndex) => {
       let currentSegment = 0;
       const interval = setInterval(() => {
@@ -83,8 +84,11 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
           clearInterval(interval);
         }
       }, 100); // Animation speed
+      intervals.push(interval);
     });
-  }, []);
+  }, [stations]);
+
+  
 
   // Handlers for pagination
   const handlePrevious = () => {
@@ -112,12 +116,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   );
 
   const renderGraduatedBar = (
-    chargingPower: number,
-    maxPower: number,
+    charging_power: number,
+    max_power: number,
     stationIndex: number,
   ) => {
     const segmentsToShow = Math.round(
-      (chargingPower / maxPower) * segmentCount,
+      (charging_power / max_power) * segmentCount,
     );
 
     return (
@@ -216,23 +220,23 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
                 {station.availability}
               </span>
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
-                {station.maxPower} kW
+                {station.max_power} kW
               </span>
               <div className="w-full ">
                 {renderGraduatedBar(
-                  station.chargingPower,
-                  station.maxPower,
+                  station.charging_power,
+                  station.max_power,
                   index,
                 )}
                 <div className="text-center font-semibold mt-1 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
-                  {station.chargingPower} kW
+                  {station.charging_power} kW
                 </div>
               </div>
               {expandedRow === station.station_id && (
                 <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
                   <p>Additional Details for {station.station_id}</p>
-                  <p>Maximum Charging Power: {station.maxPower} KWh</p>
-                  <p>Current Charging Power: {station.chargingPower} KWh</p>
+                  <p>Maximum Charging Power: {station.max_power} KWh</p>
+                  <p>Current Charging Power: {station.charging_power} KWh</p>
                 </div>
               )}
             </div>
