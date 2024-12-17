@@ -1,366 +1,75 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import API_ROUTES from '../apiRoutes';
 
-type ChargingStationData = {
-  stationId: string;
-  availability: "OK" | "Down" | "Maintenance";
-  chargingPower: number;
-  maxPower: number;
+
+
+const getStationById = async (id: string) => {
+  const response = await axios.get(API_ROUTES.GET_STATION(id));
+  console.log(response.data);
 };
+// Update a specific bus
+const updateStation = async (id: string, updatedStationData: object) => {
+  const response = await axios.put(API_ROUTES.UPDATE_STATION(id), updatedStationData);
+  console.log(response.data);
+};
+// Delete a specific bus
+const deleteStation = async (id: string) => {
+  const response = await axios.delete(API_ROUTES.DELETE_STATION(id));
+  console.log(response.data);
+};
+
+type StationData = {
+  station_id: string;
+  availability: "OK" | "Down" | "Maintenance";
+  charging_power: number;
+  max_power: number;
+};
+
 
 type ChargingStationProps = {
   fullPage?: boolean; // Controls height
 };
 
-const ChargingStationStatus: React.FC<ChargingStationProps> = ({
-  fullPage = false,
-}) => {
-  const stations: ChargingStationData[] = [
-    {
-      stationId: "ST01",
-      availability: "OK",
-      chargingPower: 100,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST02",
-      availability: "Down",
-      chargingPower: 70,
-      maxPower: 200,
-    },
-    {
-      stationId: "ST03",
-      availability: "Maintenance",
-      chargingPower: 160,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST04",
-      availability: "OK",
-      chargingPower: 200,
-      maxPower: 200,
-    },
-    {
-      stationId: "ST05",
-      availability: "OK",
-      chargingPower: 100,
-      maxPower: 150,
-    },
-    {
-      stationId: "ST06",
-      availability: "Maintenance",
-      chargingPower: 180,
-      maxPower: 200,
-    },
-    {
-      stationId: "ST07",
-      availability: "Down",
-      chargingPower: 40,
-      maxPower: 100,
-    },
-    {
-      stationId: "ST08",
-      availability: "OK",
-      chargingPower: 180,
-      maxPower: 500,
-    },
-    {
-      stationId: "ST09",
-      availability: "OK",
-      chargingPower: 150,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST10",
-      availability: "Down",
-      chargingPower: 60,
-      maxPower: 200,
-    },
-    {
-      stationId: "ST11",
-      availability: "Maintenance",
-      chargingPower: 90,
-      maxPower: 150,
-    },
-    {
-      stationId: "ST12",
-      availability: "OK",
-      chargingPower: 120,
-      maxPower: 250,
-    },
-    {
-      stationId: "ST13",
-      availability: "OK",
-      chargingPower: 200,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST14",
-      availability: "Down",
-      chargingPower: 50,
-      maxPower: 100,
-    },
-    {
-      stationId: "ST15",
-      availability: "Maintenance",
-      chargingPower: 100,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST16",
-      availability: "OK",
-      chargingPower: 180,
-      maxPower: 500,
-    },
-    {
-      stationId: "ST17",
-      availability: "OK",
-      chargingPower: 140,
-      maxPower: 250,
-    },
-    {
-      stationId: "ST18",
-      availability: "Down",
-      chargingPower: 30,
-      maxPower: 80,
-    },
-    {
-      stationId: "ST19",
-      availability: "Maintenance",
-      chargingPower: 170,
-      maxPower: 350,
-    },
-    {
-      stationId: "ST20",
-      availability: "OK",
-      chargingPower: 190,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST21",
-      availability: "OK",
-      chargingPower: 150,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST22",
-      availability: "Down",
-      chargingPower: 40,
-      maxPower: 90,
-    },
-    {
-      stationId: "ST23",
-      availability: "Maintenance",
-      chargingPower: 130,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST24",
-      availability: "OK",
-      chargingPower: 200,
-      maxPower: 500,
-    },
-    {
-      stationId: "ST25",
-      availability: "OK",
-      chargingPower: 120,
-      maxPower: 250,
-    },
-    {
-      stationId: "ST26",
-      availability: "Down",
-      chargingPower: 35,
-      maxPower: 100,
-    },
-    {
-      stationId: "ST27",
-      availability: "Maintenance",
-      chargingPower: 160,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST28",
-      availability: "OK",
-      chargingPower: 180,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST29",
-      availability: "OK",
-      chargingPower: 190,
-      maxPower: 500,
-    },
-    {
-      stationId: "ST30",
-      availability: "Down",
-      chargingPower: 70,
-      maxPower: 200,
-    },
-    {
-      stationId: "ST31",
-      availability: "Maintenance",
-      chargingPower: 120,
-      maxPower: 350,
-    },
-    {
-      stationId: "ST32",
-      availability: "OK",
-      chargingPower: 150,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST33",
-      availability: "OK",
-      chargingPower: 170,
-      maxPower: 250,
-    },
-    {
-      stationId: "ST34",
-      availability: "Down",
-      chargingPower: 50,
-      maxPower: 150,
-    },
-    {
-      stationId: "ST35",
-      availability: "Maintenance",
-      chargingPower: 100,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST36",
-      availability: "OK",
-      chargingPower: 200,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST37",
-      availability: "OK",
-      chargingPower: 140,
-      maxPower: 250,
-    },
-    {
-      stationId: "ST38",
-      availability: "Down",
-      chargingPower: 30,
-      maxPower: 80,
-    },
-    {
-      stationId: "ST39",
-      availability: "Maintenance",
-      chargingPower: 170,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST40",
-      availability: "OK",
-      chargingPower: 190,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST41",
-      availability: "OK",
-      chargingPower: 160,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST42",
-      availability: "Down",
-      chargingPower: 20,
-      maxPower: 50,
-    },
-    {
-      stationId: "ST43",
-      availability: "Maintenance",
-      chargingPower: 110,
-      maxPower: 250,
-    },
-    {
-      stationId: "ST44",
-      availability: "OK",
-      chargingPower: 200,
-      maxPower: 500,
-    },
-    {
-      stationId: "ST45",
-      availability: "OK",
-      chargingPower: 120,
-      maxPower: 350,
-    },
-    {
-      stationId: "ST46",
-      availability: "Down",
-      chargingPower: 60,
-      maxPower: 200,
-    },
-    {
-      stationId: "ST47",
-      availability: "Maintenance",
-      chargingPower: 140,
-      maxPower: 400,
-    },
-    {
-      stationId: "ST48",
-      availability: "OK",
-      chargingPower: 180,
-      maxPower: 500,
-    },
-    {
-      stationId: "ST49",
-      availability: "OK",
-      chargingPower: 150,
-      maxPower: 300,
-    },
-    {
-      stationId: "ST50",
-      availability: "Down",
-      chargingPower: 40,
-      maxPower: 100,
-    },
-  ];
+const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true }) => {
+
+  const [stations, setStations] = useState<StationData[]>([]);
+  const fetchStations = async () => {
+    try {
+      const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
+      console.log(response.data[3].station_id); // Update state with fetched data
+      setStations(response.data)
+    } catch (error) {
+      console.error("Error fetching buses:", error);
+    }
+  };
+
+  // useEffect to fetch data on component mount
+  useEffect(() => {
+    fetchStations();
+
+    // Optional: Polling to refresh data every 10 seconds
+    const interval = setInterval(fetchStations, 60000);
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
+
   const [filterStatus, setFilterStatus] = useState<
-    "all" | "OK" | "Down" | "Maintenance"
-  >("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  "all" | "In Depot" | "Maintenance" | "On Route"
+>("all");
   const [animatedSegments, setAnimatedSegments] = useState<number[]>(
     Array(stations.length).fill(0),
   );
+  const [searchQuery, setSearchQuery] = useState<string>("");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = fullPage ? 6 : 4;
 
   // sorting
-  const [fieldToSort, setFieldToSort] = useState<{
-    field: "1" | "2" | "3" | "4" | null;
-    direction: "ASC" | "DSC";
-  }>({
-    field: null,
-    direction: "ASC",
-  });
-
-  const handleSort = (field: "1" | "2" | "3" | "4" | null) => {
-    if (fieldToSort.field !== field) {
-      setFieldToSort({ field: field, direction: "ASC" });
-      fetchSortedItems(field, "ASC");
-    } else if (fieldToSort.direction === "ASC") {
-      setFieldToSort({ field: field, direction: "DSC" });
-      fetchSortedItems(field, "DSC");
-    } else {
-      setFieldToSort({ field: field, direction: "ASC" });
-      fetchSortedItems(field, "ASC");
-    }
-  };
-
-  const fetchSortedItems = (
-    field: "1" | "2" | "3" | "4" | null,
-    direction: "ASC" | "DSC",
-  ) => {
-    console.log(
-      "fetching items of column " + field + " in " + direction + " order.",
-    );
-  };
-
+ 
   const segmentCount = 20; // Number of segments in the bar
 
   useEffect(() => {
+    const intervals: NodeJS.Timeout[] = [];
     stations.forEach((_, stationIndex) => {
       let currentSegment = 0;
       const interval = setInterval(() => {
@@ -375,8 +84,11 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
           clearInterval(interval);
         }
       }, 100); // Animation speed
+      intervals.push(interval);
     });
-  }, []);
+  }, [stations]);
+
+  
 
   // Handlers for pagination
   const handlePrevious = () => {
@@ -390,7 +102,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
   const filteredStations = stations.filter((station) => {
     const matchesStatus =
       filterStatus === "all" || station.availability === filterStatus;
-    const matchesSearch = station.stationId
+    const matchesSearch = station.station_id
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
@@ -404,12 +116,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
   );
 
   const renderGraduatedBar = (
-    chargingPower: number,
-    maxPower: number,
+    charging_power: number,
+    max_power: number,
     stationIndex: number,
   ) => {
     const segmentsToShow = Math.round(
-      (chargingPower / maxPower) * segmentCount,
+      (charging_power / max_power) * segmentCount,
     );
 
     return (
@@ -433,9 +145,8 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null); // Track the expanded row
 
-  const handleRowClick = (stationId: string) => {
-    // Toggle expanded state
-    setExpandedRow((prev) => (prev === stationId ? null : stationId));
+  const handleRowClick = (station_id: string) => {
+    setExpandedRow((prev) => (prev === station_id ? null : station_id));
   };
 
   return (
@@ -477,140 +188,55 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
         >
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Station ID
-            {fieldToSort.field !== "1" ? (
-              <span
-                onClick={() => handleSort("1")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "1" ? (
-              <span
-                onClick={() => handleSort("1")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("1")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
+        
           </div>
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Availability
-            {fieldToSort.field !== "2" ? (
-              <span
-                onClick={() => handleSort("2")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "2" ? (
-              <span
-                onClick={() => handleSort("2")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("2")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
+            
           </div>
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Max Capacity
-            {fieldToSort.field !== "3" ? (
-              <span
-                onClick={() => handleSort("3")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "3" ? (
-              <span
-                onClick={() => handleSort("3")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("3")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
+            
           </div>
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Charging Power
-            {fieldToSort.field !== "4" ? (
-              <span
-                onClick={() => handleSort("4")}
-                className={`ml-1 text-gray-300 hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : fieldToSort.direction == "ASC" && fieldToSort.field == "4" ? (
-              <span
-                onClick={() => handleSort("4")}
-                className={`ml-1 text-gray-600" hover:cursor-pointer`}
-              >
-                ▼
-              </span>
-            ) : (
-              <span
-                onClick={() => handleSort("4")}
-                className={`ml-1 text-gray-600 hover:cursor-pointer`}
-              >
-                ▲
-              </span>
-            )}
           </div>
         </div>
         {/* Data Rows */}
         <div className={`overflow-x-hidden custom-scrollbar h-[90%]`}>
           {currentStations.map((station, index) => (
             <div
-              key={station.stationId}
+              key={station.station_id}
               onClick={() => {
-                if (fullPage) handleRowClick(station.stationId); // Only allow expansion if fullPage is true
+                if (fullPage) handleRowClick(station.station_id); // Only allow expansion if fullPage is true
               }}
-              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${fullPage ? "cursor-pointer" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5 ${expandedRow === station.stationId ? "bg-blue-100" : ""
+              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${fullPage ? "cursor-pointer" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5 ${expandedRow === station.station_id ? "bg-blue-100" : ""
               }`}
            >
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
-                {station.stationId}
+                {station.station_id}
               </span>
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {station.availability}
               </span>
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
-                {station.maxPower} kW
+                {station.max_power} kW
               </span>
               <div className="w-full ">
                 {renderGraduatedBar(
-                  station.chargingPower,
-                  station.maxPower,
+                  station.charging_power,
+                  station.max_power,
                   index,
                 )}
                 <div className="text-center font-semibold mt-1 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
-                  {station.chargingPower} kW
+                  {station.charging_power} kW
                 </div>
               </div>
-              {expandedRow === station.stationId && (
+              {expandedRow === station.station_id && (
                 <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
-                  <p>Additional Details for {station.stationId}</p>
-                  <p>Maximum Charging Power: {station.maxPower} KWh</p>
-                  <p>Current Charging Power: {station.chargingPower} KWh</p>
+                  <p>Additional Details for {station.station_id}</p>
+                  <p>Maximum Charging Power: {station.max_power} KWh</p>
+                  <p>Current Charging Power: {station.charging_power} KWh</p>
                 </div>
               )}
             </div>

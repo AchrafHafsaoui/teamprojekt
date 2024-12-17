@@ -7,6 +7,15 @@ const API_ROUTES = {
   GET_BUS: (id: string) => `${BASE_URL}/buses/${id}/`,  // Get a specific bus by ID
   UPDATE_BUS: (id: string) => `${BASE_URL}/buses/${id}/`, // Update a specific bus
   DELETE_BUS: (id: string) => `${BASE_URL}/buses/${id}/`, // Delete a specific bus
+  
+  GET_STATIONS: `${BASE_URL}/stations/`,  // Fetch all charging stations
+  ADD_STATION: `${BASE_URL}/stations/`,   // Add a new charging station
+  GET_STATION: (id: string) => `${BASE_URL}/stations/${id}/`,  // Get a specific charging station by ID
+  UPDATE_STATION: (id: string) => `${BASE_URL}/stations/${id}/`, // Update a specific charging station
+  DELETE_STATION: (id: string) => `${BASE_URL}/stations/${id}/`, // Delete a specific charging station
+
+  //login url
+  LOGIN: `${BASE_URL}/users/login/`
 };
 
 export default API_ROUTES;
