@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import axios from 'axios';
-import API_ROUTES from '../apiRoutes';
+import axios from "axios";
+import API_ROUTES from "../apiRoutes";
 
 // Add a new bus
 const addBus = async () => {
   const newBus = {
-    vehicle_type: 'Electric',
-    bus_id: 'BUS124',
+    vehicle_type: "Electric",
+    bus_id: "BUS124",
     battery: 90,
     charging_start: null,
-    status: 'In Depot',
+    status: "In Depot",
     charging_location: null,
-    CAP: '150 kWh',
-    ENE: 'Medium',
+    CAP: "150 kWh",
+    ENE: "Medium",
     vehicle_age: 3,
   };
   const response = await axios.post(API_ROUTES.ADD_BUS, newBus);
@@ -39,28 +39,26 @@ const deleteBus = async (id: string) => {
   console.log(response.data);
 };
 
-
 type BusData = {
   bus_id: string;
   status: "In Depot" | "Maintenance" | "On Route";
-  battery: number;
+  battery: number; //battery_soc
   charging_point: string | null; // Combined charging station and point (e.g., A1, B23, A17) or null if not charging
   session_start: string | null; // Charging start time or null if not charging
-  CAP: number;
-  ENE: number;  
+  CAP: number; //battery cap
+  ENE: number; //switch to range_max (how many buses: 80 buses)
 };
 
 type FleetStatusProps = {
   fullPage?: boolean; // Controls whether to show all columns
 };
 const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
-
   const [buses, setBuses] = useState<BusData[]>([]);
   const fetchBuses = async () => {
     try {
       const response = await axios.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
       console.log(response.data[3].bus_id); // Update state with fetched data
-      setBuses(response.data)
+      setBuses(response.data);
     } catch (error) {
       console.error("Error fetching buses:", error);
     }
@@ -79,7 +77,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
     "all" | "In Depot" | "Maintenance" | "On Route"
   >("all");
   const [animatedValues, setAnimatedValues] = useState<number[]>(
-    Array(buses.length).fill(0),
+    Array(buses.length).fill(0)
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   // Pagination state
@@ -87,7 +85,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   const itemsPerPage = fullPage ? 6 : 3;
 
   // sorting
- 
+
   // Handlers for pagination
   const handlePrevious = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -101,8 +99,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
     const matchesStatus =
       filterStatus === "all" || vehicle.status === filterStatus;
     const matchesSearch =
-      !fullPage ||
-      vehicle.bus_id.includes(searchQuery.toLowerCase())
+      !fullPage || vehicle.bus_id.includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -110,7 +107,7 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
   const currentBuses = filteredVehicles.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   useEffect(() => {
@@ -139,7 +136,11 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   };
 
   return (
-    <div className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"}`}>
+    <div
+      className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${
+        fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      }`}
+    >
       <div className="flex items-center w-full h-[10%] justify-between">
         <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
           Fleet Status
@@ -160,10 +161,11 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                 setFilterStatus(status as typeof filterStatus);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${filterStatus === status
-                ? "bg-primaryColor text-white"
-                : "border border-borderColor text-black bg-componentsColor hover:bg-primaryColor hover:text-white"
-                } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
+              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${
+                filterStatus === status
+                  ? "bg-primaryColor text-white"
+                  : "border border-borderColor text-black bg-componentsColor hover:bg-primaryColor hover:text-white"
+              } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
             >
               {status === "all" ? "All" : status}
             </button>
@@ -174,7 +176,9 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
       <div className="w-full h-[80%]">
         {/* Header Row */}
         <div
-          className={`grid gap-4 font-bold h-[10%] text-gray-600 text-center top-0 sticky ${fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"}`}
+          className={`grid gap-4 font-bold h-[10%] text-gray-600 text-center top-0 sticky ${
+            fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"
+          }`}
         >
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Plate Number
@@ -211,9 +215,13 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
               onClick={() => {
                 if (fullPage) handleRowClick(vehicle.bus_id); // Only allow expansion if fullPage is true
               }}
-              className={`grid gap-4 items-center pb-3 rounded-2xl ${fullPage ? "grid-cols-7 cursor-pointer" : "grid-cols-5 h-[33.3%]"
-                } text-gray-800 shadow-sm font-semibold ${expandedRow === vehicle.bus_id ? "bg-blue-100" : ""
-                }`}
+              className={`grid gap-4 items-center pb-3 rounded-2xl ${
+                fullPage
+                  ? "grid-cols-7 cursor-pointer"
+                  : "grid-cols-5 h-[33.3%]"
+              } text-gray-800 shadow-sm font-semibold ${
+                expandedRow === vehicle.bus_id ? "bg-blue-100" : ""
+              }`}
             >
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {vehicle.bus_id}
@@ -237,7 +245,11 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   {vehicle.ENE}
                 </span>
               )}
-              <div className={`relative my-2 mx-auto ${fullPage ? "w-[30%]" : "w-[50%]"}`}>
+              <div
+                className={`relative my-2 mx-auto ${
+                  fullPage ? "w-[30%]" : "w-[50%]"
+                }`}
+              >
                 <CircularProgressbar
                   value={animatedValues[index]}
                   maxValue={100}
@@ -293,8 +305,9 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handlePrevious}
             disabled={currentPage === 1}
           >
@@ -304,8 +317,9 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
             {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handleNext}
             disabled={currentPage === totalPages}
           >
