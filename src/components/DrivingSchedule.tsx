@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axios from 'axios';
+import API_ROUTES from '../apiRoutes';
+
+type Location = {
+  description: string;
+  location_name: string | null;
+};
+
+type Bus = {
+  bus_id: string;
+  battery_capacity: string;
+};
 
 type ScheduleEntry = {
   id: string;
-  departureTime: string;
-  arrivalTime: string;
-  vehicleCode: string;
+  departure_time: string;
+  arrival_time: string;
+  departure_location: Location;
+  arrival_location: Location;
+  bus: Bus | null;
 };
 
 type DrivingScheduleProps = {
@@ -14,37 +28,39 @@ type DrivingScheduleProps = {
 };
 
 const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
+  const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
+  const fetchSchedules = async () => {
+    try {
+      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES); // Fetch from API
+      console.log(response.data[3].id); // Update state with fetched data
+      setSchedules(response.data)
+    } catch (error) {
+      console.error("Error fetching buses:", error);
+    }
+  };
+
+  // useEffect to fetch data on component mount
+  useEffect(() => {
+    fetchSchedules();
+
+    // Optional: Polling to refresh data every 10 seconds
+    const interval = setInterval(fetchSchedules, 60000);
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [time, setTime] = useState<Date>(new Date());
   const [isPanelOpen, setIsPanelOpen] = useState(false); // State for panel visibility
   const [activeButton, setActiveButton] = useState("Departure"); // Default active button
 
-  const scheduleData: ScheduleEntry[] = [
-    { id: "10190", departureTime: "06:15", arrivalTime: "08:30", vehicleCode: "T300L18" },
-    { id: "12222", departureTime: "09:00", arrivalTime: "11:10", vehicleCode: "B250L12" },
-    { id: "15643", departureTime: "12:45", arrivalTime: "14:50", vehicleCode: "B400L18" },
-    { id: "16754", departureTime: "15:20", arrivalTime: "17:15", vehicleCode: "T450L20" },
-    { id: "17865", departureTime: "18:00", arrivalTime: "20:30", vehicleCode: "B320L15" },
-    { id: "18976", departureTime: "21:10", arrivalTime: "23:00", vehicleCode: "T350L12" },
-    { id: "19087", departureTime: "23:45", arrivalTime: "02:00", vehicleCode: "B410L18" },
-    { id: "20198", departureTime: "04:00", arrivalTime: "06:15", vehicleCode: "T300L16" },
-  ];
-
-  const parseVehicleCode = (code: string) => {
-    const type = code[0] === "T" ? "Truck" : "Bus";
-    const batteryCapacity = `${code.slice(2, -3)} kWh`;
-    const length = `${code.slice(-2)}m`;
-    return { type, batteryCapacity, length };
-  };
-
   const filterSchedule = () => {
-    if (!time) return scheduleData; // No filter if no start or end time selected
+    if (!time) return schedules; // No filter if no start or end time selected
 
     const startHours = time.getHours();
     const startMinutes = time.getMinutes();
 
-    return scheduleData.filter((entry) => {
-      const [entryHours, entryMinutes] = entry.departureTime.split(":").map(Number);
+    return schedules.filter((entry) => {
+      const [entryHours, entryMinutes] = entry.departure_time.split(":").map(Number);
 
       // Check if the departure time is within the range
       const isAfterTime =
@@ -186,37 +202,15 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
         <div className="text-center w-1/2">Departure</div>
       </div>
       <div className={`flex overflow-y-auto ${fullPage ? "h-4/5" : "h-60"} custom-scrollbar`}>
-        <div className="w-1/2 pl-4 mr-5">
-          <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
-            {filterSchedule().map((entry) => {
-              const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
-              return (
-                <div key={entry.id} className="flex justify-between w-full">
-                  <span className="font-semibold text-gray-700">{entry.id}</span>
-                  {fullPage && (<span className="block text-sm text-gray-500">{type}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{batteryCapacity}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{length}</span>)}
-                  <span className="font-medium text-gray-700">{entry.arrivalTime}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
         <div className="border-l-2 border-borderColor sticky top-0 h-full"></div>
         <div className="w-1/2 ml-4">
           <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
-            {filterSchedule().map((entry) => {
-              const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
-              return (
-                <div key={entry.id} className="flex justify-between w-full">
-                  <span className="font-semibold text-gray-700">{entry.id}</span>
-                  {fullPage && (<span className="block text-sm text-gray-500">{type}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{batteryCapacity}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{length}</span>)}
-                  <span className="font-medium text-gray-700">{entry.departureTime}</span>
-                </div>
-              );
-            })}
+            {filterSchedule().map((entry) => (
+              <div key={entry.id} className="flex justify-between w-full">
+                <span className="font-semibold text-gray-700">{entry.id}</span>
+                <span className="font-medium text-gray-700">{entry.departure_time}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
