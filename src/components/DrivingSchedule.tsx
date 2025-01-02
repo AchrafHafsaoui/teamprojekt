@@ -4,24 +4,25 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 import API_ROUTES from '../apiRoutes';
 
-type Location = {
-  description: string;
-  location_name: string | null;
-};
+
 
 type Bus = {
+  id : string
   bus_id: string;
-  battery_capacity: string;
+  battery: string;
 };
 
 type ScheduleEntry = {
   id: string;
   departure_time: string;
   arrival_time: string;
-  departure_location: Location;
-  arrival_location: Location;
+  departure_location: string; // Still accepts IDs for input
+  departure_location_name: string; // Display location name
+  arrival_location: string; // Still accepts IDs for input
+  arrival_location_name: string; // Display location name
   bus: Bus | null;
 };
+
 
 type DrivingScheduleProps = {
   fullPage?: boolean;
@@ -37,6 +38,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
   const fetchSchedules = async () => {
     try {
       const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
+      console.log(response.data[3].id);
       setSchedules(response.data);
     } catch (error) {
       console.error("Error fetching schedules:", error);
@@ -145,22 +147,41 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
       <div className={`flex flex-col overflow-y-auto ${fullPage ? "h-4/5" : "h-60"} custom-scrollbar`}>
         {schedules.map((entry) => ( //schedules need to be changed with filterschedule once fixed
           <div key={entry.id} className="border-b py-2">
-            <p>
-              <strong>ID:</strong> {entry.id}
-            </p>
-            <p>
-              <strong>Departure:</strong> {entry.departure_location.location_name || "N/A"} at{" "}
-              {entry.departure_time}
-            </p>
-            <p>
-              <strong>Arrival:</strong> {entry.arrival_location.location_name || "N/A"} at{" "}
-              {entry.arrival_time}
-            </p>
-            <p>
-              <strong>Bus:</strong>{" "}
-              {entry.bus ? `ID: ${entry.bus.bus_id}, Battery: ${entry.bus.battery_capacity}` : "N/A"}
-            </p>
-          </div>
+          <p>
+            <strong>ID:</strong> {entry.id}
+          </p>
+          <p>
+            <strong>Departure:</strong> {entry.departure_location_name} at{" "}
+            {new Date(entry.departure_time).toLocaleString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </p>
+          <p>
+            <strong>Arrival:</strong> {entry.arrival_location_name} at{" "}
+            {new Date(entry.arrival_time).toLocaleString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </p>
+          <p>
+            <strong>Bus:</strong>{" "}
+            {entry.bus
+              ? `ID: ${entry.bus.id}, Battery: ${entry.bus.battery}`
+              : "N/A"}
+          </p>
+        </div>
+        
         ))}
       </div>
     </div>
