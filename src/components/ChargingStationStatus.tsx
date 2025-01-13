@@ -37,7 +37,6 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   const fetchStations = async () => {
     try {
       const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
-      console.log(response.data[3].station_id); // Update state with fetched data
       setStations(response.data)
     } catch (error) {
       console.error("Error fetching buses:", error);

@@ -157,17 +157,6 @@ const ChargingSchedule: React.FC = () => {
 
   const renderStations = () => {
     return stations.map((station, index) => {
-      // Calculate station charging stats
-      const busesInStation = buses.filter((bus) => bus.station === station.id);
-      const currentChargingCapacity = busesInStation.reduce(
-        (sum, bus) => sum + bus.currentCharging,
-        0
-      );
-      const maxChargingCapacity = busesInStation.reduce(
-        (sum, bus) => sum + bus.maxCapacity,
-        0
-      );
-
       return (
         <div
           key={station.id}

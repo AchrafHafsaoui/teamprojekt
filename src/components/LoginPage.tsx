@@ -24,9 +24,10 @@ const LoginPage: React.FC = () => {
   };
 
   const checkAuth = async () => {
+    console.log(localStorage.getItem("access token"));
     try {
       const res = await axios.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        access: auth.access,
+        access: localStorage.getItem("access token"),
         role: 20,
       });
       if (res.data.message == "Authorized access") {
@@ -49,15 +50,19 @@ const LoginPage: React.FC = () => {
   };
 
   const handleLogin = async () => {
-    console.log("hello");
     try {
       const res = await axios.post<Creds>(API_ROUTES.LOGIN, {
         email,
         password,
       });
-      console.log("success:  " + res.data.access);
-      setAuth({ access: res.data.access });
-      navigate("/overview", { replace: true });
+      if (res.status === 200) {
+        //setAuth({ access: res.data.access });
+        localStorage.setItem("access token", res.data.access);
+        localStorage.setItem("refresh token", res.data.refresh);
+        //navigate("/overview", { replace: true });
+      } else {
+        alert("login unsuccessfull");
+      }
     } catch (error) {
       console.error("Login error :", error);
     }

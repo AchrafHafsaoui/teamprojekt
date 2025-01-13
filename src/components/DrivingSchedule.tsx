@@ -1,224 +1,188 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axios from 'axios';
+import API_ROUTES from '../apiRoutes';
+
+
+
+type Bus = {
+  id : string
+  bus_id: string;
+  battery: string;
+};
 
 type ScheduleEntry = {
   id: string;
-  departureTime: string;
-  arrivalTime: string;
-  vehicleCode: string;
+  departure_time: string;
+  arrival_time: string;
+  departure_location: string; // Still accepts IDs for input
+  departure_location_name: string; // Display location name
+  arrival_location: string; // Still accepts IDs for input
+  arrival_location_name: string; // Display location name
+  bus: Bus | null;
 };
+
 
 type DrivingScheduleProps = {
   fullPage?: boolean;
 };
 
 const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
+  const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [time, setTime] = useState<Date>(new Date());
-  const [isPanelOpen, setIsPanelOpen] = useState(false); // State for panel visibility
-  const [activeButton, setActiveButton] = useState("Departure"); // Default active button
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [activeButton, setActiveButton] = useState("Departure");
 
-  const scheduleData: ScheduleEntry[] = [
-    { id: "10190", departureTime: "06:15", arrivalTime: "08:30", vehicleCode: "T300L18" },
-    { id: "12222", departureTime: "09:00", arrivalTime: "11:10", vehicleCode: "B250L12" },
-    { id: "15643", departureTime: "12:45", arrivalTime: "14:50", vehicleCode: "B400L18" },
-    { id: "16754", departureTime: "15:20", arrivalTime: "17:15", vehicleCode: "T450L20" },
-    { id: "17865", departureTime: "18:00", arrivalTime: "20:30", vehicleCode: "B320L15" },
-    { id: "18976", departureTime: "21:10", arrivalTime: "23:00", vehicleCode: "T350L12" },
-    { id: "19087", departureTime: "23:45", arrivalTime: "02:00", vehicleCode: "B410L18" },
-    { id: "20198", departureTime: "04:00", arrivalTime: "06:15", vehicleCode: "T300L16" },
-  ];
-
-  const parseVehicleCode = (code: string) => {
-    const type = code[0] === "T" ? "Truck" : "Bus";
-    const batteryCapacity = `${code.slice(2, -3)} kWh`;
-    const length = `${code.slice(-2)}m`;
-    return { type, batteryCapacity, length };
+  const fetchSchedules = async () => {
+    try {
+      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
+      console.log(response.data[3].id);
+      setSchedules(response.data);
+    } catch (error) {
+      console.error("Error fetching schedules:", error);
+    }
   };
 
-  const filterSchedule = () => {
-    if (!time) return scheduleData; // No filter if no start or end time selected
+  useEffect(() => {
+    fetchSchedules();
 
+    // Optional: Polling every 60 seconds
+    const interval = setInterval(fetchSchedules, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const filterSchedule = () => {
+    if (!time) return schedules;
     const startHours = time.getHours();
     const startMinutes = time.getMinutes();
 
-    return scheduleData.filter((entry) => {
-      const [entryHours, entryMinutes] = entry.departureTime.split(":").map(Number);
-
-      // Check if the departure time is within the range
-      const isAfterTime =
-        entryHours > startHours || (entryHours === startHours && entryMinutes >= startMinutes);
-
-      return isAfterTime;
+    return schedules.filter((entry) => {
+      const [entryHours, entryMinutes] = entry.departure_time.split(":").map(Number);
+      return (
+        entryHours > startHours || (entryHours === startHours && entryMinutes >= startMinutes)
+      );
     });
   };
 
   const handlePanelToggle = () => {
-    setIsPanelOpen(!isPanelOpen); // Toggle panel visibility
+    setIsPanelOpen(!isPanelOpen);
   };
 
   return (
     <div
-      className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
-        }`}
+      className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${
+        fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-primaryColor">Driving Schedule</h2>
-        {/* Select Date Button */}
-        {fullPage && (<button
-          onClick={handlePanelToggle}
-          className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
-        >
-          Select Date & Time
-        </button>)}
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-primaryColor">
+          Driving Schedule
+        </h2>
+        {fullPage && (
+          <button
+            onClick={handlePanelToggle}
+            className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
+          >
+            Select Date & Time
+          </button>
+        )}
       </div>
-      <div className="relative">
 
-        {/* Overlay Panel */}
-        {isPanelOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-xl shadow-xl p-6 relative">
-              {/* Close Button */}
+      {/* Panel */}
+      {isPanelOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 relative">
+            <button
+              onClick={handlePanelToggle}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold text-primaryColor text-center">
+              Select Date & Time
+            </h2>
+            <div className="flex space-x-2 my-4 justify-center">
               <button
-                onClick={handlePanelToggle}
-                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                onClick={() => setActiveButton("Departure")}
+                className={`py-1 px-3 rounded-lg text-sm font-semibold transition ${
+                  activeButton === "Departure"
+                    ? "bg-primaryColor text-white"
+                    : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
+                }`}
               >
-                ×
+                Departure
               </button>
-
-              {/* Panel Header */}
-              <h2 className="text-xl font-bold text-primaryColor text-center">Select Date & Time</h2>
-              <div className="flex space-x-2 my-4 justify-center">
-                {/* Departure Button */}
-                <button
-                  onClick={() => setActiveButton("Departure")}
-                  className={`py-1 px-3 rounded-lg text-sm font-semibold transition ${activeButton === "Departure"
-                    ? "bg-primaryColor text-white"
-                    : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
-                    }`}
-                >
-                  Departure
-                </button>
-
-                {/* Arrival Button */}
-                <button
-                  onClick={() => setActiveButton("Arrival")}
-                  className={`py-1 px-3 rounded-lg text-sm font-semibold transition ${activeButton === "Arrival"
-                    ? "bg-primaryColor text-white"
-                    : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
-                    }`}
-                >
-                  Arrival
-                </button>
-              </div>
-
-              {/* Customized Calendar */}
-              <div className="mb-4 mx-6">
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
-                  inline
-                  className="custom-calendar"
-                />
-              </div>
-
-              {/* Time Picker */}
-              <div className="mb-6 mx-6">
-                <div className="flex items-center space-x-4">
-                  {/* Decrease Time Button */}
-                  <button
-                    onClick={() => {
-                      if (time) {
-                        const updatedTime = new Date(time);
-                        updatedTime.setMinutes(updatedTime.getMinutes() - 15); // Decrease by 15 minutes
-                        setTime(updatedTime);
-                      }
-                    }}
-                    className="text-primaryColor text-2xl font-bold px-2 hover:opacity-80"
-                  >
-                    −
-                  </button>
-
-                  {/* Time Display */}
-                  <div className="text-xl font-medium text-gray-800 underline">
-                    {time ? time.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "00:00"}
-                  </div>
-
-                  {/* Increase Time Button */}
-                  <button
-                    onClick={() => {
-                      if (time) {
-                        const updatedTime = new Date(time);
-                        updatedTime.setMinutes(updatedTime.getMinutes() + 15); // Increase by 15 minutes
-                        setTime(updatedTime);
-                      }
-                    }}
-                    className="text-primaryColor text-2xl font-bold px-2 hover:opacity-80"
-                  >
-                    +
-                  </button>
-
-                  {/* Now Button */}
-                  <button
-                    onClick={() => setTime(new Date())}
-                    className="py-1 px-5 border border-borderColor bg-componentsColor text-black font-semibold rounded-lg hover:bg-primaryColor hover:text-white transition"
-                  >
-                    Now
-                  </button>
-                </div>
-              </div>
-              {/* Apply Button */}
               <button
-                onClick={handlePanelToggle}
-                className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
+                onClick={() => setActiveButton("Arrival")}
+                className={`py-1 px-3 rounded-lg text-sm font-semibold transition ${
+                  activeButton === "Arrival"
+                    ? "bg-primaryColor text-white"
+                    : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
+                }`}
               >
-                Apply
+                Arrival
               </button>
             </div>
+            <div className="mb-4 mx-6">
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                inline
+                className="custom-calendar"
+              />
+            </div>
+            <button
+              onClick={handlePanelToggle}
+              className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
+            >
+              Apply
+            </button>
           </div>
-        )}
+        </div>
+      )}
 
-      </div>
-      {/* Filtered Schedule */}
-      <div className="flex justify-between mb-4 px-2 text-lg font-semibold">
-        <div className="text-center w-1/2">Arrival</div>
-        <div className="text-center w-1/2">Departure</div>
-      </div>
-      <div className={`flex overflow-y-auto ${fullPage ? "h-4/5" : "h-60"} custom-scrollbar`}>
-        <div className="w-1/2 pl-4 mr-5">
-          <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
-            {filterSchedule().map((entry) => {
-              const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
-              return (
-                <div key={entry.id} className="flex justify-between w-full">
-                  <span className="font-semibold text-gray-700">{entry.id}</span>
-                  {fullPage && (<span className="block text-sm text-gray-500">{type}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{batteryCapacity}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{length}</span>)}
-                  <span className="font-medium text-gray-700">{entry.arrivalTime}</span>
-                </div>
-              );
+      {/* Schedule */}
+      <div className={`flex flex-col overflow-y-auto ${fullPage ? "h-4/5" : "h-60"} custom-scrollbar`}>
+        {schedules.map((entry) => ( //schedules need to be changed with filterschedule once fixed
+          <div key={entry.id} className="border-b py-2">
+          <p>
+            <strong>ID:</strong> {entry.id}
+          </p>
+          <p>
+            <strong>Departure:</strong> {entry.departure_location_name} at{" "}
+            {new Date(entry.departure_time).toLocaleString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
             })}
-          </div>
-        </div>
-        <div className="border-l-2 border-borderColor sticky top-0 h-full"></div>
-        <div className="w-1/2 ml-4">
-          <div className={`flex flex-col items-start ${fullPage ? "space-y-10" : "space-y-4"}`}>
-            {filterSchedule().map((entry) => {
-              const { type, batteryCapacity, length } = parseVehicleCode(entry.vehicleCode);
-              return (
-                <div key={entry.id} className="flex justify-between w-full">
-                  <span className="font-semibold text-gray-700">{entry.id}</span>
-                  {fullPage && (<span className="block text-sm text-gray-500">{type}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{batteryCapacity}</span>)}
-                  {fullPage && (<span className="block text-sm text-gray-500">{length}</span>)}
-                  <span className="font-medium text-gray-700">{entry.departureTime}</span>
-                </div>
-              );
+          </p>
+          <p>
+            <strong>Arrival:</strong> {entry.arrival_location_name} at{" "}
+            {new Date(entry.arrival_time).toLocaleString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
             })}
-          </div>
+          </p>
+          <p>
+            <strong>Bus:</strong>{" "}
+            {entry.bus
+              ? `ID: ${entry.bus.id}, Battery: ${entry.bus.battery}`
+              : "N/A"}
+          </p>
         </div>
+        
+        ))}
       </div>
     </div>
   );
