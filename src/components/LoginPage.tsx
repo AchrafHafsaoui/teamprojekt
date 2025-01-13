@@ -1,14 +1,12 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
 import Logo from "../assets/logo.png";
-import { Navigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
 
-type LoginProps = {
-  setIsLoggedIn: (value: boolean) => void;
-};
-const LoginPage: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
+const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -17,9 +15,33 @@ const LoginPage: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
     return context;
   };
 
-  const { setAuth } = useAuth();
+  const { setAuth, auth } = useAuth();
   const [email, setEmail] = useState(""); // State for email input
   const [password, setPassword] = useState(""); // State for password input
+
+  type AuthReq = {
+    message: string;
+  };
+
+  const checkAuth = async () => {
+    try {
+      const res = await axios.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        access: auth.access,
+        role: 20,
+      });
+      if (res.data.message == "Authorized access") {
+        navigate("/overview", { replace: true });
+      }
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (auth) {
+      checkAuth();
+    }
+  }, []);
 
   type Creds = {
     access: string;
@@ -27,12 +49,15 @@ const LoginPage: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
   };
 
   const handleLogin = async () => {
+    console.log("hello");
     try {
       const res = await axios.post<Creds>(API_ROUTES.LOGIN, {
         email,
         password,
       });
+      console.log("success:  " + res.data.access);
       setAuth({ access: res.data.access });
+      navigate("/overview", { replace: true });
     } catch (error) {
       console.error("Login error :", error);
     }

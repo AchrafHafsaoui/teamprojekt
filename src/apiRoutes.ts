@@ -15,7 +15,8 @@ const API_ROUTES = {
   DELETE_STATION: (id: string) => `${BASE_URL}/stations/${id}/`, // Delete a specific charging station
 
   //login url
-  LOGIN: `${BASE_URL}/users/login/`
+  LOGIN: `${BASE_URL}/users/login/`,
+  IS_AUTH: `${BASE_URL}/users/is_auth/`
 };
 
 export default API_ROUTES;
