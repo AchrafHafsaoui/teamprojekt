@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
-import API_ROUTES from '../apiRoutes';
-
-
+import axios from "axios";
+import API_ROUTES from "../apiRoutes";
+import apiClient from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 const getStationById = async (id: string) => {
   const response = await axios.get(API_ROUTES.GET_STATION(id));
@@ -10,7 +10,10 @@ const getStationById = async (id: string) => {
 };
 // Update a specific bus
 const updateStation = async (id: string, updatedStationData: object) => {
-  const response = await axios.put(API_ROUTES.UPDATE_STATION(id), updatedStationData);
+  const response = await axios.put(
+    API_ROUTES.UPDATE_STATION(id),
+    updatedStationData
+  );
   console.log(response.data);
 };
 // Delete a specific bus
@@ -26,22 +29,49 @@ type StationData = {
   max_power: number;
 };
 
-
 type ChargingStationProps = {
   fullPage?: boolean; // Controls height
 };
 
-const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true }) => {
-
+const ChargingStationStatus: React.FC<ChargingStationProps> = ({
+  fullPage = true,
+}) => {
   const [stations, setStations] = useState<StationData[]>([]);
   const fetchStations = async () => {
     try {
       const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
-      setStations(response.data)
+      setStations(response.data);
     } catch (error) {
       console.error("Error fetching buses:", error);
     }
   };
+
+  const navigate = useNavigate();
+  type AuthReq = {
+    message: string;
+  };
+  const checkAuth = async () => {
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      console.log(res.data);
+      if (res.data.message != "Authorized access") {
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
+      checkAuth();
+    } else navigate("/login", { replace: true });
+  }, []);
 
   // useEffect to fetch data on component mount
   useEffect(() => {
@@ -53,10 +83,10 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   }, []);
 
   const [filterStatus, setFilterStatus] = useState<
-  "all" | "In Depot" | "Maintenance" | "On Route"
->("all");
+    "all" | "In Depot" | "Maintenance" | "On Route"
+  >("all");
   const [animatedSegments, setAnimatedSegments] = useState<number[]>(
-    Array(stations.length).fill(0),
+    Array(stations.length).fill(0)
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   // Pagination state
@@ -64,7 +94,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   const itemsPerPage = fullPage ? 6 : 4;
 
   // sorting
- 
+
   const segmentCount = 20; // Number of segments in the bar
 
   useEffect(() => {
@@ -86,8 +116,6 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
       intervals.push(interval);
     });
   }, [stations]);
-
-  
 
   // Handlers for pagination
   const handlePrevious = () => {
@@ -111,16 +139,16 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   const totalPages = Math.ceil(filteredStations.length / itemsPerPage);
   const currentStations = filteredStations.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const renderGraduatedBar = (
     charging_power: number,
     max_power: number,
-    stationIndex: number,
+    stationIndex: number
   ) => {
     const segmentsToShow = Math.round(
-      (charging_power / max_power) * segmentCount,
+      (charging_power / max_power) * segmentCount
     );
 
     return (
@@ -149,10 +177,14 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
   };
 
   return (
-    <div className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"}`}>
+    <div
+      className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${
+        fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      }`}
+    >
       <div className="flex items-center w-full h-[10%] justify-between">
-      <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
-      Charging Station Status
+        <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
+          Charging Station Status
         </h2>
         {fullPage && (
           <input
@@ -170,10 +202,11 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
                 setFilterStatus(status as typeof filterStatus);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${filterStatus === status
-                ? "bg-primaryColor text-white"
-                : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
-                } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
+              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${
+                filterStatus === status
+                  ? "bg-primaryColor text-white"
+                  : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
+              } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </button>
@@ -187,15 +220,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
         >
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Station ID
-        
           </div>
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Availability
-            
           </div>
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Max Capacity
-            
           </div>
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Charging Power
@@ -209,9 +239,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
               onClick={() => {
                 if (fullPage) handleRowClick(station.station_id); // Only allow expansion if fullPage is true
               }}
-              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${fullPage ? "cursor-pointer" : "h-[25%]"} min-h-14 py-3 shadow-sm font-semibold mr-5 ${expandedRow === station.station_id ? "bg-blue-100" : ""
+              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${
+                fullPage ? "cursor-pointer" : "h-[25%]"
+              } min-h-14 py-3 shadow-sm font-semibold mr-5 ${
+                expandedRow === station.station_id ? "bg-blue-100" : ""
               }`}
-           >
+            >
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {station.station_id}
               </span>
@@ -225,7 +258,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
                 {renderGraduatedBar(
                   station.charging_power,
                   station.max_power,
-                  index,
+                  index
                 )}
                 <div className="text-center font-semibold mt-1 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                   {station.charging_power} kW
@@ -246,8 +279,9 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handlePrevious}
             disabled={currentPage === 1}
           >
@@ -257,8 +291,9 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({ fullPage = true
             {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handleNext}
             disabled={currentPage === totalPages}
           >

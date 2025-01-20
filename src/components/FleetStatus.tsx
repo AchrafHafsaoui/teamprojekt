@@ -3,6 +3,8 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
+import apiClient from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 // Add a new bus
 const addBus = async () => {
@@ -82,6 +84,33 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = fullPage ? 6 : 3;
+
+  const navigate = useNavigate();
+  type AuthReq = {
+    message: string;
+  };
+  const checkAuth = async () => {
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      console.log(res.data);
+      if (res.data.message != "Authorized access") {
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
+      checkAuth();
+    } else navigate("/login", { replace: true });
+  }, []);
 
   // sorting
 

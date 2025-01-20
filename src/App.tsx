@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,14 +17,11 @@ import ControlPanel from "./components/ControlPanel";
 import LoginPage from "./components/LoginPage";
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // State for login status
   return (
     <Router>
       <div className="flex min-h-screen h-full w-full">
-        {/* Sidebar */}
-        <Sidebar setIsLoggedIn={setIsLoggedIn} />
+        <Sidebar />
 
-        {/* Background styling */}
         <div
           className="fixed min-h-screen min-w-full animated-bg"
           style={{

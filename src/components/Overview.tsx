@@ -1,12 +1,42 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FleetStatus from "./FleetStatus";
 import ElectricityCost from "./ElectricityCost";
 import EnergyConsumption from "./EnergyConsumption";
 import DrivingSchedule from "./DrivingSchedule";
 import ParkingStatus from "./ParkingStatus";
 import ChargingSchedule from "./ChargingStationStatus";
+import { useNavigate } from "react-router-dom";
+import apiClient from "../api/api";
+import API_ROUTES from "../apiRoutes";
 
 const Overview: React.FC = () => {
+  const navigate = useNavigate();
+  type AuthReq = {
+    message: string;
+  };
+  const checkAuth = async () => {
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      console.log(res.data);
+      if (res.data.message != "Authorized access") {
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
+      checkAuth();
+    } else navigate("/login", { replace: true });
+  }, []);
+
   return (
     <div className="grid h-full w-full gap-10 overflow-hidden bg-cover bg-center pl-32 pt-12 pr-12">
       {/* Define 3 rows: Upper, Middle, and Parking Status */}

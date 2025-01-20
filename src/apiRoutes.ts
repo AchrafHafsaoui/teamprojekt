@@ -22,7 +22,8 @@ const API_ROUTES = {
 
   //login url
   LOGIN: `${BASE_URL}/users/login/`,
-  IS_AUTH: `${BASE_URL}/users/is_auth/`
+  IS_AUTH: `${BASE_URL}/users/is_auth/`,
+  REFRESH_TOKEN: `${BASE_URL}/users/access_token/refresh/`
 };
 
 export default API_ROUTES;

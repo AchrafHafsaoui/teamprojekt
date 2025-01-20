@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
 import Logo from "../assets/logo.png";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import apiClient from "../api/api";
 import API_ROUTES from "../apiRoutes";
 
 const LoginPage: React.FC = () => {
@@ -24,10 +25,8 @@ const LoginPage: React.FC = () => {
   };
 
   const checkAuth = async () => {
-    console.log(localStorage.getItem("access token"));
     try {
-      const res = await axios.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        access: localStorage.getItem("access token"),
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
       });
       if (res.data.message == "Authorized access") {
@@ -39,7 +38,10 @@ const LoginPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (auth) {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
       checkAuth();
     }
   }, []);
@@ -56,15 +58,16 @@ const LoginPage: React.FC = () => {
         password,
       });
       if (res.status === 200) {
-        //setAuth({ access: res.data.access });
+        setAuth({ access: res.data.access });
         localStorage.setItem("access token", res.data.access);
         localStorage.setItem("refresh token", res.data.refresh);
-        //navigate("/overview", { replace: true });
+        navigate("/overview", { replace: true });
       } else {
         alert("login unsuccessfull");
       }
     } catch (error) {
       console.error("Login error :", error);
+      alert("login unsuccessfull");
     }
   };
 
@@ -124,12 +127,9 @@ const LoginPage: React.FC = () => {
           </div>
         </form>
         <div className="mt-4 text-center">
-          <a
-            href="/forgot-password"
-            className="text-primaryColor hover:underline"
-          >
+          <p className="text-primaryColor hover:underline hover:cursor-pointer">
             Forgot your password?
-          </a>
+          </p>
         </div>
       </div>
     </div>

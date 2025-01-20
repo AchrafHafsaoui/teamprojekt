@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import axios from 'axios';
-import API_ROUTES from '../apiRoutes';
-
-
+import axios from "axios";
+import API_ROUTES from "../apiRoutes";
+import apiClient from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 type Bus = {
-  id : string
+  id: string;
   bus_id: string;
   battery: string;
 };
@@ -23,21 +23,51 @@ type ScheduleEntry = {
   bus: Bus | null;
 };
 
-
 type DrivingScheduleProps = {
   fullPage?: boolean;
 };
 
-const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
+const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
+  fullPage = false,
+}) => {
   const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [time, setTime] = useState<Date>(new Date());
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [activeButton, setActiveButton] = useState("Departure");
 
+  const navigate = useNavigate();
+  type AuthReq = {
+    message: string;
+  };
+  const checkAuth = async () => {
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      console.log(res.data);
+      if (res.data.message != "Authorized access") {
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
+      checkAuth();
+    } else navigate("/login", { replace: true });
+  }, []);
+
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
+      const response = await axios.get<ScheduleEntry[]>(
+        API_ROUTES.GET_DRIVING_SCHEDULES
+      );
       console.log(response.data[3].id);
       setSchedules(response.data);
     } catch (error) {
@@ -59,9 +89,12 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
     const startMinutes = time.getMinutes();
 
     return schedules.filter((entry) => {
-      const [entryHours, entryMinutes] = entry.departure_time.split(":").map(Number);
+      const [entryHours, entryMinutes] = entry.departure_time
+        .split(":")
+        .map(Number);
       return (
-        entryHours > startHours || (entryHours === startHours && entryMinutes >= startMinutes)
+        entryHours > startHours ||
+        (entryHours === startHours && entryMinutes >= startMinutes)
       );
     });
   };
@@ -144,45 +177,52 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
       )}
 
       {/* Schedule */}
-      <div className={`flex flex-col overflow-y-auto ${fullPage ? "h-4/5" : "h-60"} custom-scrollbar`}>
-        {schedules.map((entry) => ( //schedules need to be changed with filterschedule once fixed
-          <div key={entry.id} className="border-b py-2">
-          <p>
-            <strong>ID:</strong> {entry.id}
-          </p>
-          <p>
-            <strong>Departure:</strong> {entry.departure_location_name} at{" "}
-            {new Date(entry.departure_time).toLocaleString("en-US", {
-              weekday: "short",
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
-          </p>
-          <p>
-            <strong>Arrival:</strong> {entry.arrival_location_name} at{" "}
-            {new Date(entry.arrival_time).toLocaleString("en-US", {
-              weekday: "short",
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
-          </p>
-          <p>
-            <strong>Bus:</strong>{" "}
-            {entry.bus
-              ? `ID: ${entry.bus.id}, Battery: ${entry.bus.battery}`
-              : "N/A"}
-          </p>
-        </div>
-        
-        ))}
+      <div
+        className={`flex flex-col overflow-y-auto ${
+          fullPage ? "h-4/5" : "h-60"
+        } custom-scrollbar`}
+      >
+        {schedules.map(
+          (
+            entry //schedules need to be changed with filterschedule once fixed
+          ) => (
+            <div key={entry.id} className="border-b py-2">
+              <p>
+                <strong>ID:</strong> {entry.id}
+              </p>
+              <p>
+                <strong>Departure:</strong> {entry.departure_location_name} at{" "}
+                {new Date(entry.departure_time).toLocaleString("en-US", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </p>
+              <p>
+                <strong>Arrival:</strong> {entry.arrival_location_name} at{" "}
+                {new Date(entry.arrival_time).toLocaleString("en-US", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </p>
+              <p>
+                <strong>Bus:</strong>{" "}
+                {entry.bus
+                  ? `ID: ${entry.bus.id}, Battery: ${entry.bus.battery}`
+                  : "N/A"}
+              </p>
+            </div>
+          )
+        )}
       </div>
     </div>
   );
