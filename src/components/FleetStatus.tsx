@@ -42,11 +42,11 @@ const deleteBus = async (id: string) => {
 type BusData = {
   bus_id: string;
   status: "In Depot" | "Maintenance" | "On Route";
-  battery: number; //battery_soc
+  battery: number;
   charging_point: string | null; // Combined charging station and point (e.g., A1, B23, A17) or null if not charging
   session_start: string | null; // Charging start time or null if not charging
-  CAP: number; //battery cap
-  ENE: number; //switch to range_max (how many buses: 80 buses)
+  CAP: number;
+  ENE: number;
 };
 
 type FleetStatusProps = {
@@ -57,7 +57,6 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   const fetchBuses = async () => {
     try {
       const response = await axios.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
-      console.log(response.data[3].bus_id); // Update state with fetched data
       setBuses(response.data);
     } catch (error) {
       console.error("Error fetching buses:", error);

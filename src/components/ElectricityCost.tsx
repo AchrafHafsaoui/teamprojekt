@@ -1,61 +1,45 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { AreaChart, Area, Tooltip, XAxis, YAxis } from "recharts";
 
 const ElectricityCost: React.FC = () => {
   const [chartWidth, setChartWidth] = useState(0);
+  const [hourlyData, setHourlyData] = useState<{ hour: string; price: number }[]>(
+    [],
+  ); // State to hold the fetched data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const hourlyData = [
-    { hour: "0", price: 0.85 },
-    { hour: "1", price: 0.91 },
-    { hour: "2", price: 0.86 },
-    { hour: "3", price: 0.78 },
-    { hour: "4", price: 0.89 },
-    { hour: "5", price: 0.95 },
-    { hour: "6", price: 0.98 },
-    { hour: "7", price: 1.15 },
-    { hour: "8", price: 0.91 },
-    { hour: "9", price: 1.18 },
-    { hour: "10", price: 1.1 },
-    { hour: "11", price: 1.12 },
-    { hour: "12", price: 0.97 },
-    { hour: "13", price: 1.05 },
-    { hour: "14", price: 1.0 },
-    { hour: "15", price: 0.98 },
-    { hour: "16", price: 0.95 },
-    { hour: "17", price: 1.0 },
-    { hour: "18", price: 0.97 },
-    { hour: "19", price: 0.94 },
-    { hour: "20", price: 0.85 },
-    { hour: "21", price: 0.82 },
-    { hour: "22", price: 0.8 },
-    { hour: "23", price: 0.78 },
-    { hour: "24", price: 0.75 },
-  ];
+  useEffect(() => {
+    const fetchElectricityData = async () => {
+      try {
+        setLoading(true); // Start loading
+        const response = await axios.get("http://localhost:8000/api/entsoe-data/"); // Update to your backend URL
+        const fetchedData = response.data;
 
-  const weeklyData = [
-    { day: "Mo", price: 0.95 },
-    { day: "Tu", price: 1.02 },
-    { day: "We", price: 0.88 },
-    { day: "Th", price: 1.15 },
-    { day: "Fr", price: 0.97 },
-    { day: "Sa", price: 0.78 },
-    { day: "Su", price: 0.82 },
-  ];
+        // Map the data to match the expected format
+        const formattedData = Object.entries(fetchedData).map(([hour, price]) => ({
+          hour: hour.split(" ")[1], // Extract the hour part from the timestamp
+          price: parseFloat(price), // Convert price to a number
+        }));
 
-  const monthlyData = Array.from({ length: 31 }, (_, i) => ({
-    day: `${i + 1}`,
-    price: (Math.random() * (1.2 - 0.7) + 0.7).toFixed(2), // Generate random filter for 31 days
-  }));
+        setHourlyData(formattedData);
+        setLoading(false); // End loading
+      } catch (err) {
+        console.error("Error fetching electricity data:", err);
+        setError("Failed to fetch data.");
+        setLoading(false);
+      }
+    };
 
-  const [filter, setFilter] = useState<"hourly" | "weekly" | "monthly">(
-    "hourly",
-  );
+    fetchElectricityData(); // Fetch data on component mount
+  }, []);
 
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setChartWidth(containerRef.current.offsetWidth); // Adjust for padding
+        setChartWidth(containerRef.current.offsetWidth);
       }
     };
     updateWidth();
@@ -75,109 +59,65 @@ const ElectricityCost: React.FC = () => {
           "linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 90%)",
       }}
     >
-      {/* Centered Heading with Buttons */}
       <div className="flex justify-between items-center px-4">
-        {/* Heading */}
-        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-secondaryColor">Electricity Cost</h2>
-
-        {/* Buttons for time period */}
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setFilter("hourly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition border border-tertiaryColor ${filter === "hourly"
-                ? "bg-secondaryColor"
-                : "text-secondaryColor hover:bg-secondaryColor hover:text-black"
-              }`}
-          >
-            Day
-          </button>
-          <button
-            onClick={() => setFilter("weekly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition border border-tertiaryColor ${filter === "weekly"
-              ? "bg-secondaryColor"
-              : "text-secondaryColor hover:bg-secondaryColor hover:text-black"
-            }`}
-          >
-            Week
-          </button>
-          <button
-            onClick={() => setFilter("monthly")}
-            className={`py-1 px-4 text-sm font-semibold rounded-full transition border border-tertiaryColor ${filter === "monthly"
-              ? "bg-secondaryColor"
-              : "text-secondaryColor hover:bg-secondaryColor hover:text-black"
-            }`}
-          >
-            Month
-          </button>
-        </div>
+        <h2 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-2 text-secondaryColor">
+          Electricity Cost
+        </h2>
       </div>
-      {/* Graph */}
       <div className="mt-2 flex justify-center">
-        <AreaChart
-          width={chartWidth}
-          height={200}
-          data={
-            filter === "hourly"
-              ? hourlyData
-              : filter === "weekly"
-                ? weeklyData
-                : monthlyData
-          }
-          margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
-        >
-          <defs>
-            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#e8f4ff" stopOpacity={0.5} />
-              <stop offset="95%" stopColor="#e8f4ff" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis
-            dataKey={filter === "hourly" ? "hour" : "day"} // Dynamically choose the key
-            tick={{ fill: "#fff", fontSize: 12 }}
-            axisLine={{ stroke: "#ccc" }}
-            tickLine={false}
-            ticks={
-              filter === "hourly"
-                ? hourlyData
-                  .filter((_, index) => index % 2 === 0)
-                  .map((entry) => entry.hour)
-                : filter === "monthly"
-                  ? monthlyData
-                    .filter((_, index) => index % 2 === 0)
-                    .map((entry) => entry.day)
-                  : undefined
-            }
-          />
-          <YAxis
-            domain={[0.5, 1.5]}
-            ticks={[0.75, 1, 1.25]}
-            tick={{ fill: "#fff", fontSize: 12 }}
-            tickLine={false}
-            axisLine={false}
-          />
-          <Tooltip
-            contentStyle={{
-              background: "transparent",
-              border: "none",
-              boxShadow: "none",
-            }}
-            labelStyle={{
-              color: "transparent",
-            }}
-            itemStyle={{
-              color: "#FFF",
-              fontWeight: "semibold",
-              fontSize: "15px",
-            }}
-          />
-          <Area
-            type="monotone" // Smooth sinusoidal lines
-            dataKey="price"
-            stroke="#e8f4ff"
-            fill="url(#colorPrice)"
-            strokeWidth={4} // Wider stroke for the graph
-          />
-        </AreaChart>
+        {loading ? (
+          <p className="text-secondaryColor">Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <AreaChart
+            width={chartWidth}
+            height={200}
+            data={hourlyData}
+            margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#e8f4ff" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#e8f4ff" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="hour"
+              tick={{ fill: "#fff", fontSize: 12 }}
+              axisLine={{ stroke: "#ccc" }}
+              tickLine={false}
+            />
+            <YAxis
+              domain={['dataMin', 'dataMax']}
+              tick={{ fill: "#fff", fontSize: 12 }}
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                background: "transparent",
+                border: "none",
+                boxShadow: "none",
+              }}
+              labelStyle={{
+                color: "transparent",
+              }}
+              itemStyle={{
+                color: "#FFF",
+                fontWeight: "semibold",
+                fontSize: "15px",
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="price"
+              stroke="#e8f4ff"
+              fill="url(#colorPrice)"
+              strokeWidth={4}
+            />
+          </AreaChart>
+        )}
       </div>
     </div>
   );
