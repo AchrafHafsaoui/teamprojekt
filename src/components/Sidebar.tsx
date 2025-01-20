@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import OverviewIcon from "../assets/icons/overview.svg";
 import ChargingStationIcon from "../assets/icons/chargingstation.svg";
 import ChargingScheduleIcon from "../assets/icons/charging schedule.svg";
@@ -10,13 +10,23 @@ import Logo from "../assets/logo.png";
 import PowerIcon from "../assets/icons/power.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
+import apiClient from "../api/api";
+import API_ROUTES from "../apiRoutes";
+import AuthContext from "../context/AuthProvider";
 
-type SidebarProps = {
-  setIsLoggedIn: (value: boolean) => void;
-};
-
-const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
+const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
   const [activeButton, setActiveButton] = useState<string>("Overview");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+  const { setAuth, auth } = useAuth();
 
   const menuItems = [
     { label: "Overview", icon: OverviewIcon, path: "/" },
@@ -39,6 +49,32 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
     { label: "Parking", icon: ParkingIcon, path: "/parking" },
   ];
 
+  type AuthReq = {
+    message: string;
+  };
+  const checkAdmin = async () => {
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 100,
+      });
+      console.log(res.data);
+      if (res.data.message === "Authorized access") {
+        setIsAdmin(true);
+      } else setIsAdmin(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
+      checkAdmin();
+    } else setIsAdmin(false);
+  }, [auth]);
+
   return (
     <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-secondaryColor group z-10">
       {/* Top menu part */}
@@ -59,8 +95,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
             className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
             style={{ transition: "background-color 0.3s" }}
             onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              "rgba(7, 142, 205, 0.35)")
+              (e.currentTarget.style.backgroundColor =
+                "rgba(7, 142, 205, 0.35)")
             }
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "transparent")
@@ -68,10 +104,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
           >
             <img src={item.icon} alt={item.label} className="w-12 ml-2" />
             <span
-              className={`whitespace-nowrap overflow-hidden ml-4  ${activeButton === item.label
+              className={`whitespace-nowrap overflow-hidden ml-4  ${
+                activeButton === item.label
                   ? "font-bold text-[rgb(7, 142, 205)]"
                   : "font-semibold text-gray-800"
-                } text-lg tracking-wide transition-all`}
+              } text-lg tracking-wide transition-all`}
             >
               {item.label}
             </span>
@@ -85,45 +122,52 @@ const Sidebar: React.FC<SidebarProps> = ({ setIsLoggedIn }) => {
       {/* Bottom menu part */}
       <div className="flex flex-col mb-5 space-y-5">
         {/* Control Panel button with a link */}
-        <Link
-          to="/control-panel"
-          onClick={() => setActiveButton("Control Panel")}
-          className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
-          style={{ transition: "background-color 0.3s" }}
-          onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor =
-            "rgba(7, 142, 205, 0.35)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "transparent")
-          }
-        >
-          <img
-            src={ControlPanelIcon}
-            alt="Control Panel"
-            className="w-8 ml-4 mr-2"
-          />
-          <span
-            className={`whitespace-nowrap overflow-hidden ml-4 ${activeButton === "Control Panel"
-                ? "font-bold text-[rgb(7, 142, 205)]"
-                : "font-semibold text-gray-800"
-              } text-lg tracking-wide transition-all`}
+        {isAdmin && (
+          <Link
+            to="/control-panel"
+            onClick={() => setActiveButton("Control Panel")}
+            className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
+            style={{ transition: "background-color 0.3s" }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                "rgba(7, 142, 205, 0.35)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
           >
-            Control Panel
-          </span>
-          {activeButton === "Control Panel" && (
-            <div className="absolute right-0 top-0 h-full w-1 bg-black bg-opacity-50 rounded" />
-          )}
-        </Link>
+            <img
+              src={ControlPanelIcon}
+              alt="Control Panel"
+              className="w-8 ml-4 mr-2"
+            />
+            <span
+              className={`whitespace-nowrap overflow-hidden ml-4 ${
+                activeButton === "Control Panel"
+                  ? "font-bold text-[rgb(7, 142, 205)]"
+                  : "font-semibold text-gray-800"
+              } text-lg tracking-wide transition-all`}
+            >
+              Control Panel
+            </span>
+            {activeButton === "Control Panel" && (
+              <div className="absolute right-0 top-0 h-full w-1 bg-black bg-opacity-50 rounded" />
+            )}
+          </Link>
+        )}
 
         {/* Logout button without a link */}
         <button
-          onClick={() => setIsLoggedIn(false)} // Handle logout
+          onClick={() => {
+            localStorage.removeItem("access token");
+            localStorage.removeItem("refresh token");
+            setAuth({ access: "" });
+            navigate("/login", { replace: true });
+          }} // Handle logout
           className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
           style={{ transition: "background-color 0.3s" }}
           onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor =
-            "rgba(7, 142, 205, 0.35)")
+            (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")
           }
           onMouseLeave={(e) =>
             (e.currentTarget.style.backgroundColor = "transparent")

@@ -3,6 +3,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
+import apiClient from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 type Bus = {
   id: string;
@@ -14,10 +16,10 @@ type ScheduleEntry = {
   id: string;
   departure_time: string;
   arrival_time: string;
-  departure_location: string;
-  departure_location_name: string;
-  arrival_location: string;
-  arrival_location_name: string;
+  departure_location: string; // Still accepts IDs for input
+  departure_location_name: string; // Display location name
+  arrival_location: string; // Still accepts IDs for input
+  arrival_location_name: string; // Display location name
   bus: Bus | null;
 };
 
@@ -25,15 +27,49 @@ type DrivingScheduleProps = {
   fullPage?: boolean;
 };
 
-const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
+const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
+  fullPage = false,
+}) => {
   const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
-  const [selectedDepartureDate, setSelectedDepartureDate] = useState<Date | null>(null);
-  const [selectedArrivalDate, setSelectedArrivalDate] = useState<Date | null>(null);
+  const [selectedDepartureDate, setSelectedDepartureDate] =
+    useState<Date | null>(null);
+  const [selectedArrivalDate, setSelectedArrivalDate] = useState<Date | null>(
+    null
+  );
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+  const navigate = useNavigate();
+  type AuthReq = {
+    message: string;
+  };
+  const checkAuth = async () => {
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      console.log(res.data);
+      if (res.data.message != "Authorized access") {
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("access token") ||
+      localStorage.getItem("refresh token")
+    ) {
+      checkAuth();
+    } else navigate("/login", { replace: true });
+  }, []);
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
+      const response = await axios.get<ScheduleEntry[]>(
+        API_ROUTES.GET_DRIVING_SCHEDULES
+      );
       setSchedules(response.data);
     } catch (error) {
       console.error("Error fetching schedules:", error);
@@ -134,7 +170,11 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
       )}
 
       {/* Schedule */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto ${fullPage ? "h-[calc(100vh-8rem)]" : "h-72"} custom-scrollbar`}>
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto ${
+          fullPage ? "h-[calc(100vh-8rem)]" : "h-72"
+        } custom-scrollbar`}
+      >
         {filterSchedule().map((entry) => (
           <div
             key={entry.id}
@@ -143,7 +183,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
             {/* Departure Section */}
             <div>
               <p className="text-lg font-bold text-primaryColor">Departure</p>
-              <p className="text-md font-semibold">{entry.departure_location_name}</p>
+              <p className="text-md font-semibold">
+                {entry.departure_location_name}
+              </p>
               <p className="text-sm text-gray-600">
                 {new Date(entry.departure_time).toLocaleString("en-US", {
                   weekday: "short",
@@ -160,7 +202,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
             {/* Arrival Section */}
             <div className="mt-auto">
               <p className="text-lg font-bold text-primaryColor">Arrival</p>
-              <p className="text-md font-semibold">{entry.arrival_location_name}</p>
+              <p className="text-md font-semibold">
+                {entry.arrival_location_name}
+              </p>
               <p className="text-sm text-gray-600">
                 {new Date(entry.arrival_time).toLocaleString("en-US", {
                   weekday: "short",
@@ -183,7 +227,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
                   ID: {entry.bus.bus_id},{" "}
                   <span
                     className={`font-bold ${
-                      parseFloat(entry.bus.battery) >= 50 ? "text-green-500" : "text-red-500"
+                      parseFloat(entry.bus.battery) >= 50
+                        ? "text-green-500"
+                        : "text-red-500"
                     }`}
                   >
                     Battery: {entry.bus.battery}%
