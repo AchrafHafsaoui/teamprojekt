@@ -16,60 +16,51 @@ type ScheduleEntry = {
   id: string;
   departure_time: string;
   arrival_time: string;
-  departure_location: string; // Still accepts IDs for input
-  departure_location_name: string; // Display location name
-  arrival_location: string; // Still accepts IDs for input
-  arrival_location_name: string; // Display location name
-  bus: Bus | null;
+  departure_location: string;
+  departure_location_name: string;
+  arrival_location: string;
+  arrival_location_name: string;
+  bus_details: Bus | null;
 };
 
 type DrivingScheduleProps = {
   fullPage?: boolean;
 };
 
-const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
-  fullPage = false,
-}) => {
+const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
   const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
-  const [selectedDepartureDate, setSelectedDepartureDate] =
-    useState<Date | null>(null);
-  const [selectedArrivalDate, setSelectedArrivalDate] = useState<Date | null>(
-    null
-  );
+  const [selectedDepartureDate, setSelectedDepartureDate] = useState<Date | null>(null);
+  const [selectedArrivalDate, setSelectedArrivalDate] = useState<Date | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 8;
 
   const navigate = useNavigate();
-  type AuthReq = {
-    message: string;
-  };
-  const checkAuth = async () => {
-    try {
-      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        role: 20,
-      });
-      console.log(res.data);
-      if (res.data.message != "Authorized access") {
-        navigate("/login", { replace: true });
-      }
-    } catch (error) {
-      console.error("Is auth error :", error);
-    }
-  };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    const checkAuth = async () => {
+      try {
+        const res = await apiClient.post<{ message: string }>(API_ROUTES.IS_AUTH, { role: 20 });
+        if (res.data.message !== "Authorized access") {
+          navigate("/login", { replace: true });
+        }
+      } catch (error) {
+        console.error("Is auth error:", error);
+        navigate("/login", { replace: true });
+      }
+    };
+
+    if (localStorage.getItem("access token") || localStorage.getItem("refresh token")) {
       checkAuth();
-    } else navigate("/login", { replace: true });
-  }, []);
+    } else {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get<ScheduleEntry[]>(
-        API_ROUTES.GET_DRIVING_SCHEDULES
-      );
+      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
       setSchedules(response.data);
     } catch (error) {
       console.error("Error fetching schedules:", error);
@@ -83,25 +74,37 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
   }, []);
 
   const filterSchedule = () => {
-    if (!selectedDepartureDate && !selectedArrivalDate) {
-      return schedules; // If no filters are applied, return all schedules
+    let filtered = schedules;
+    if (selectedDepartureDate) {
+      filtered = filtered.filter(
+        (entry) => new Date(entry.departure_time) >= selectedDepartureDate
+      );
     }
-
-    return schedules.filter((entry) => {
-      const departureDate = new Date(entry.departure_time);
-      const arrivalDate = new Date(entry.arrival_time);
-
-      const matchesDepartureFilter =
-        !selectedDepartureDate || departureDate >= selectedDepartureDate;
-      const matchesArrivalFilter =
-        !selectedArrivalDate || arrivalDate <= selectedArrivalDate;
-
-      return matchesDepartureFilter && matchesArrivalFilter;
-    });
+    if (selectedArrivalDate) {
+      filtered = filtered.filter(
+        (entry) => new Date(entry.arrival_time) <= selectedArrivalDate
+      );
+    }
+    return filtered;
   };
+
+  const paginatedSchedules = filterSchedule().slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(filterSchedule().length / ITEMS_PER_PAGE);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
   return (
@@ -124,7 +127,6 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         )}
       </div>
 
-      {/* Panel */}
       {isPanelOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-xl p-6 relative">
@@ -169,18 +171,16 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         </div>
       )}
 
-      {/* Schedule */}
       <div
         className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto ${
           fullPage ? "h-[calc(100vh-8rem)]" : "h-72"
         } custom-scrollbar`}
       >
-        {filterSchedule().map((entry) => (
+        {paginatedSchedules.map((entry) => (
           <div
             key={entry.id}
             className="schedule-card bg-white shadow-md rounded-lg p-4 flex flex-col justify-between"
           >
-            {/* Departure Section */}
             <div>
               <p className="text-lg font-bold text-primaryColor">Departure</p>
               <p className="text-md font-semibold">
@@ -199,7 +199,6 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
               </p>
             </div>
 
-            {/* Arrival Section */}
             <div className="mt-auto">
               <p className="text-lg font-bold text-primaryColor">Arrival</p>
               <p className="text-md font-semibold">
@@ -218,21 +217,20 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
               </p>
             </div>
 
-            {/* Bus Details */}
             <hr className="my-2" />
             <p className="text-sm text-gray-500">
-              <strong>Bus:</strong>{" "}
-              {entry.bus ? (
+              <strong>Bus</strong>{" "}
+              {entry.bus_details ? (
                 <>
-                  ID: {entry.bus.bus_id},{" "}
+                  <strong>ID: {entry.bus_details.bus_id},{" "} </strong>
                   <span
                     className={`font-bold ${
-                      parseFloat(entry.bus.battery) >= 50
+                      parseFloat(entry.bus_details.battery) >= 50
                         ? "text-green-500"
                         : "text-red-500"
                     }`}
                   >
-                    Battery: {entry.bus.battery}%
+                    Battery: {entry.bus_details.battery}%
                   </span>
                 </>
               ) : (
@@ -241,6 +239,26 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
             </p>
           </div>
         ))}
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
