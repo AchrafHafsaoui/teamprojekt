@@ -172,73 +172,81 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
       )}
 
       <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto ${
-          fullPage ? "h-[calc(100vh-8rem)]" : "h-72"
-        } custom-scrollbar`}
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`}
+        style={{ minHeight: "500px" }}
       >
-        {paginatedSchedules.map((entry) => (
-          <div
-            key={entry.id}
-            className="schedule-card bg-white shadow-md rounded-lg p-4 flex flex-col justify-between"
-          >
-            <div>
-              <p className="text-lg font-bold text-primaryColor">Departure</p>
-              <p className="text-md font-semibold">
-                {entry.departure_location_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                {new Date(entry.departure_time).toLocaleString("en-US", {
-                  weekday: "short",
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
-              </p>
+        {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
+          const entry = paginatedSchedules[index];
+          return entry ? (
+            <div
+              key={entry.id}
+              className="schedule-card bg-white shadow-md rounded-xl p-5 flex flex-col justify-between hover:shadow-lg transition-all"
+              style={{ minHeight: "200px" }}
+            >
+              <div className="mb-4">
+                <p className="text-lg font-bold text-primaryColor mb-1">
+                  Departure
+                </p>
+                <p className="text-sm font-semibold text-gray-700">
+                  {entry.departure_location_name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {new Date(entry.departure_time).toLocaleString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </p>
+              </div>
+              <div className="mb-4">
+                <p className="text-lg font-bold text-primaryColor mb-1">
+                  Arrival
+                </p>
+                <p className="text-sm font-semibold text-gray-700">
+                  {entry.arrival_location_name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {new Date(entry.arrival_time).toLocaleString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-500">
+                  <strong>Bus ID:</strong> {entry.bus_details?.bus_id || "N/A"}
+                </p>
+                <p
+                  className={`font-semibold ${
+                    entry.bus_details &&
+                    parseFloat(entry.bus_details.battery) >= 50
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {entry.bus_details
+                    ? `Battery: ${entry.bus_details.battery}%`
+                    : "N/A"}
+                </p>
+              </div>
             </div>
-
-            <div className="mt-auto">
-              <p className="text-lg font-bold text-primaryColor">Arrival</p>
-              <p className="text-md font-semibold">
-                {entry.arrival_location_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                {new Date(entry.arrival_time).toLocaleString("en-US", {
-                  weekday: "short",
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
-              </p>
-            </div>
-
-            <hr className="my-2" />
-            <p className="text-sm text-gray-500">
-              <strong>Bus</strong>{" "}
-              {entry.bus_details ? (
-                <>
-                  <strong>ID: {entry.bus_details.bus_id},{" "} </strong>
-                  <span
-                    className={`font-bold ${
-                      parseFloat(entry.bus_details.battery) >= 50
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    Battery: {entry.bus_details.battery}%
-                  </span>
-                </>
-              ) : (
-                "N/A"
-              )}
-            </p>
-          </div>
-        ))}
+          ) : (
+            <div
+              key={index}
+              className="schedule-card bg-white shadow-md rounded-xl p-5"
+              style={{ minHeight: "200px", opacity: 0 }}
+            />
+          );
+        })}
       </div>
 
       <div className="flex justify-between items-center mt-4">
@@ -249,9 +257,6 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
         >
           Previous
         </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages}
