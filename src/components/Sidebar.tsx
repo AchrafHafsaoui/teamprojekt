@@ -10,7 +10,7 @@ import Logo from "../assets/logo.png";
 import PowerIcon from "../assets/icons/power.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 import AuthContext from "../context/AuthProvider";
 
@@ -53,6 +53,7 @@ const Sidebar: React.FC = () => {
     message: string;
   };
   const checkAdmin = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 100,
@@ -67,10 +68,7 @@ const Sidebar: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAdmin();
     } else setIsAdmin(false);
   }, [auth]);
@@ -159,9 +157,8 @@ const Sidebar: React.FC = () => {
         {/* Logout button without a link */}
         <button
           onClick={() => {
-            localStorage.removeItem("access token");
             localStorage.removeItem("refresh token");
-            setAuth({ access: "" });
+            setAuth({ access: null });
             navigate("/login", { replace: true });
           }} // Handle logout
           className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"

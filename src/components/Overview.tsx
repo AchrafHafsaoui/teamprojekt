@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import FleetStatus from "./FleetStatus";
 import ElectricityCost from "./ElectricityCost";
 import EnergyConsumption from "./EnergyConsumption";
 import ParkingStatus from "./ParkingStatus";
 import ChargingSchedule from "./ChargingStationStatus";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 import axios from "axios";
 
@@ -24,9 +25,21 @@ const Overview: React.FC = () => {
   const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
   const navigate = useNavigate();
 
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
+
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
+      const response = await axios.get<ScheduleEntry[]>(
+        API_ROUTES.GET_DRIVING_SCHEDULES
+      );
       setSchedules(response.data.slice(0, 3)); // Show top 3 schedules
     } catch (error) {
       console.error("Error fetching driving schedules:", error);
@@ -34,8 +47,12 @@ const Overview: React.FC = () => {
   };
 
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const res = await apiClient.post<{ message: string }>(API_ROUTES.IS_AUTH, { role: 20 });
+      const res = await apiClient.post<{ message: string }>(
+        API_ROUTES.IS_AUTH,
+        { role: 20 }
+      );
       if (res.data.message !== "Authorized access") {
         navigate("/login", { replace: true });
       }
@@ -45,7 +62,7 @@ const Overview: React.FC = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("access token") || localStorage.getItem("refresh token")) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
       fetchSchedules();
     } else {
@@ -82,31 +99,41 @@ const Overview: React.FC = () => {
                       </td>
                       <td className="px-4 py-2">
                         <div>
-                          <p className="font-semibold">{entry.departure_location_name}</p>
+                          <p className="font-semibold">
+                            {entry.departure_location_name}
+                          </p>
                           <p className="text-sm text-gray-500">
-                            {new Date(entry.departure_time).toLocaleString("en-US", {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: false,
-                            })}
+                            {new Date(entry.departure_time).toLocaleString(
+                              "en-US",
+                              {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              }
+                            )}
                           </p>
                         </div>
                       </td>
                       <td className="px-4 py-2">
                         <div>
-                          <p className="font-semibold">{entry.arrival_location_name}</p>
+                          <p className="font-semibold">
+                            {entry.arrival_location_name}
+                          </p>
                           <p className="text-sm text-gray-500">
-                            {new Date(entry.arrival_time).toLocaleString("en-US", {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: false,
-                            })}
+                            {new Date(entry.arrival_time).toLocaleString(
+                              "en-US",
+                              {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              }
+                            )}
                           </p>
                         </div>
                       </td>

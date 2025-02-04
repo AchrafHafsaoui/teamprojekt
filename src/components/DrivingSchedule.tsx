@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 type Bus = {
@@ -27,32 +28,67 @@ type DrivingScheduleProps = {
   fullPage?: boolean;
 };
 
-const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) => {
+const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
+  fullPage = false,
+}) => {
   const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
-  const [selectedDepartureDate, setSelectedDepartureDate] = useState<Date | null>(null);
-  const [selectedArrivalDate, setSelectedArrivalDate] = useState<Date | null>(null);
+  const [selectedDepartureDate, setSelectedDepartureDate] =
+    useState<Date | null>(null);
+  const [selectedArrivalDate, setSelectedArrivalDate] = useState<Date | null>(
+    null
+  );
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeUser, setActiveUser] = useState<boolean>(false);
 
   const ITEMS_PER_PAGE = 8;
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await apiClient.post<{ message: string }>(API_ROUTES.IS_AUTH, { role: 20 });
-        if (res.data.message !== "Authorized access") {
-          navigate("/login", { replace: true });
-        }
-      } catch (error) {
-        console.error("Is auth error:", error);
+  const { setAuth, auth } = useAuth();
+
+  type AuthReq = {
+    message: string;
+  };
+  const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      if (res.data.message != "Authorized access") {
         navigate("/login", { replace: true });
       }
-    };
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
 
-    if (localStorage.getItem("access token") || localStorage.getItem("refresh token")) {
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
+  useEffect(() => {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkActiveUser();
     } else {
       navigate("/login", { replace: true });
     }
@@ -60,7 +96,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({ fullPage = false }) =
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get<ScheduleEntry[]>(API_ROUTES.GET_DRIVING_SCHEDULES);
+      const response = await axios.get<ScheduleEntry[]>(
+        API_ROUTES.GET_DRIVING_SCHEDULES
+      );
       setSchedules(response.data);
     } catch (error) {
       console.error("Error fetching schedules:", error);

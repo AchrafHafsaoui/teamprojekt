@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 // Add a new bus
@@ -84,12 +85,23 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = fullPage ? 6 : 3;
+  const [activeUser, setActiveUser] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
@@ -103,12 +115,25 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
     }
   };
 
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkActiveUser();
     } else navigate("/login", { replace: true });
   }, []);
 

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import axios from "axios";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +24,6 @@ const BusSVG = () => (
     </g>
   </svg>
 );
-
 
 type StationData = {
   station_id: string;
@@ -169,13 +169,13 @@ const ChargingSchedule: React.FC = () => {
         prevBuses.map((bus) =>
           bus.remainingTime > 0
             ? {
-              ...bus,
-              remainingTime: bus.remainingTime - 1,
-              currentCharging: Math.min(
-                bus.currentCharging + 1,
-                bus.maxCapacity
-              ),
-            }
+                ...bus,
+                remainingTime: bus.remainingTime - 1,
+                currentCharging: Math.min(
+                  bus.currentCharging + 1,
+                  bus.maxCapacity
+                ),
+              }
             : bus
         )
       );
@@ -185,10 +185,20 @@ const ChargingSchedule: React.FC = () => {
   }, []);
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
@@ -203,10 +213,7 @@ const ChargingSchedule: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
     } else navigate("/login", { replace: true });
   }, []);
@@ -245,7 +252,7 @@ const ChargingSchedule: React.FC = () => {
               //const busId = chargingPoints[station.station_id][index];
               //const bus = buses.find((b) => b.id === busId);
               //const remainingTime = bus?.remainingTime;
-              const remainingTime=90
+              const remainingTime = 90;
               // Format remaining time
               let formattedTime = "";
               if (remainingTime !== undefined) {
@@ -263,7 +270,7 @@ const ChargingSchedule: React.FC = () => {
                   key={index}
                   className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
                 >
-                  {(
+                  {
                     <>
                       <span className="absolute -top-6 text-sm font-semibold">
                         Bus ID
@@ -273,7 +280,7 @@ const ChargingSchedule: React.FC = () => {
                         {formattedTime}
                       </span>
                     </>
-                  )}
+                  }
                 </div>
               );
             })}
@@ -322,10 +329,7 @@ const ChargingSchedule: React.FC = () => {
             className={`h-6 rounded transition-colors duration-500`}
             style={{
               width: "4%", // Each segment takes 4% of the column width
-              backgroundColor:
-                index < segmentsToShow
-                  ? "#078ECD"
-                  : "#D3D3D3",
+              backgroundColor: index < segmentsToShow ? "#078ECD" : "#D3D3D3",
             }}
           ></div>
         ))}

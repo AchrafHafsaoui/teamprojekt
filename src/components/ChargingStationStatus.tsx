@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 const getStationById = async (id: string) => {
@@ -37,6 +38,8 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
   fullPage = true,
 }) => {
   const [stations, setStations] = useState<StationData[]>([]);
+  const [activeUser, setActiveUser] = useState<boolean>(false);
+
   const fetchStations = async () => {
     try {
       const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
@@ -47,10 +50,20 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
   };
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
@@ -64,12 +77,25 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     }
   };
 
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkActiveUser();
     } else navigate("/login", { replace: true });
   }, []);
 

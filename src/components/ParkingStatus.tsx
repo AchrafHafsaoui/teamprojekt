@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import apiClient from "../api/api";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
+import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import API_ROUTES from "../apiRoutes";
 
@@ -23,6 +24,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
   const [columns, setColumns] = useState<number>(0);
   const [rowsPerColumn, setRowsPerColumn] = useState<string[]>([]);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [activeUser, setActiveUser] = useState<boolean>(false);
   const [addingDepot, setAddingDepot] = useState(false);
   const [editingDepot, setEditingDepot] = useState<number | null>(null);
   const [editingDepotName, setEditingDepotName] = useState("");
@@ -34,15 +36,24 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
   const colorFree = "#D3D3D3";
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
       });
-      console.log(res.data);
       if (res.data.message != "Authorized access") {
         navigate("/login", { replace: true });
       }
@@ -51,12 +62,25 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
     }
   };
 
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkActiveUser();
     } else navigate("/login", { replace: true });
   }, []);
 
@@ -149,7 +173,11 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
 
       return (
         <div key={colIndex} className="flex flex-col items-center space-y-2">
-          <div className={`flex items-center ${editMode ? "ml-4" : "ml-2"}`}>
+          <div
+            className={`flex items-center ${
+              editMode && activeUser ? "ml-4" : "ml-2"
+            }`}
+          >
             <h2 className="font-semibold text-xl mr-2">
               Column {colIndex + 1}
             </h2>
@@ -184,7 +212,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
             )}
 
             {/* Remove Column Button (Only in Edit Mode) */}
-            {editMode && (
+            {editMode && activeUser && (
               <button
                 onClick={() => {
                   if (
@@ -277,7 +305,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                   </div>
 
                   {/* Edit Mode Buttons */}
-                  {editMode && (
+                  {editMode && activeUser && (
                     <div className="absolute top-0 right-0 flex flex-col space-y-1 mt-1 mr-1">
                       {/* Remove Slot Button */}
                       <button
@@ -390,7 +418,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                 </div>
               );
             })}
-            {editMode && (
+            {editMode && activeUser && (
               <button
                 onClick={() => addNewSlot(colIndex)}
                 className={`flex items-center justify-center border rounded-xl border-borderColor h-20 opacity-50 hover:opacity-80 transition`}
@@ -421,29 +449,31 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         {/* Edit Button */}
         {fullPage && (
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => {
-                if (editMode) {
-                  // Remove empty columns when exiting edit mode
-                  const nonEmptyColumns = rowsPerColumn.filter(
-                    (column) => column.trim() !== ""
-                  );
-                  setRowsPerColumn([...nonEmptyColumns]); // Create a new array to remove empty columns from memory
-                  setColumns(nonEmptyColumns.length); // Update the columns count
-                } else {
-                  handleColumnChange(); // Add a new column only when entering edit mode
-                }
-                if (addingDepot) setAddingDepot(false);
-                setEditMode(!editMode); // Toggle edit mode
-              }}
-              className={`p-2 rounded-lg border font-semibold transition ${
-                editMode
-                  ? "bg-primaryColor text-white border-borderColor"
-                  : "bg-componentsColor text-black border-borderColor hover:bg-primaryColor hover:text-white"
-              }`}
-            >
-              {editMode ? "Save" : "Edit"}
-            </button>
+            {activeUser && (
+              <button
+                onClick={() => {
+                  if (editMode && activeUser) {
+                    // Remove empty columns when exiting edit mode
+                    const nonEmptyColumns = rowsPerColumn.filter(
+                      (column) => column.trim() !== ""
+                    );
+                    setRowsPerColumn([...nonEmptyColumns]); // Create a new array to remove empty columns from memory
+                    setColumns(nonEmptyColumns.length); // Update the columns count
+                  } else {
+                    handleColumnChange(); // Add a new column only when entering edit mode
+                  }
+                  if (addingDepot) setAddingDepot(false);
+                  setEditMode(!editMode); // Toggle edit mode
+                }}
+                className={`p-2 rounded-lg border font-semibold transition ${
+                  editMode && activeUser
+                    ? "bg-primaryColor text-white border-borderColor"
+                    : "bg-componentsColor text-black border-borderColor hover:bg-primaryColor hover:text-white"
+                }`}
+              >
+                {editMode && activeUser ? "Save" : "Edit"}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -469,7 +499,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
               </button>
 
               {/* Edit Mode Buttons */}
-              {editMode && (
+              {editMode && activeUser && (
                 <>
                   {editingDepot === index ? (
                     <div className="flex items-center space-x-2">
@@ -580,7 +610,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           ))}
 
           {/* Add New Depot Button */}
-          {editMode && (
+          {editMode && activeUser && (
             <button
               onClick={() => {
                 const newDepotName = `Depot ${parkingLots.length + 1}`;
