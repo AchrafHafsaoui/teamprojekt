@@ -38,10 +38,7 @@ const LoginPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (localStorage.getItem("access token")) {
       checkAuth();
     }
   }, []);
@@ -53,14 +50,17 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post<Creds>(API_ROUTES.LOGIN, {
-        email,
-        password,
-      });
+      const res = await axios.post<Creds>(
+        API_ROUTES.LOGIN,
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
       if (res.status === 200) {
         setAuth({ access: res.data.access });
         localStorage.setItem("access token", res.data.access);
-        localStorage.setItem("refresh token", res.data.refresh);
         navigate("/overview", { replace: true });
       } else {
         alert("login unsuccessfull");

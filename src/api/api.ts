@@ -9,24 +9,17 @@ interface Tokens {
 // Create Axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:8000/api', // Base URL is already in API_ROUTES
- // withCredentials: true, // Include cookies if needed
+  withCredentials: true, 
 });
 
 // Function to refresh the access token
 const refreshAccessToken = async (): Promise<string> => {
   try {
-    const refresh = localStorage.getItem('refresh token');
-    if (!refresh) throw new Error('No refresh token found.');
-
-    // Use the REFRESH_TOKEN route to refresh the token
-    const response: AxiosResponse<Tokens> = await axios.post(API_ROUTES.REFRESH_TOKEN, {
-      refresh, // Send the refresh token in the body
-    });
+    const response: AxiosResponse<Tokens> = await axios.post(API_ROUTES.REFRESH_TOKEN, null , { withCredentials: true });
 
     const { access } = response.data;
 
-    // Update tokens in storage
-    localStorage.setItem('access token', access);
+    console.log("123"+access)
 
     return access;
   } catch (error) {
@@ -39,12 +32,8 @@ const refreshAccessToken = async (): Promise<string> => {
 apiClient.interceptors.request.use(
   (config) => {
     const access = localStorage.getItem('access token');
-    if (access) {
-      // Ensure the body exists and add the access token
-      config.data = {
-        ...(config.data || {}),
-        access,
-      };
+    if (access && config.headers) {
+      config.headers.Authorization = `Bearer ${access}`;
     }
     return config;
   },
@@ -62,18 +51,21 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true; // Mark request as retried
       try {
         const access = await refreshAccessToken(); // Refresh token
+        console.log(access)
 
-        originalRequest.data = {
-          ...JSON.parse(originalRequest.data),
-          access, // Include new access token in the body
-        };
+            // Update tokens in storage
+        localStorage.setItem('access token', access);
+
+        if (originalRequest.headers) {
+          console.log("header func")
+          originalRequest.headers.Authorization = `Bearer ${access}`; // Add it to the failed request
+        }
 
         return apiClient(originalRequest); // Retry original request
       } catch (refreshError) {
         alert(refreshError)
         console.error('Redirecting to login due to refresh failure.');
-        localStorage.removeItem('access token'); // Clear tokens
-        localStorage.removeItem('refresh token');
+        localStorage.removeItem('access token'); 
         window.location.href = '/login'; // Redirect to login
         return Promise.reject(refreshError);
       }
