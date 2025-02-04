@@ -1,5 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
-import AuthContext from "../context/AuthProvider";
+import React, { useState, useEffect } from "react";
 import Logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,15 +7,6 @@ import API_ROUTES from "../apiRoutes";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-      throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
-  };
-
-  const { setAuth, auth } = useAuth();
   const [email, setEmail] = useState(""); // State for email input
   const [password, setPassword] = useState(""); // State for password input
 
@@ -58,7 +48,6 @@ const LoginPage: React.FC = () => {
         password,
       });
       if (res.status === 200) {
-        setAuth({ access: res.data.access });
         localStorage.setItem("access token", res.data.access);
         localStorage.setItem("refresh token", res.data.refresh);
         navigate("/overview", { replace: true });
