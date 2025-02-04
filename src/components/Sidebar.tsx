@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OverviewIcon from "../assets/icons/overview.svg";
 import ChargingStationIcon from "../assets/icons/chargingstation.svg";
@@ -12,11 +12,21 @@ import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 import apiClient from "../api/api";
 import API_ROUTES from "../apiRoutes";
+import AuthContext from "../context/AuthProvider";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [activeButton, setActiveButton] = useState<string>("Overview");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+  const { setAuth, auth } = useAuth();
 
   const menuItems = [
     { label: "Overview", icon: OverviewIcon, path: "/" },
@@ -63,7 +73,7 @@ const Sidebar: React.FC = () => {
     ) {
       checkAdmin();
     } else setIsAdmin(false);
-  }, []);
+  }, [auth]);
 
   return (
     <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-secondaryColor group z-10">
@@ -146,12 +156,14 @@ const Sidebar: React.FC = () => {
           </Link>
         )}
 
+        {/* Logout button without a link */}
         <button
           onClick={() => {
             localStorage.removeItem("access token");
             localStorage.removeItem("refresh token");
+            setAuth({ access: "" });
             navigate("/login", { replace: true });
-          }}
+          }} // Handle logout
           className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
           style={{ transition: "background-color 0.3s" }}
           onMouseEnter={(e) =>
