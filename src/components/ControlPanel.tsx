@@ -90,63 +90,29 @@ const ControlPanel: React.FC = () => {
     },
   ];
 
-  const [members, setMembers] = useState([
-    { id: 1, name: "John Doe", role: "Admin", email: "john.doe@example.com" },
-    {
-      id: 2,
-      name: "Jane Smith",
-      role: "Active User",
-      email: "jane.smith@example.com",
-    },
-    {
-      id: 3,
-      name: "Chris Johnson",
-      role: "Passive User",
-      email: "chris.johnson@example.com",
-    },
-    {
-      id: 4,
-      name: "Anna Müller",
-      role: "Admin",
-      email: "anna.mueller@example.de",
-    },
-    {
-      id: 5,
-      name: "Lukas Schmidt",
-      role: "Active User",
-      email: "lukas.schmidt@example.de",
-    },
-    {
-      id: 6,
-      name: "Sophia Wagner",
-      role: "Passive User",
-      email: "sophia.wagner@example.de",
-    },
-    {
-      id: 7,
-      name: "Karl Becker",
-      role: "Active User",
-      email: "karl.becker@example.de",
-    },
-    {
-      id: 8,
-      name: "Emily Davis",
-      role: "Passive User",
-      email: "emily.davis@example.com",
-    },
-    {
-      id: 9,
-      name: "Maximilian Hoffmann",
-      role: "Admin",
-      email: "maximilian.hoffmann@example.de",
-    },
-    {
-      id: 10,
-      name: "Laura Fischer",
-      role: "Active User",
-      email: "laura.fischer@example.de",
-    },
-  ]);
+  type member = {
+    id: number;
+    username: string;
+    email: string;
+    role: number;
+  };
+
+  const [members, setMembers] = useState<member[] | undefined>();
+
+  const getUsers = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<member[]>(API_ROUTES.GET_USERS, {});
+      setMembers(res.data);
+      console.log(res.data);
+    } catch (error) {
+      console.error("could not get the users list :", error);
+    }
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   const pageRoutes: { [key: string]: string } = {
     "Fleet Status": "/fleet-status",
@@ -194,13 +160,7 @@ const ControlPanel: React.FC = () => {
     } else navigate("/login", { replace: true });
   }, []);
 
-  const handleRoleChange = (id: number, newRole: string) => {
-    setMembers((prevMembers) =>
-      prevMembers.map((member) =>
-        member.id === id ? { ...member, role: newRole } : member
-      )
-    );
-  };
+  const handleRoleChange = (id: number, newRole: string) => {};
 
   const handleGenerateCredentials = () => {
     setNewUsername(generateUsername());
@@ -248,7 +208,10 @@ const ControlPanel: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
         {/* Login/Logout Logs */}
         <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4">
-          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
+          <h3
+            onClick={getUsers}
+            className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor"
+          >
             Login/Logout Logs
           </h3>
           <div className="overflow-y-auto custom-scrollbar">
@@ -312,13 +275,13 @@ const ControlPanel: React.FC = () => {
             </button>
           </div>
           <div className="overflow-y-auto custom-scrollbar">
-            {members.map((member) => (
+            {members?.map((member) => (
               <div
                 key={member.id}
                 className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
               >
                 <div>
-                  <p className="font-semibold">{member.name}</p>
+                  <p className="font-semibold">{member.username}</p>
                   <p className="text-sm text-gray-500">{member.email}</p>
                 </div>
                 <select

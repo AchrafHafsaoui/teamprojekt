@@ -25,6 +25,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [loading, setLoading] = useState(true); // Track loading state
   const [auth, setAuth] = useState<AuthState>({
     access: null,
   });
@@ -33,40 +34,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     access: string;
   }
 
-  const getNewAccessToken = async () => {
-    try {
-      const refresh = localStorage.getItem("refresh token");
-      if (!refresh) throw new Error("No refresh token found.");
-
-      // Use the REFRESH_TOKEN route to refresh the token
-      const response: AxiosResponse<Tokens> = await axios.post(
-        API_ROUTES.REFRESH_TOKEN,
-        {
-          refresh, // Send the refresh token in the body
-        }
-      );
-
-      const { access } = response.data;
-
-      console.log("authpro" + access);
-
-      // Update tokens in storage
-      setAuth({ access: access });
-
-      return access;
-    } catch (error) {
-      console.error("Failed to refresh token:", error);
-      throw error;
-    }
-  };
-
   useEffect(() => {
+    const getNewAccessToken = async () => {
+      try {
+        const refresh = localStorage.getItem("refresh token");
+        if (!refresh) throw new Error("No refresh token found.");
+
+        const response: AxiosResponse<Tokens> = await axios.post(
+          API_ROUTES.REFRESH_TOKEN,
+          {
+            refresh,
+          }
+        );
+
+        const { access } = response.data;
+
+        console.log("authpro        ++++++++++     " + access);
+
+        // Update tokens in storage
+        setAuth({ access: access });
+        setLoading(false);
+        return access;
+      } catch (error) {
+        console.error("Failed to refresh token:", error);
+        throw error;
+      }
+    };
+
     getNewAccessToken();
-  }, []);
+  }, [auth]);
+
+  //if (loading) return <p>Loading...</p>;
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
-      {children}
+      {loading && localStorage.getItem("refresh token") !== null ? (
+        <p>Loading...</p>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

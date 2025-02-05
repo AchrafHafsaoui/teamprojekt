@@ -51,7 +51,6 @@ const refreshAccessToken = async (): Promise<string> => {
 // Request Interceptor: Attach access token in the body
 apiClient.interceptors.request.use(
   (config) => {
-    console.log(auth.access)
     const access = auth.access;
     if (access!==null) {
       // Ensure the body exists and add the access token
