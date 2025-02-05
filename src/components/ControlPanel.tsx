@@ -5,7 +5,7 @@ import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 
 const generateUsername = () =>
-  `user_${Math.floor(1000 + Math.random() * 9000)}`;
+  `user_${Math.floor(1000 + Math.random() * 9000)}@fenexity.com`;
 const generatePassword = () =>
   Math.random().toString(36).substring(2, 10) + "!";
 
@@ -207,17 +207,40 @@ const ControlPanel: React.FC = () => {
     setNewPassword(generatePassword());
   };
 
-  const handleAddNewUser = () => {
-    setMembers((prevMembers) => [
-      ...prevMembers,
-      {
-        id: prevMembers.length + 1,
-        name: newUsername,
-        role: "Passive User",
-        email: `${newUsername}@example.com`,
-      },
-    ]);
-    setIsPanelOpen(false);
+  type AddUserRes = {
+    id: number;
+    email: string;
+    role: number;
+  };
+
+  const handleAddNewUser = async () => {
+    let re =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (re.test(newUsername)) {
+      try {
+        await navigator.clipboard.writeText(
+          "username: " + newUsername + " / password: " + newPassword
+        );
+        alert("Generated user is copied to your clipboard!!");
+      } catch (err) {
+        console.error("Failed to copy text:", err);
+        alert("Failed to copy text to clipboard");
+      }
+      try {
+        const res = await apiClient.post<AddUserRes>(API_ROUTES.ADD_USER, {
+          username: newUsername.split("@")[0],
+          email: newUsername,
+          password: newPassword,
+        });
+        alert(res.data.email + " was successfully added");
+      } catch (error) {
+        alert("an error occured when adding the user");
+      }
+      setIsPanelOpen(false);
+    } else {
+      setNewUsername("");
+      alert("username must be an email");
+    }
   };
 
   return (
@@ -327,11 +350,12 @@ const ControlPanel: React.FC = () => {
                 {/* Username and Password Display */}
                 <div className="mb-4 mx-6">
                   <label className="block text-lg font-medium text-gray-700 mb-2">
-                    Username:
+                    User Email:
                   </label>
                   <input
+                    placeholder="email"
                     type="text"
-                    readOnly
+                    onChange={(e) => setNewUsername(e.target.value)}
                     value={newUsername}
                     className="w-full px-4 py-2 border border-borderColor rounded-md"
                   />
@@ -341,8 +365,9 @@ const ControlPanel: React.FC = () => {
                     Password:
                   </label>
                   <input
+                    placeholder="password"
                     type="text"
-                    readOnly
+                    onChange={(e) => setNewPassword(e.target.value)}
                     value={newPassword}
                     className="w-full px-4 py-2 border border-borderColor rounded-md"
                   />
@@ -359,7 +384,7 @@ const ControlPanel: React.FC = () => {
                   onClick={handleAddNewUser}
                   className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
                 >
-                  Add User
+                  Copy and add User
                 </button>
               </div>
             </div>
