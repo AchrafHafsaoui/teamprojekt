@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import apiClient from "../api/api";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
+import axios from "axios";
+import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 import { useNavigate } from "react-router-dom";
 
@@ -23,11 +25,11 @@ const BusSVG = () => (
   </svg>
 );
 
-type ChargingStationData = {
-  stationId: string;
+type StationData = {
+  station_id: string;
   availability: "OK" | "Down" | "Maintenance";
-  chargingPower: number;
-  maxPower: number;
+  charging_power: number;
+  max_power: number;
 };
 
 interface Bus {
@@ -40,16 +42,22 @@ interface Bus {
 }
 
 const ChargingSchedule: React.FC = () => {
-  const stations = [
-    { id: "A", chargingPoints: 4, currentCapacity: 30, maxCapacity: 100 },
-    { id: "B", chargingPoints: 4, currentCapacity: 70, maxCapacity: 100 },
-    { id: "C", chargingPoints: 4, currentCapacity: 60, maxCapacity: 100 },
-    { id: "D", chargingPoints: 4, currentCapacity: 10, maxCapacity: 100 },
-    { id: "E", chargingPoints: 4, currentCapacity: 50, maxCapacity: 100 },
-    { id: "F", chargingPoints: 4, currentCapacity: 100, maxCapacity: 100 },
-    { id: "G", chargingPoints: 4, currentCapacity: 80, maxCapacity: 100 },
-    { id: "H", chargingPoints: 4, currentCapacity: 50, maxCapacity: 100 },
-  ];
+  const [stations, setStations] = useState<StationData[]>([]);
+  const fetchStations = async () => {
+    try {
+      const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
+      setStations(response.data);
+    } catch (error) {
+      console.error("Error fetching buses:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStations();
+    // Optional: Polling to refresh data every 10 seconds
+    const interval = setInterval(fetchStations, 60000);
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
 
   const [chargingPoints] = useState<{
     [key: string]: (number | null)[];
@@ -177,10 +185,20 @@ const ChargingSchedule: React.FC = () => {
   }, []);
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
@@ -195,10 +213,7 @@ const ChargingSchedule: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
     } else navigate("/login", { replace: true });
   }, []);
@@ -207,36 +222,37 @@ const ChargingSchedule: React.FC = () => {
     return stations.map((station, index) => {
       return (
         <div
-          key={station.id}
+          key={station.station_id}
           className="bg-secondaryColor border border-borderColor p-4 rounded-2xl shadow-xl relative w-full flex flex-row"
         >
           {/* Left Part: Station Information */}
           <div className="w-1/2 flex flex-col items-start px-4">
             <h3 className="text-3xl text-primaryColor font-semibold mb-4">
-              Station {station.id}
+              Station {station.station_id}
             </h3>
             <p className="text-md text-black">
               <span className="font-semibold">Current Capacity:</span>{" "}
-              {station.currentCapacity} kWh
+              {station.charging_power} kWh
             </p>
             <p className="text-md text-black mb-4">
               <span className="font-semibold">Max Capacity:</span>{" "}
-              {station.maxCapacity} kWh
+              {station.max_power} kWh
             </p>
             {renderGraduatedBar(
-              station.currentCapacity,
-              station.maxCapacity,
+              station.charging_power,
+              station.max_power,
               index
             )}
           </div>
 
           {/* Right Part: Charging Spots */}
           <div className="w-1/2 grid grid-cols-4 gap-5 items-center">
-            {Array.from({ length: station.chargingPoints }).map((_, index) => {
-              const busId = chargingPoints[station.id][index];
-              const bus = buses.find((b) => b.id === busId);
-              const remainingTime = bus?.remainingTime;
-
+            {Array.from({ length: 4 }).map((_, index) => {
+              //console.log(chargingPoints[station.station_id][index])
+              //const busId = chargingPoints[station.station_id][index];
+              //const bus = buses.find((b) => b.id === busId);
+              //const remainingTime = bus?.remainingTime;
+              const remainingTime = 90;
               // Format remaining time
               let formattedTime = "";
               if (remainingTime !== undefined) {
@@ -254,17 +270,17 @@ const ChargingSchedule: React.FC = () => {
                   key={index}
                   className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
                 >
-                  {busId && (
+                  {
                     <>
                       <span className="absolute -top-6 text-sm font-semibold">
-                        {busId}
+                        Bus ID
                       </span>
                       <BusSVG />
                       <span className="absolute -bottom-6 text-xs text-gray-700">
                         {formattedTime}
                       </span>
                     </>
-                  )}
+                  }
                 </div>
               );
             })}
@@ -305,7 +321,6 @@ const ChargingSchedule: React.FC = () => {
     const segmentsToShow = Math.round(
       (chargingPower / maxPower) * segmentCount
     );
-
     return (
       <div className="flex space-x-0.5 w-full items-center">
         {Array.from({ length: segmentCount }).map((_, index) => (
@@ -314,10 +329,7 @@ const ChargingSchedule: React.FC = () => {
             className={`h-6 rounded transition-colors duration-500`}
             style={{
               width: "4%", // Each segment takes 4% of the column width
-              backgroundColor:
-                index < animatedSegments[stationIndex] && index < segmentsToShow
-                  ? "#078ECD"
-                  : "#D3D3D3",
+              backgroundColor: index < segmentsToShow ? "#078ECD" : "#D3D3D3",
             }}
           ></div>
         ))}

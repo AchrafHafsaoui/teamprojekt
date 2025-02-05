@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import API_ROUTES from "../apiRoutes";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 type Bus = {
@@ -16,11 +17,11 @@ type ScheduleEntry = {
   id: string;
   departure_time: string;
   arrival_time: string;
-  departure_location: string; // Still accepts IDs for input
-  departure_location_name: string; // Display location name
-  arrival_location: string; // Still accepts IDs for input
-  arrival_location_name: string; // Display location name
-  bus: Bus | null;
+  departure_location: string;
+  departure_location_name: string;
+  arrival_location: string;
+  arrival_location_name: string;
+  bus_details: Bus | null;
 };
 
 type DrivingScheduleProps = {
@@ -37,17 +38,31 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     null
   );
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeUser, setActiveUser] = useState<boolean>(false);
+
+  const ITEMS_PER_PAGE = 8;
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
+
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
       });
-      console.log(res.data);
       if (res.data.message != "Authorized access") {
         navigate("/login", { replace: true });
       }
@@ -55,15 +70,29 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
       console.error("Is auth error :", error);
     }
   };
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
-    } else navigate("/login", { replace: true });
-  }, []);
+      checkActiveUser();
+    } else {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
 
   const fetchSchedules = async () => {
     try {
@@ -83,25 +112,37 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
   }, []);
 
   const filterSchedule = () => {
-    if (!selectedDepartureDate && !selectedArrivalDate) {
-      return schedules; // If no filters are applied, return all schedules
+    let filtered = schedules;
+    if (selectedDepartureDate) {
+      filtered = filtered.filter(
+        (entry) => new Date(entry.departure_time) >= selectedDepartureDate
+      );
     }
-
-    return schedules.filter((entry) => {
-      const departureDate = new Date(entry.departure_time);
-      const arrivalDate = new Date(entry.arrival_time);
-
-      const matchesDepartureFilter =
-        !selectedDepartureDate || departureDate >= selectedDepartureDate;
-      const matchesArrivalFilter =
-        !selectedArrivalDate || arrivalDate <= selectedArrivalDate;
-
-      return matchesDepartureFilter && matchesArrivalFilter;
-    });
+    if (selectedArrivalDate) {
+      filtered = filtered.filter(
+        (entry) => new Date(entry.arrival_time) <= selectedArrivalDate
+      );
+    }
+    return filtered;
   };
+
+  const paginatedSchedules = filterSchedule().slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(filterSchedule().length / ITEMS_PER_PAGE);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
   return (
@@ -124,7 +165,6 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         )}
       </div>
 
-      {/* Panel */}
       {isPanelOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-xl p-6 relative">
@@ -169,78 +209,99 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         </div>
       )}
 
-      {/* Schedule */}
       <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto ${
-          fullPage ? "h-[calc(100vh-8rem)]" : "h-72"
-        } custom-scrollbar`}
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`}
+        style={{ minHeight: "500px" }}
       >
-        {filterSchedule().map((entry) => (
-          <div
-            key={entry.id}
-            className="schedule-card bg-white shadow-md rounded-lg p-4 flex flex-col justify-between"
-          >
-            {/* Departure Section */}
-            <div>
-              <p className="text-lg font-bold text-primaryColor">Departure</p>
-              <p className="text-md font-semibold">
-                {entry.departure_location_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                {new Date(entry.departure_time).toLocaleString("en-US", {
-                  weekday: "short",
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
-              </p>
+        {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
+          const entry = paginatedSchedules[index];
+          return entry ? (
+            <div
+              key={entry.id}
+              className="schedule-card bg-white shadow-md rounded-xl p-5 flex flex-col justify-between hover:shadow-lg transition-all"
+              style={{ minHeight: "200px" }}
+            >
+              <div className="mb-4">
+                <p className="text-lg font-bold text-primaryColor mb-1">
+                  Departure
+                </p>
+                <p className="text-sm font-semibold text-gray-700">
+                  {entry.departure_location_name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {new Date(entry.departure_time).toLocaleString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </p>
+              </div>
+              <div className="mb-4">
+                <p className="text-lg font-bold text-primaryColor mb-1">
+                  Arrival
+                </p>
+                <p className="text-sm font-semibold text-gray-700">
+                  {entry.arrival_location_name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {new Date(entry.arrival_time).toLocaleString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-500">
+                  <strong>Bus ID:</strong> {entry.bus_details?.bus_id || "N/A"}
+                </p>
+                <p
+                  className={`font-semibold ${
+                    entry.bus_details &&
+                    parseFloat(entry.bus_details.battery) >= 50
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {entry.bus_details
+                    ? `Battery: ${entry.bus_details.battery}%`
+                    : "N/A"}
+                </p>
+              </div>
             </div>
+          ) : (
+            <div
+              key={index}
+              className="schedule-card bg-white shadow-md rounded-xl p-5"
+              style={{ minHeight: "200px", opacity: 0 }}
+            />
+          );
+        })}
+      </div>
 
-            {/* Arrival Section */}
-            <div className="mt-auto">
-              <p className="text-lg font-bold text-primaryColor">Arrival</p>
-              <p className="text-md font-semibold">
-                {entry.arrival_location_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                {new Date(entry.arrival_time).toLocaleString("en-US", {
-                  weekday: "short",
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
-              </p>
-            </div>
-
-            {/* Bus Details */}
-            <hr className="my-2" />
-            <p className="text-sm text-gray-500">
-              <strong>Bus:</strong>{" "}
-              {entry.bus ? (
-                <>
-                  ID: {entry.bus.bus_id},{" "}
-                  <span
-                    className={`font-bold ${
-                      parseFloat(entry.bus.battery) >= 50
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    Battery: {entry.bus.battery}%
-                  </span>
-                </>
-              ) : (
-                "N/A"
-              )}
-            </p>
-          </div>
-        ))}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

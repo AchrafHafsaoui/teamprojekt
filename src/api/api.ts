@@ -1,5 +1,18 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import API_ROUTES from '../../src/apiRoutes'; // Import routes
+import API_ROUTES from '../../src/apiRoutes'; 
+import { Dispatch, SetStateAction } from 'react';
+
+interface AuthState {
+  access: string | null;
+}
+
+let setAuth: Dispatch<SetStateAction<AuthState>> ;
+let auth:AuthState = {access:null};
+
+export const updateContextValues= (setAuthParam:Dispatch<SetStateAction<AuthState>>,authParam:AuthState)=>{
+  setAuth = setAuthParam;
+  auth= authParam;
+}
 
 // Define types for tokens
 interface Tokens {
@@ -26,7 +39,7 @@ const refreshAccessToken = async (): Promise<string> => {
     const { access } = response.data;
 
     // Update tokens in storage
-    localStorage.setItem('access token', access);
+    setAuth({access:access});
 
     return access;
   } catch (error) {
@@ -38,8 +51,9 @@ const refreshAccessToken = async (): Promise<string> => {
 // Request Interceptor: Attach access token in the body
 apiClient.interceptors.request.use(
   (config) => {
-    const access = localStorage.getItem('access token');
-    if (access) {
+    console.log(auth.access)
+    const access = auth.access;
+    if (access!==null) {
       // Ensure the body exists and add the access token
       config.data = {
         ...(config.data || {}),
@@ -72,7 +86,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         alert(refreshError)
         console.error('Redirecting to login due to refresh failure.');
-        localStorage.removeItem('access token'); // Clear tokens
+        setAuth({access:null}) 
         localStorage.removeItem('refresh token');
         window.location.href = '/login'; // Redirect to login
         return Promise.reject(refreshError);

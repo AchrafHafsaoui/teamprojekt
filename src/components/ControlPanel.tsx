@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AuthContext from "../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 
 const generateUsername = () =>
@@ -160,10 +161,20 @@ const ControlPanel: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
 
   const navigate = useNavigate();
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
   type AuthReq = {
     message: string;
   };
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 100,
@@ -178,10 +189,7 @@ const ControlPanel: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
     } else navigate("/login", { replace: true });
   }, []);

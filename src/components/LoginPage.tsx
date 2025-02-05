@@ -3,7 +3,7 @@ import AuthContext from "../context/AuthProvider";
 import Logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import apiClient from "../api/api";
+import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 
 const LoginPage: React.FC = () => {
@@ -25,6 +25,7 @@ const LoginPage: React.FC = () => {
   };
 
   const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
@@ -38,10 +39,7 @@ const LoginPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("access token") ||
-      localStorage.getItem("refresh token")
-    ) {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
     }
   }, []);
@@ -59,7 +57,6 @@ const LoginPage: React.FC = () => {
       });
       if (res.status === 200) {
         setAuth({ access: res.data.access });
-        localStorage.setItem("access token", res.data.access);
         localStorage.setItem("refresh token", res.data.refresh);
         navigate("/overview", { replace: true });
       } else {
