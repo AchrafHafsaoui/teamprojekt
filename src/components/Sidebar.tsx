@@ -29,7 +29,7 @@ const Sidebar: React.FC = () => {
   const { setAuth, auth } = useAuth();
 
   const menuItems = [
-    { label: "Overview", icon: OverviewIcon, path: "/" },
+    { label: "Overview", icon: OverviewIcon, path: "/overview" },
     { label: "Fleet Status", icon: FleetStatusIcon, path: "/fleet-status" },
     {
       label: "Charging Stations",
