@@ -326,21 +326,31 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         ))}
       </div>
 
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
+{/* Pagination Buttons */}
+<div className="w-full h-[10%] flex justify-end items-center mt-auto">
+        <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
+          <button
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-lg font-medium">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
