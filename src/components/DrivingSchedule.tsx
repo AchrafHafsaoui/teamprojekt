@@ -40,6 +40,8 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [activeUser, setActiveUser] = useState<boolean>(false);
+
   const ITEMS_PER_PAGE = 8;
 
   const navigate = useNavigate();
@@ -53,10 +55,16 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
 
   const { setAuth, auth } = useAuth();
 
+  type AuthReq = {
+    message: string;
+  };
+
   const checkAuth = async () => {
     updateContextValues(setAuth, auth);
     try {
-      const res = await apiClient.post(API_ROUTES.IS_AUTH, { role: 20 });
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
       if (res.data.message !== "Authorized access") {
         navigate("/login", { replace: true });
       }
@@ -65,9 +73,25 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     }
   };
 
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkActiveUser();
     } else {
       navigate("/login", { replace: true });
     }
@@ -122,7 +146,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = Math.ceil(sortedAndFilteredSchedules.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(
+    sortedAndFilteredSchedules.length / ITEMS_PER_PAGE
+  );
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
@@ -239,7 +265,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
           <div
             key={entry.id}
             className="schedule-card bg-white shadow-md rounded-xl p-5 flex flex-col justify-between hover:shadow-lg transition-all"
-            style={{ minHeight: "240px", height: "240px"}}
+            style={{ minHeight: "240px", height: "240px" }}
           >
             <div className="mb-4">
               <p className="text-lg font-bold text-primaryColor mb-1">
