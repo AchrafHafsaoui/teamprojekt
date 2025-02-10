@@ -4,6 +4,8 @@ import axios from "axios";
 import API_ROUTES from "../apiRoutes";
 import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
+import { Trash2 } from "lucide-react";
+
 
 const getStationById = async (id: string) => {
   const response = await axios.get(API_ROUTES.GET_STATION(id));
@@ -18,10 +20,6 @@ const updateStation = async (id: string, updatedStationData: object) => {
   console.log(response.data);
 };
 // Delete a specific bus
-const deleteStation = async (id: string) => {
-  const response = await axios.delete(API_ROUTES.DELETE_STATION(id));
-  console.log(response.data);
-};
 
 type StationData = {
   station_id: string;
@@ -39,6 +37,13 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
 }) => {
   const [stations, setStations] = useState<StationData[]>([]);
   const [activeUser, setActiveUser] = useState<boolean>(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newStation, setNewStation] = useState({
+    station_id: "",
+    availability: "OK",
+    charging_power: "",
+    max_power: "",
+    });
 
   const fetchStations = async () => {
     try {
@@ -48,6 +53,56 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
       console.error("Error fetching buses:", error);
     }
   };
+  const confirmDelete = (stationId: number, stationName: string) => {
+    if (window.confirm(`Are you sure you want to delete station: ${stationName}?`)) {
+        deleteStation(stationId);
+    }
+};
+  const deleteStation = async (stationId: string) => {
+    try {
+        const deleteUrl = API_ROUTES.DELETE_STATION(stationId);
+        console.log("Attempting DELETE request to:", deleteUrl);
+
+        const response = await axios.delete(deleteUrl, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${auth.access || ''}`, // ✅ Add if authentication is required
+            },
+        });
+
+        console.log("Delete response:", response);
+        alert("Charging Station Deleted Successfully!");
+
+        fetchStations(); // Refresh the list
+    } catch (error: any) {
+        console.error("Error deleting station:", error.response || error.message);
+
+        alert(`Failed to delete charging station. Error: ${error.response?.data?.message || error.message}`);
+    }
+};
+
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewStation({ ...newStation, [name]: value });
+  };
+  const addNewStation = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await axios.post(API_ROUTES.ADD_STATION, newStation, {
+            headers: { "Content-Type": "application/json" },
+        });
+        alert("Charging Station Added Successfully!");
+        setShowAddForm(false);
+        fetchStations(); // Refresh the stations list
+    } catch (error) {
+        console.error("Error adding station:", error);
+        alert("Failed to add charging station.");
+    }
+};
+
+
 
   const navigate = useNavigate();
   const useAuth = () => {
@@ -176,8 +231,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     const segmentsToShow = Math.round(
       (charging_power / max_power) * segmentCount
     );
-
-    return (
+    <div className="flex justify-between items-center mb-4">
+        <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor">
+            Charging Station Status
+        </h2>
+    </div>
+    return (      
       <div className="flex space-x-0.5 w-full justify-center items-center">
         {Array.from({ length: segmentCount }).map((_, index) => (
           <div
@@ -239,6 +298,63 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
           ))}
         </div>
       </div>
+      {showAddForm && (
+    <form onSubmit={addNewStation} className="bg-white shadow-lg p-4 rounded-lg mt-4">
+        <h3 className="text-lg font-semibold mb-2">Add New Charging Station</h3>
+        <div className="grid grid-cols-2 gap-4">
+            <input
+                type="text"
+                name="station_id"
+                placeholder="Station ID"
+                value={newStation.station_id}
+                onChange={handleInputChange}
+                required
+                className="p-2 border rounded-lg"
+            />
+            <select
+                name="availability"
+                value={newStation.availability}
+                onChange={handleInputChange}
+                className="p-2 border rounded-lg"
+            >
+                <option value="OK">OK</option>
+                <option value="Down">Down</option>
+                <option value="Maintenance">Maintenance</option>
+            </select>
+            <input
+                type="number"
+                name="charging_power"
+                placeholder="Charging Power (kW)"
+                value={newStation.charging_power}
+                onChange={handleInputChange}
+                required
+                className="p-2 border rounded-lg"
+            />
+            <input
+                type="number"
+                name="max_power"
+                placeholder="Max Power (kW)"
+                value={newStation.max_power}
+                onChange={handleInputChange}
+                required
+                className="p-2 border rounded-lg"
+            />
+        </div>
+        <div className="flex justify-end mt-4">
+            <button
+                type="button"
+                onClick={() => setShowAddForm(false)}
+                className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
+            >
+                Cancel
+            </button>
+            <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                Add
+            </button>
+        </div>
+    </form>
+)}
+
       <div className="w-full h-[80%]">
         {/* Header Row */}
         <div
@@ -290,6 +406,16 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
                   {station.charging_power} kW
                 </div>
               </div>
+              <button
+                 onClick={(e) => {
+                 e.stopPropagation(); // Prevent row click from triggering
+                 confirmDelete(station.id, station.station_id);
+                }}
+              className="p-1 rounded-full hover:bg-red-100 transition"
+              >
+              <Trash2 className="w-5 h-5 text-red-600 hover:text-red-800" />
+              </button>
+
               {expandedRow === station.station_id && (
                 <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
                   <p>Additional Details for {station.station_id}</p>
@@ -302,6 +428,14 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
         </div>
       </div>
       <div className="w-full h-[10%] flex justify-end items-center">
+        <div className="flex-1">
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition"
+          >
+             + Add Station
+          </button>
+        </div>
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
@@ -326,8 +460,8 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
             Next
           </button>
         </div>
+        </div>
       </div>
-    </div>
   );
 };
 
