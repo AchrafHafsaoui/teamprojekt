@@ -84,7 +84,7 @@ const Overview: React.FC = () => {
             </h3>
             <table className="table-auto w-full text-left">
               <thead>
-                <tr className="bg-primaryColor text-white">
+                <tr className="bg-secondaryColor text-gray-600">
                   <th className="px-4 py-2">Bus ID</th>
                   <th className="px-4 py-2">Departure</th>
                   <th className="px-4 py-2">Arrival</th>

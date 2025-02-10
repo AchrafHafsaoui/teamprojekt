@@ -39,8 +39,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
   );
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeUser, setActiveUser] = useState<boolean>(false);
-
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const ITEMS_PER_PAGE = 8;
 
   const navigate = useNavigate();
@@ -54,41 +53,21 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
 
   const { setAuth, auth } = useAuth();
 
-  type AuthReq = {
-    message: string;
-  };
   const checkAuth = async () => {
     updateContextValues(setAuth, auth);
     try {
-      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        role: 20,
-      });
-      if (res.data.message != "Authorized access") {
+      const res = await apiClient.post(API_ROUTES.IS_AUTH, { role: 20 });
+      if (res.data.message !== "Authorized access") {
         navigate("/login", { replace: true });
       }
     } catch (error) {
-      console.error("Is auth error :", error);
-    }
-  };
-  const checkActiveUser = async () => {
-    updateContextValues(setAuth, auth);
-    try {
-      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        role: 50,
-      });
-
-      if (res.data.message === "Authorized access") {
-        setActiveUser(true);
-      } else setActiveUser(false);
-    } catch (error) {
-      console.error("Is auth error :", error);
+      console.error("Is auth error:", error);
     }
   };
 
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
-      checkActiveUser();
     } else {
       navigate("/login", { replace: true });
     }
@@ -111,8 +90,10 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  const filterSchedule = () => {
-    let filtered = schedules;
+  const filterAndSortSchedules = () => {
+    let filtered = [...schedules];
+
+    // Filter schedules based on selected dates
     if (selectedDepartureDate) {
       filtered = filtered.filter(
         (entry) => new Date(entry.departure_time) >= selectedDepartureDate
@@ -123,15 +104,25 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         (entry) => new Date(entry.arrival_time) <= selectedArrivalDate
       );
     }
+
+    // Sort schedules by departure time
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.departure_time).getTime();
+      const dateB = new Date(b.departure_time).getTime();
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
+
     return filtered;
   };
 
-  const paginatedSchedules = filterSchedule().slice(
+  const sortedAndFilteredSchedules = filterAndSortSchedules();
+
+  const paginatedSchedules = sortedAndFilteredSchedules.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = Math.ceil(filterSchedule().length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(sortedAndFilteredSchedules.length / ITEMS_PER_PAGE);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
@@ -145,6 +136,15 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
+  const handleReset = () => {
+    setSelectedDepartureDate(null);
+    setSelectedArrivalDate(null);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
+
   return (
     <div
       className={`bg-secondaryColor bg-opacity-80 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 ${
@@ -156,55 +156,77 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
           Driving Schedule
         </h2>
         {fullPage && (
-          <button
-            onClick={handlePanelToggle}
-            className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
-          >
-            Select Date & Time
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleSortOrder}
+              className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
+            >
+              Sort by Date ({sortOrder === "asc" ? "Ascending" : "Descending"})
+            </button>
+            <button
+              onClick={handlePanelToggle}
+              className="bg-componentsColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
+            >
+              Select Date & Time
+            </button>
+          </div>
         )}
       </div>
 
       {isPanelOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 relative">
+          <div className="bg-white rounded-xl shadow-xl p-6 relative w-[24rem]">
             <button
               onClick={handlePanelToggle}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
             >
               ×
             </button>
-            <h2 className="text-xl font-bold text-primaryColor text-center">
+            <h2 className="text-2xl font-bold text-primaryColor text-center mb-4">
               Select Date & Time
             </h2>
-            <div className="mb-4 mx-6">
-              <p className="font-semibold mb-2">Departure Time:</p>
-              <DatePicker
-                selected={selectedDepartureDate}
-                onChange={(date) => setSelectedDepartureDate(date)}
-                showTimeSelect
-                dateFormat="Pp"
-                placeholderText="Select departure time"
-                className="custom-calendar-input border border-gray-300 rounded-lg px-3 py-2 w-full"
-              />
+            <div className="space-y-4 mx-auto text-center">
+              <div>
+                <p className="font-semibold text-gray-700 mb-2">
+                  Departure Time:
+                </p>
+                <DatePicker
+                  selected={selectedDepartureDate}
+                  onChange={(date) => setSelectedDepartureDate(date)}
+                  showTimeSelect
+                  dateFormat="Pp"
+                  placeholderText="Select departure time"
+                  className="custom-calendar-input border border-gray-300 rounded-lg px-3 py-2 w-full shadow-sm"
+                />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-700 mb-2">
+                  Arrival Time:
+                </p>
+                <DatePicker
+                  selected={selectedArrivalDate}
+                  onChange={(date) => setSelectedArrivalDate(date)}
+                  showTimeSelect
+                  dateFormat="Pp"
+                  placeholderText="Select arrival time"
+                  className="custom-calendar-input border border-gray-300 rounded-lg px-3 py-2 w-full shadow-sm"
+                />
+              </div>
             </div>
-            <div className="mb-4 mx-6">
-              <p className="font-semibold mb-2">Arrival Time:</p>
-              <DatePicker
-                selected={selectedArrivalDate}
-                onChange={(date) => setSelectedArrivalDate(date)}
-                showTimeSelect
-                dateFormat="Pp"
-                placeholderText="Select arrival time"
-                className="custom-calendar-input border border-gray-300 rounded-lg px-3 py-2 w-full"
-              />
+            <div className="flex justify-between items-center mt-6 mx-6 gap-2">
+              <button
+                onClick={handleReset}
+                className="w-28 py-3 rounded-lg font-semibold border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+              >
+                Reset
+              </button>
+              <button
+                onClick={handlePanelToggle}
+                className="w-28 py-3 rounded-lg font-semibold border border-primaryColor bg-primaryColor text-white hover:bg-blue-600 transition-all"
+              >
+                Apply
+              </button>
             </div>
-            <button
-              onClick={handlePanelToggle}
-              className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
-            >
-              Apply
-            </button>
           </div>
         </div>
       )}
@@ -213,78 +235,69 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`}
         style={{ minHeight: "500px" }}
       >
-        {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
-          const entry = paginatedSchedules[index];
-          return entry ? (
-            <div
-              key={entry.id}
-              className="schedule-card bg-white shadow-md rounded-xl p-5 flex flex-col justify-between hover:shadow-lg transition-all"
-              style={{ minHeight: "200px" }}
-            >
-              <div className="mb-4">
-                <p className="text-lg font-bold text-primaryColor mb-1">
-                  Departure
-                </p>
-                <p className="text-sm font-semibold text-gray-700">
-                  {entry.departure_location_name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {new Date(entry.departure_time).toLocaleString("en-US", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                  })}
-                </p>
-              </div>
-              <div className="mb-4">
-                <p className="text-lg font-bold text-primaryColor mb-1">
-                  Arrival
-                </p>
-                <p className="text-sm font-semibold text-gray-700">
-                  {entry.arrival_location_name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {new Date(entry.arrival_time).toLocaleString("en-US", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                  })}
-                </p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-500">
-                  <strong>Bus ID:</strong> {entry.bus_details?.bus_id || "N/A"}
-                </p>
-                <p
-                  className={`font-semibold ${
-                    entry.bus_details &&
-                    parseFloat(entry.bus_details.battery) >= 50
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {entry.bus_details
-                    ? `Battery: ${entry.bus_details.battery}%`
-                    : "N/A"}
-                </p>
-              </div>
+        {paginatedSchedules.map((entry) => (
+          <div
+            key={entry.id}
+            className="schedule-card bg-white shadow-md rounded-xl p-5 flex flex-col justify-between hover:shadow-lg transition-all"
+            style={{ minHeight: "240px", height: "240px"}}
+          >
+            <div className="mb-4">
+              <p className="text-lg font-bold text-primaryColor mb-1">
+                Departure
+              </p>
+              <p className="text-sm font-semibold text-gray-700">
+                {entry.departure_location_name}
+              </p>
+              <p className="text-sm text-gray-600">
+                {new Date(entry.departure_time).toLocaleString("en-US", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </p>
             </div>
-          ) : (
-            <div
-              key={index}
-              className="schedule-card bg-white shadow-md rounded-xl p-5"
-              style={{ minHeight: "200px", opacity: 0 }}
-            />
-          );
-        })}
+            <div className="mb-4">
+              <p className="text-lg font-bold text-primaryColor mb-1">
+                Arrival
+              </p>
+              <p className="text-sm font-semibold text-gray-700">
+                {entry.arrival_location_name}
+              </p>
+              <p className="text-sm text-gray-600">
+                {new Date(entry.arrival_time).toLocaleString("en-US", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                <strong>Bus ID:</strong> {entry.bus_details?.bus_id || "N/A"}
+              </p>
+              <p
+                className={`font-semibold ${
+                  entry.bus_details &&
+                  parseFloat(entry.bus_details.battery) >= 50
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {entry.bus_details
+                  ? `Battery: ${entry.bus_details.battery}%`
+                  : "N/A"}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="flex justify-between items-center mt-4">
