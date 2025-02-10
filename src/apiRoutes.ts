@@ -20,12 +20,13 @@ const API_ROUTES = {
   UPDATE_DRIVNG_SCHEDULE: (id: string) => `${BASE_URL}/driving-schedule/${id}/`, // Update a specific charging station
   DELETE_DRIVING_SCHEDULE: (id: string) => `${BASE_URL}/driving-schedule/${id}/`, // Delete a specific charging station
 
+  GET_LOCATIONS: `${BASE_URL}/location-types/`,  // Fetch all charging stations
+  GET_LOCATION: (id: string) => `${BASE_URL}/location-types/${id}/`,
   //login url
   LOGIN: `${BASE_URL}/users/login/`,
   IS_AUTH: `${BASE_URL}/users/is_auth/`,
   REFRESH_TOKEN: `${BASE_URL}/users/access_token/refresh/`,
-  ADD_USER: `${BASE_URL}/users/add_user/`,
-  GET_USERS: `${BASE_URL}/users/get_all_users/`,
+  ADD_USER: `${BASE_URL}/users/add_user/`
 };
 
 export default API_ROUTES;
