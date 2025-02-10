@@ -68,13 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
-      {loading &&
-      localStorage.getItem("refresh token") !== null &&
-      auth.access == null ? (
-        <p>Loading...</p>
-      ) : (
-        children
-      )}
+      {children}
     </AuthContext.Provider>
   );
 };
