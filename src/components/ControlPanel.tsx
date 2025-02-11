@@ -55,6 +55,7 @@ const ControlPanel: React.FC = () => {
   };
 
   const [members, setMembers] = useState<member[] | undefined>();
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const getUsers = async () => {
     updateContextValues(setAuth, auth);
@@ -94,24 +95,40 @@ const ControlPanel: React.FC = () => {
   type AuthReq = {
     message: string;
   };
-  const checkAuth = async () => {
+  const checkAdmin = async () => {
     updateContextValues(setAuth, auth);
     try {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 100,
       });
       console.log(res.data);
-      if (res.data.message != "Authorized access") {
-        navigate("/login", { replace: true });
+      if (res.data.message == "Authorized access") {
+        setIsAdmin(true);
       }
     } catch (error) {
       console.error("Is auth error :", error);
     }
   };
 
+  const checkAuth = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
+      if (res.data.message !== "Authorized access") {
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      navigate("/login", { replace: true });
+      console.error("Is auth error:", error);
+    }
+  };
+
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkAdmin();
     } else navigate("/login", { replace: true });
   }, []);
 
@@ -324,123 +341,127 @@ const ControlPanel: React.FC = () => {
           </div>
         </div>
         {/* Login/Logout Logs */}
-        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
-          <h3
-            onClick={getUsers}
-            className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor"
-          >
-            Login/Logout Logs
-          </h3>
-          <div className="overflow-y-scroll custom-scrollbar">
-            {sampleLoginLogs.map((log, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
+        {isAdmin && (
+          <>
+            <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
+              <h3
+                onClick={getUsers}
+                className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor"
               >
-                <div>
-                  <p className="font-semibold">{log.user}</p>
-                  <p className="text-sm">{log.action}</p>
-                </div>
-                <p className="text-sm text-gray-500">{log.timestamp}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Edits Logs */}
-
-        {/* Member Management */}
-        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
-          <div className="flex justify-between items-center">
-            <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
-              Member Management
-            </h3>
-            <button
-              onClick={() => setIsPanelOpen(true)}
-              className="bg-secondaryColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
-            >
-              Add User
-            </button>
-          </div>
-          <div className=" overflow-y-scroll custom-scrollbar p-0">
-            {members?.map((member) => (
-              <div
-                key={member.id}
-                className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
-              >
-                <div>
-                  <p className="font-semibold">{member.username}</p>
-                  <p className="text-sm text-gray-500">{member.email}</p>
-                </div>
-                <select
-                  value={member.role}
-                  onChange={(e) => handleRoleChange(member, e.target.value)}
-                  className="px-2 py-1 border border-borderColor rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor bg-secondaryColor"
-                >
-                  <option value="100">Admin</option>
-                  <option value="50">Active User</option>
-                  <option value="20">Passive User</option>
-                </select>
-              </div>
-            ))}
-          </div>
-          {/* New User Panel */}
-          {isPanelOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-xl shadow-xl p-6 relative">
-                {/* Close Button */}
-                <button
-                  onClick={() => setIsPanelOpen(false)}
-                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-                >
-                  ×
-                </button>
-                <h3 className="text-2xl font-bold mb-4 text-primaryColor">
-                  Generate New User
-                </h3>
-                {/* Username and Password Display */}
-                <div className="mb-4 mx-6">
-                  <label className="block text-lg font-medium text-gray-700 mb-2">
-                    User Email:
-                  </label>
-                  <input
-                    placeholder="email"
-                    type="text"
-                    onChange={(e) => setNewUsername(e.target.value)}
-                    value={newUsername}
-                    className="w-full px-4 py-2 border border-borderColor rounded-md"
-                  />
-                </div>
-                <div className="mb-6 mx-6">
-                  <label className="block text-lg font-medium text-gray-700 mb-2">
-                    Password:
-                  </label>
-                  <input
-                    placeholder="password"
-                    type="text"
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    value={newPassword}
-                    className="w-full px-4 py-2 border border-borderColor rounded-md"
-                  />
-                </div>
-                {/* Generate Button */}
-                <button
-                  onClick={handleGenerateCredentials}
-                  className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
-                >
-                  Generate
-                </button>
-                {/* Add User Button */}
-                <button
-                  onClick={handleAddNewUser}
-                  className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
-                >
-                  Copy and add User
-                </button>
+                Login/Logout Logs
+              </h3>
+              <div className="overflow-y-scroll custom-scrollbar">
+                {sampleLoginLogs.map((log, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
+                  >
+                    <div>
+                      <p className="font-semibold">{log.user}</p>
+                      <p className="text-sm">{log.action}</p>
+                    </div>
+                    <p className="text-sm text-gray-500">{log.timestamp}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Edits Logs */}
+
+            {/* Member Management */}
+            <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
+              <div className="flex justify-between items-center">
+                <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
+                  Member Management
+                </h3>
+                <button
+                  onClick={() => setIsPanelOpen(true)}
+                  className="bg-secondaryColor border border-borderColor text-black px-4 py-2 rounded-lg hover:bg-primaryColor hover:text-white transition-all font-semibold"
+                >
+                  Add User
+                </button>
+              </div>
+              <div className=" overflow-y-scroll custom-scrollbar p-0">
+                {members?.map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
+                  >
+                    <div>
+                      <p className="font-semibold">{member.username}</p>
+                      <p className="text-sm text-gray-500">{member.email}</p>
+                    </div>
+                    <select
+                      value={member.role}
+                      onChange={(e) => handleRoleChange(member, e.target.value)}
+                      className="px-2 py-1 border border-borderColor rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor bg-secondaryColor"
+                    >
+                      <option value="100">Admin</option>
+                      <option value="50">Active User</option>
+                      <option value="20">Passive User</option>
+                    </select>
+                  </div>
+                ))}
+              </div>
+              {/* New User Panel */}
+              {isPanelOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                  <div className="bg-white rounded-xl shadow-xl p-6 relative">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setIsPanelOpen(false)}
+                      className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                    >
+                      ×
+                    </button>
+                    <h3 className="text-2xl font-bold mb-4 text-primaryColor">
+                      Generate New User
+                    </h3>
+                    {/* Username and Password Display */}
+                    <div className="mb-4 mx-6">
+                      <label className="block text-lg font-medium text-gray-700 mb-2">
+                        User Email:
+                      </label>
+                      <input
+                        placeholder="email"
+                        type="text"
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        value={newUsername}
+                        className="w-full px-4 py-2 border border-borderColor rounded-md"
+                      />
+                    </div>
+                    <div className="mb-6 mx-6">
+                      <label className="block text-lg font-medium text-gray-700 mb-2">
+                        Password:
+                      </label>
+                      <input
+                        placeholder="password"
+                        type="text"
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        value={newPassword}
+                        className="w-full px-4 py-2 border border-borderColor rounded-md"
+                      />
+                    </div>
+                    {/* Generate Button */}
+                    <button
+                      onClick={handleGenerateCredentials}
+                      className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
+                    >
+                      Generate
+                    </button>
+                    {/* Add User Button */}
+                    <button
+                      onClick={handleAddNewUser}
+                      className="w-60 py-3 mx-6 rounded-lg font-semibold border border-borderColor bg-primaryColor text-white text-lg"
+                    >
+                      Copy and add User
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

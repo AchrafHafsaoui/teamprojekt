@@ -190,13 +190,13 @@ const ChargingSchedule: React.FC = () => {
         prevBuses.map((bus) =>
           bus.remainingTime > 0
             ? {
-              ...bus,
-              remainingTime: bus.remainingTime - 1,
-              currentCharging: Math.min(
-                bus.currentCharging + 1,
-                bus.maxCapacity
-              ),
-            }
+                ...bus,
+                remainingTime: bus.remainingTime - 1,
+                currentCharging: Math.min(
+                  bus.currentCharging + 1,
+                  bus.maxCapacity
+                ),
+              }
             : bus
         )
       );
@@ -229,6 +229,7 @@ const ChargingSchedule: React.FC = () => {
         navigate("/login", { replace: true });
       }
     } catch (error) {
+      navigate("/login", { replace: true });
       console.error("Is auth error :", error);
     }
   };
@@ -253,7 +254,7 @@ const ChargingSchedule: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
       alert("Charging Station Added Successfully!");
-      fetchStations();  // Refresh the bus list
+      fetchStations(); // Refresh the bus list
       setIsAddStationOpen(false); // Close modal
     } catch (error) {
       console.error("Error adding bus:", error);
@@ -261,14 +262,15 @@ const ChargingSchedule: React.FC = () => {
   };
   const handleDeleteStation = async (stationId: Number) => {
     try {
-      if (!window.confirm(`Are you sure you want to delete Bus ${stationId}?`)) return;
+      if (!window.confirm(`Are you sure you want to delete Bus ${stationId}?`))
+        return;
       const deleteUrl = API_ROUTES.DELETE_STATION(String(stationId));
       console.log("Attempting DELETE request to:", deleteUrl);
 
       const response = await axios.delete(deleteUrl, {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${auth.access || ''}`,
+          Authorization: `Bearer ${auth.access || ""}`,
         },
       });
 
@@ -279,9 +281,13 @@ const ChargingSchedule: React.FC = () => {
     } catch (error: any) {
       console.error("Error deleting station:", error.response || error.message);
 
-      alert(`Failed to delete charging station. Error: ${error.response?.data?.message || error.message}`);
+      alert(
+        `Failed to delete charging station. Error: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
-  }
+  };
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
@@ -420,7 +426,8 @@ const ChargingSchedule: React.FC = () => {
             </div>
           </div>
         );
-      })];
+      }),
+    ];
   };
 
   const segmentCount = 20; // Number of segments in the bar
@@ -462,7 +469,10 @@ const ChargingSchedule: React.FC = () => {
             className={`h-6 rounded transition-colors duration-500`}
             style={{
               width: "4%", // Each segment takes 4% of the column width
-              backgroundColor: index < animatedSegments[stationIndex] && index < segmentsToShow ? "#078ECD" : "#D3D3D3",
+              backgroundColor:
+                index < animatedSegments[stationIndex] && index < segmentsToShow
+                  ? "#078ECD"
+                  : "#D3D3D3",
             }}
           ></div>
         ))}
@@ -521,20 +531,26 @@ const ChargingSchedule: React.FC = () => {
       {isAddStationOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-xl">
-            <h2 className="text-lg font-bold text-gray-700 mb-4">Add New Station</h2>
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Add New Station
+            </h2>
 
             <label className="block mb-2">Station ID:</label>
             <input
               type="text"
               value={newStation.station_id}
-              onChange={(e) => setNewStation({ ...newStation, station_id: e.target.value })}
+              onChange={(e) =>
+                setNewStation({ ...newStation, station_id: e.target.value })
+              }
               className="border border-gray-300 p-2 w-full rounded"
             />
 
             <label className="block mt-4 mb-2">Availability:</label>
             <select
               value={newStation.availability}
-              onChange={(e) => setNewStation({ ...newStation, availability: e.target.value })}
+              onChange={(e) =>
+                setNewStation({ ...newStation, availability: e.target.value })
+              }
               className="border border-gray-300 p-2 w-full rounded"
             >
               <option value="OK">OK</option>
@@ -546,7 +562,9 @@ const ChargingSchedule: React.FC = () => {
             <input
               type="number"
               value={newStation.charging_power}
-              onChange={(e) => setNewStation({ ...newStation, charging_power: e.target.value })}
+              onChange={(e) =>
+                setNewStation({ ...newStation, charging_power: e.target.value })
+              }
               className="border border-gray-300 p-2 w-full rounded"
             />
 
@@ -554,15 +572,23 @@ const ChargingSchedule: React.FC = () => {
             <input
               type="number"
               value={newStation.max_power}
-              onChange={(e) => setNewStation({ ...newStation, max_power: e.target.value })}
+              onChange={(e) =>
+                setNewStation({ ...newStation, max_power: e.target.value })
+              }
               className="border border-gray-300 p-2 w-full rounded"
             />
 
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setIsAddStationOpen(false)} className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">
+              <button
+                onClick={() => setIsAddStationOpen(false)}
+                className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
+              >
                 Cancel
               </button>
-              <button onClick={handleAddStation} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+              <button
+                onClick={handleAddStation}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+              >
                 Save Station
               </button>
             </div>

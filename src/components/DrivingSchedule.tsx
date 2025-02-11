@@ -69,6 +69,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         navigate("/login", { replace: true });
       }
     } catch (error) {
+      navigate("/login", { replace: true });
       console.error("Is auth error:", error);
     }
   };
@@ -326,8 +327,8 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         ))}
       </div>
 
-{/* Pagination Buttons */}
-<div className="w-full h-[10%] flex justify-end items-center mt-auto">
+      {/* Pagination Buttons */}
+      <div className="w-full h-[10%] flex justify-end items-center mt-auto">
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
             className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${

@@ -58,6 +58,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         navigate("/login", { replace: true });
       }
     } catch (error) {
+      navigate("/login", { replace: true });
       console.error("Is auth error :", error);
     }
   };

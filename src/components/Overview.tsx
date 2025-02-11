@@ -57,6 +57,7 @@ const Overview: React.FC = () => {
         navigate("/login", { replace: true });
       }
     } catch (error) {
+      navigate("/login", { replace: true });
       console.error("Is auth error:", error);
     }
   };

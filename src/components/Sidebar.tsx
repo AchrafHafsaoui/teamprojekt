@@ -9,14 +9,11 @@ import Logo from "../assets/logo.png";
 import PowerIcon from "../assets/icons/power.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
-import apiClient, { updateContextValues } from "../api/api";
-import API_ROUTES from "../apiRoutes";
 import AuthContext from "../context/AuthProvider";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [activeButton, setActiveButton] = useState<string>("Overview");
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const useAuth = () => {
     const context = useContext(AuthContext);
@@ -25,7 +22,7 @@ const Sidebar: React.FC = () => {
     }
     return context;
   };
-  const { setAuth, auth } = useAuth();
+  const { setAuth } = useAuth();
 
   const menuItems = [
     { label: "Overview", icon: OverviewIcon, path: "/overview" },
@@ -42,30 +39,6 @@ const Sidebar: React.FC = () => {
     },
     { label: "Parking", icon: ParkingIcon, path: "/parking" },
   ];
-
-  type AuthReq = {
-    message: string;
-  };
-  const checkAdmin = async () => {
-    updateContextValues(setAuth, auth);
-    try {
-      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        role: 100,
-      });
-      console.log(res.data);
-      if (res.data.message === "Authorized access") {
-        setIsAdmin(true);
-      } else setIsAdmin(false);
-    } catch (error) {
-      console.error("Is auth error :", error);
-    }
-  };
-
-  useEffect(() => {
-    if (auth.access !== null || localStorage.getItem("refresh token")) {
-      checkAdmin();
-    } else setIsAdmin(false);
-  }, [auth]);
 
   return (
     <div className="flex flex-col bg-opacity-80 w-20 hover:w-80 hover:shadow-[rgba(0,0,15,0.1)_4px_0px_4px_0px] duration-300 h-screen fixed justify-between bg-secondaryColor group z-10">
@@ -114,39 +87,36 @@ const Sidebar: React.FC = () => {
       {/* Bottom menu part */}
       <div className="flex flex-col mb-5 space-y-5">
         {/* Control Panel button with a link */}
-        {isAdmin && (
-          <Link
-            to="/control-panel"
-            onClick={() => setActiveButton("Control Panel")}
-            className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
-            style={{ transition: "background-color 0.3s" }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                "rgba(7, 142, 205, 0.35)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "transparent")
-            }
+        <Link
+          to="/control-panel"
+          onClick={() => setActiveButton("Control Panel")}
+          className="flex items-center p-1 rounded hover:pl-3 transition duration-300 relative"
+          style={{ transition: "background-color 0.3s" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(7, 142, 205, 0.35)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
+        >
+          <img
+            src={ControlPanelIcon}
+            alt="Control Panel"
+            className="w-8 ml-4 mr-2"
+          />
+          <span
+            className={`whitespace-nowrap overflow-hidden ml-4 ${
+              activeButton === "Control Panel"
+                ? "font-bold text-[rgb(7, 142, 205)]"
+                : "font-semibold text-gray-800"
+            } text-lg tracking-wide transition-all`}
           >
-            <img
-              src={ControlPanelIcon}
-              alt="Control Panel"
-              className="w-8 ml-4 mr-2"
-            />
-            <span
-              className={`whitespace-nowrap overflow-hidden ml-4 ${
-                activeButton === "Control Panel"
-                  ? "font-bold text-[rgb(7, 142, 205)]"
-                  : "font-semibold text-gray-800"
-              } text-lg tracking-wide transition-all`}
-            >
-              Control Panel
-            </span>
-            {activeButton === "Control Panel" && (
-              <div className="absolute right-0 top-0 h-full w-1 bg-black bg-opacity-50 rounded" />
-            )}
-          </Link>
-        )}
+            Control Panel
+          </span>
+          {activeButton === "Control Panel" && (
+            <div className="absolute right-0 top-0 h-full w-1 bg-black bg-opacity-50 rounded" />
+          )}
+        </Link>
 
         {/* Logout button without a link */}
         <button
