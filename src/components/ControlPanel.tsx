@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 
@@ -19,6 +19,22 @@ const ControlPanel: React.FC = () => {
     { user: "Sophia Wagner", action: "Login", timestamp: "2024-11-12 11:45" },
     { user: "Karl Becker", action: "Login", timestamp: "2024-11-12 12:15" },
     { user: "Emily Davis", action: "Logout", timestamp: "2024-11-12 12:30" },
+    { user: "John Doe", action: "Login", timestamp: "2024-11-12 09:30" },
+    { user: "Jane Smith", action: "Logout", timestamp: "2024-11-12 10:15" },
+    { user: "Chris Johnson", action: "Login", timestamp: "2024-11-12 10:45" },
+    { user: "Anna Müller", action: "Login", timestamp: "2024-11-12 11:00" },
+    { user: "Lukas Schmidt", action: "Logout", timestamp: "2024-11-12 11:20" },
+    { user: "Sophia Wagner", action: "Login", timestamp: "2024-11-12 11:45" },
+    { user: "Karl Becker", action: "Login", timestamp: "2024-11-12 12:15" },
+    { user: "Emily Davis", action: "Logout", timestamp: "2024-11-12 12:30" },
+    { user: "John Doe", action: "Login", timestamp: "2024-11-12 09:30" },
+    { user: "Jane Smith", action: "Logout", timestamp: "2024-11-12 10:15" },
+    { user: "Chris Johnson", action: "Login", timestamp: "2024-11-12 10:45" },
+    { user: "Anna Müller", action: "Login", timestamp: "2024-11-12 11:00" },
+    { user: "Lukas Schmidt", action: "Logout", timestamp: "2024-11-12 11:20" },
+    { user: "Sophia Wagner", action: "Login", timestamp: "2024-11-12 11:45" },
+    { user: "Karl Becker", action: "Login", timestamp: "2024-11-12 12:15" },
+    { user: "Emily Davis", action: "Logout", timestamp: "2024-11-12 12:30" },
     {
       user: "Maximilian Hoffmann",
       action: "Login",
@@ -27,68 +43,9 @@ const ControlPanel: React.FC = () => {
     { user: "Laura Fischer", action: "Logout", timestamp: "2024-11-12 13:00" },
   ];
 
-  const sampleEditLogs = [
-    {
-      user: "Jane Smith",
-      page: "Fleet Status",
-      action: "Changed Bus 23001 status",
-      timestamp: "2024-11-12 11:00",
-    },
-    {
-      user: "John Doe",
-      page: "Parking Status",
-      action: "Deleted Slot 1D (18m)",
-      timestamp: "2024-11-12 11:15",
-    },
-    {
-      user: "Chris Johnson",
-      page: "Charging Schedule",
-      action: "Added bus 19286 to charging queue",
-      timestamp: "2024-11-12 11:30",
-    },
-    {
-      user: "Anna Müller",
-      page: "Fleet Status",
-      action: "Changed bus 19286 charging point",
-      timestamp: "2024-11-12 11:45",
-    },
-    {
-      user: "Lukas Schmidt",
-      page: "Parking Status",
-      action: "Added Slot 4B (12m)",
-      timestamp: "2024-11-12 12:00",
-    },
-    {
-      user: "Sophia Wagner",
-      page: "Charging Stations",
-      action: "Deleted Station",
-      timestamp: "2024-11-12 12:15",
-    },
-    {
-      user: "Karl Becker",
-      page: "Fleet Status",
-      action: "Added Vehicle",
-      timestamp: "2024-11-12 12:30",
-    },
-    {
-      user: "Emily Davis",
-      page: "Parking Status",
-      action: "Changed size 5C (12m -> 18m)",
-      timestamp: "2024-11-12 12:45",
-    },
-    {
-      user: "Maximilian Hoffmann",
-      page: "Charging Schedule",
-      action: "Removed bus 23001 from charging queue",
-      timestamp: "2024-11-12 13:00",
-    },
-    {
-      user: "Laura Fischer",
-      page: "Fleet Status",
-      action: "Added new bus",
-      timestamp: "2024-11-12 13:15",
-    },
-  ];
+  type EditInfo = {
+    detail: string;
+  };
 
   type member = {
     id: number;
@@ -114,17 +71,15 @@ const ControlPanel: React.FC = () => {
     getUsers();
   }, []);
 
-  const pageRoutes: { [key: string]: string } = {
-    "Fleet Status": "/fleet-status",
-    "Parking Status": "/parking",
-    "Charging Schedule": "/charging-schedule",
-    "Electricity Schedule": "/electricity-schedule",
-    "Charging Stations": "/charging-stations",
-  };
-
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
+  const [changeEmail, setChangeEmail] = useState("");
+  const [changeUserName, setChangeUserName] = useState("");
+  const [changePwd, setChangePwd] = useState("");
+  const [changeConfirmPwd, setChangeConfirmPwd] = useState("");
+  const [oldPwd, setOldPwd] = useState("");
 
   const navigate = useNavigate();
   const useAuth = () => {
@@ -160,7 +115,39 @@ const ControlPanel: React.FC = () => {
     } else navigate("/login", { replace: true });
   }, []);
 
-  const handleRoleChange = (id: number, newRole: string) => {};
+  const handleRoleChange = async (member: member, newRole: string) => {
+    const userResponse = window.confirm(
+      "are u sure u want to change the role of user " +
+        member.username +
+        " from " +
+        (member.role === 100
+          ? "admin"
+          : member.role === 50
+          ? "active user"
+          : "passive user") +
+        " to " +
+        (newRole === "100"
+          ? "admin"
+          : newRole === "50"
+          ? "active user"
+          : "passive user")
+    );
+    if (userResponse) {
+      try {
+        const res = await apiClient.post<EditInfo>(
+          API_ROUTES.UPDATE_USER_ROLE,
+          {
+            member_id: member.id,
+            new_role: newRole,
+          }
+        );
+        alert(res.data.detail);
+        getUsers();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   const handleGenerateCredentials = () => {
     setNewUsername(generateUsername());
@@ -177,6 +164,7 @@ const ControlPanel: React.FC = () => {
     let re =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (re.test(newUsername)) {
+      updateContextValues(setAuth, auth);
       try {
         await navigator.clipboard.writeText(
           "username: " + newUsername + " / password: " + newPassword
@@ -193,6 +181,7 @@ const ControlPanel: React.FC = () => {
           password: newPassword,
         });
         alert(res.data.email + " was successfully added");
+        getUsers();
       } catch (error) {
         alert("an error occured when adding the user");
       }
@@ -203,18 +192,146 @@ const ControlPanel: React.FC = () => {
     }
   };
 
+  const handleEditInfo = async () => {
+    let re =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (oldPwd == "") {
+      alert("please provide your old password");
+    }
+    if (changeEmail !== "" && !re.test(changeEmail)) {
+      alert("the new Email should have email format!");
+    }
+    if (
+      changePwd !== "" &&
+      changeConfirmPwd !== "" &&
+      changePwd !== changeConfirmPwd
+    ) {
+      alert("the confirmation password is different from the new password");
+    } else if (
+      oldPwd !== "" &&
+      ((re.test(changeEmail) && changeEmail !== "") ||
+        changeUserName !== "" ||
+        (changePwd !== "" &&
+          changeConfirmPwd !== "" &&
+          changePwd === changeConfirmPwd))
+    ) {
+      try {
+        const res = await apiClient.post<EditInfo>(
+          API_ROUTES.UPDATE_USER_INFO,
+          {
+            newEmail: changeEmail,
+            newUserName: changeUserName,
+            newPwd: changePwd,
+            oldPwd: oldPwd,
+          }
+        );
+        alert(res.data.detail);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
+        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
+          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
+            Edit Personal info
+          </h3>
+          <div className="overflow-y-scroll custom-scrollbar p-4">
+            <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  enter your new email
+                </label>
+                <input
+                  type="email"
+                  onFocus={(e) => e.target.removeAttribute("readonly")}
+                  readOnly
+                  value={changeEmail}
+                  onChange={(e) => {
+                    setChangeEmail(e.target.value);
+                  }}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  enter your new user name
+                </label>
+                <input
+                  type="text"
+                  onFocus={(e) => e.target.removeAttribute("readonly")}
+                  readOnly
+                  value={changeUserName}
+                  onChange={(e) => {
+                    setChangeUserName(e.target.value);
+                  }}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
+                />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  enter your new password
+                </label>
+                <input
+                  type="password"
+                  onFocus={(e) => e.target.removeAttribute("readonly")}
+                  readOnly
+                  value={changePwd}
+                  onChange={(e) => setChangePwd(e.target.value)}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  confirm your new password
+                </label>
+                <input
+                  type="password"
+                  onFocus={(e) => e.target.removeAttribute("readonly")}
+                  readOnly
+                  value={changeConfirmPwd}
+                  onChange={(e) => setChangeConfirmPwd(e.target.value)}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  enter your old password (important!)
+                </label>
+                <input
+                  type="password"
+                  onFocus={(e) => e.target.removeAttribute("readonly")}
+                  readOnly
+                  value={oldPwd}
+                  onChange={(e) => setOldPwd(e.target.value)}
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all"
+                />
+              </div>
+              <div className="flex justify-center">
+                <button
+                  onClick={handleEditInfo}
+                  type="submit"
+                  className="w-full py-3 px-4 bg-primaryColor text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor transition-all duration-300 transform hover:scale-105"
+                >
+                  apply changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
         {/* Login/Logout Logs */}
-        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4">
+        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
           <h3
             onClick={getUsers}
             className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor"
           >
             Login/Logout Logs
           </h3>
-          <div className="overflow-y-auto custom-scrollbar">
+          <div className="overflow-y-scroll custom-scrollbar">
             {sampleLoginLogs.map((log, index) => (
               <div
                 key={index}
@@ -231,38 +348,9 @@ const ControlPanel: React.FC = () => {
         </div>
 
         {/* Edits Logs */}
-        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4">
-          <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
-            Edit Logs
-          </h3>
-          <div className="overflow-y-auto custom-scrollbar">
-            {sampleEditLogs.map((log, index) => {
-              return (
-                <div
-                  key={index}
-                  className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
-                >
-                  <div>
-                    <p className="font-semibold">{log.user}</p>
-                    <p className="text-sm">
-                      {log.action} -{" "}
-                      <Link
-                        to={pageRoutes[log.page] || "/"}
-                        className="text-primaryColor underline hover:text-[#066a97] transition"
-                      >
-                        {log.page}
-                      </Link>
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-500">{log.timestamp}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Member Management */}
-        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 relative">
+        <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
           <div className="flex justify-between items-center">
             <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
               Member Management
@@ -274,7 +362,7 @@ const ControlPanel: React.FC = () => {
               Add User
             </button>
           </div>
-          <div className="overflow-y-auto custom-scrollbar">
+          <div className=" overflow-y-scroll custom-scrollbar p-0">
             {members?.map((member) => (
               <div
                 key={member.id}
@@ -286,12 +374,12 @@ const ControlPanel: React.FC = () => {
                 </div>
                 <select
                   value={member.role}
-                  onChange={(e) => handleRoleChange(member.id, e.target.value)}
+                  onChange={(e) => handleRoleChange(member, e.target.value)}
                   className="px-2 py-1 border border-borderColor rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor bg-secondaryColor"
                 >
-                  <option value="Admin">Admin</option>
-                  <option value="Active User">Active User</option>
-                  <option value="Passive User">Passive User</option>
+                  <option value="100">Admin</option>
+                  <option value="50">Active User</option>
+                  <option value="20">Passive User</option>
                 </select>
               </div>
             ))}

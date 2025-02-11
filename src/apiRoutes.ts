@@ -27,7 +27,9 @@ const API_ROUTES = {
   IS_AUTH: `${BASE_URL}/users/is_auth/`,
   REFRESH_TOKEN: `${BASE_URL}/users/access_token/refresh/`,
   ADD_USER: `${BASE_URL}/users/add_user/`,
-  GET_USERS: `${BASE_URL}/users/get_all_users/`
+  GET_USERS: `${BASE_URL}/users/get_all_users/`,
+  UPDATE_USER_INFO: `${BASE_URL}/users/update/info`,
+  UPDATE_USER_ROLE: `${BASE_URL}/users/update/role`,
 };
 
 export default API_ROUTES;
