@@ -26,6 +26,7 @@ const BusSVG = () => (
 );
 
 type StationData = {
+  id: Number;
   station_id: string;
   availability: "OK" | "Down" | "Maintenance";
   charging_power: number;
@@ -48,7 +49,7 @@ const ChargingSchedule: React.FC = () => {
       const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
       setStations(response.data);
     } catch (error) {
-      console.error("Error fetching buses:", error);
+      console.error("Error fetching stations:", error);
     }
   };
 
@@ -58,6 +59,26 @@ const ChargingSchedule: React.FC = () => {
     const interval = setInterval(fetchStations, 60000);
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
+
+  useEffect(() => {
+    const intervals: NodeJS.Timeout[] = [];
+    stations.forEach((_, stationIndex) => {
+      let currentSegment = 0;
+      const interval = setInterval(() => {
+        if (currentSegment <= segmentCount) {
+          setAnimatedSegments((prev) => {
+            const updatedSegments = [...prev];
+            updatedSegments[stationIndex] = currentSegment;
+            return updatedSegments;
+          });
+          currentSegment++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 100); // Animation speed
+      intervals.push(interval);
+    });
+  }, [stations]);
 
   const [chargingPoints] = useState<{
     [key: string]: (number | null)[];
@@ -169,13 +190,13 @@ const ChargingSchedule: React.FC = () => {
         prevBuses.map((bus) =>
           bus.remainingTime > 0
             ? {
-                ...bus,
-                remainingTime: bus.remainingTime - 1,
-                currentCharging: Math.min(
-                  bus.currentCharging + 1,
-                  bus.maxCapacity
-                ),
-              }
+              ...bus,
+              remainingTime: bus.remainingTime - 1,
+              currentCharging: Math.min(
+                bus.currentCharging + 1,
+                bus.maxCapacity
+              ),
+            }
             : bus
         )
       );
@@ -212,82 +233,194 @@ const ChargingSchedule: React.FC = () => {
     }
   };
 
+  const [newStation, setNewStation] = useState({
+    station_id: "",
+    availability: "OK",
+    charging_power: "",
+    max_power: "",
+  });
+
+  const [isAddStationOpen, setIsAddStationOpen] = useState(false);
+
+  const handleAddStation = async () => {
+    if (!newStation.station_id) {
+      alert("Station ID is required!");
+      return;
+    }
+
+    try {
+      await axios.post(API_ROUTES.ADD_STATION, newStation, {
+        headers: { "Content-Type": "application/json" },
+      });
+      alert("Charging Station Added Successfully!");
+      fetchStations();  // Refresh the bus list
+      setIsAddStationOpen(false); // Close modal
+    } catch (error) {
+      console.error("Error adding bus:", error);
+    }
+  };
+  const handleDeleteStation = async (stationId: Number) => {
+    try {
+      if (!window.confirm(`Are you sure you want to delete Bus ${stationId}?`)) return;
+      const deleteUrl = API_ROUTES.DELETE_STATION(String(stationId));
+      console.log("Attempting DELETE request to:", deleteUrl);
+
+      const response = await axios.delete(deleteUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${auth.access || ''}`,
+        },
+      });
+
+      console.log("Delete response:", response);
+      alert("Charging Station Deleted Successfully!");
+
+      fetchStations(); // Refresh the list
+    } catch (error: any) {
+      console.error("Error deleting station:", error.response || error.message);
+
+      alert(`Failed to delete charging station. Error: ${error.response?.data?.message || error.message}`);
+    }
+  }
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
     } else navigate("/login", { replace: true });
   }, []);
 
+  const [activeUser, setActiveUser] = useState<boolean>(false);
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+  useEffect(() => {
+    if (auth.access !== null || localStorage.getItem("refresh token")) {
+      checkAuth();
+      checkActiveUser();
+    } else navigate("/login", { replace: true });
+  }, []);
+
   const renderStations = () => {
-    return stations.map((station, index) => {
-      return (
-        <div
-          key={station.station_id}
-          className="bg-secondaryColor border border-borderColor p-4 rounded-2xl shadow-xl relative w-full flex flex-row"
+    return [
+      // Empty first div
+      <div
+        key="Add Bus"
+        className="bg-secondaryColor border border-borderColor rounded-2xl shadow-xl w-full flex flex-row h-52"
+      >
+        <button
+          onClick={() => setIsAddStationOpen(true)}
+          className="w-full h-full text-white rounded-2xl hover:bg-blue-100"
         >
-          {/* Left Part: Station Information */}
-          <div className="w-1/2 flex flex-col items-start px-4">
-            <h3 className="text-3xl text-primaryColor font-semibold mb-4">
-              Station {station.station_id}
-            </h3>
-            <p className="text-md text-black">
-              <span className="font-semibold">Current Capacity:</span>{" "}
-              {station.charging_power} kWh
-            </p>
-            <p className="text-md text-black mb-4">
-              <span className="font-semibold">Max Capacity:</span>{" "}
-              {station.max_power} kWh
-            </p>
-            {renderGraduatedBar(
-              station.charging_power,
-              station.max_power,
-              index
-            )}
-          </div>
-
-          {/* Right Part: Charging Spots */}
-          <div className="w-1/2 grid grid-cols-4 gap-5 items-center">
-            {Array.from({ length: 4 }).map((_, index) => {
-              //console.log(chargingPoints[station.station_id][index])
-              //const busId = chargingPoints[station.station_id][index];
-              //const bus = buses.find((b) => b.id === busId);
-              //const remainingTime = bus?.remainingTime;
-              const remainingTime = 90;
-              // Format remaining time
-              let formattedTime = "";
-              if (remainingTime !== undefined) {
-                if (remainingTime < 60) {
-                  formattedTime = `${remainingTime}s`; // Seconds
-                } else if (remainingTime < 3600) {
-                  formattedTime = `${Math.floor(remainingTime / 60)}m`; // Minutes
-                } else {
-                  formattedTime = `${Math.floor(remainingTime / 3600)}h`; // Hours
-                }
-              }
-
-              return (
-                <div
-                  key={index}
-                  className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
+          <span className="text-9xl font-bold text-gray-500">+</span>
+        </button>
+      </div>,
+      stations.map((station, index) => {
+        return (
+          <div
+            key={station.station_id}
+            className="bg-secondaryColor border border-borderColor p-4 rounded-2xl shadow-xl w-full flex flex-row h-52"
+          >
+            {activeUser && (
+              <div className="flex items-center justify-center ">
+                <button
+                  onClick={() => handleDeleteStation(station.id)}
+                  className="bg-red-500 text-white p-1 rounded-lg hover:bg-red-600 transition-all"
                 >
-                  {
-                    <>
-                      <span className="absolute -top-6 text-sm font-semibold">
-                        Bus ID
-                      </span>
-                      <BusSVG />
-                      <span className="absolute -bottom-6 text-xs text-gray-700">
-                        {formattedTime}
-                      </span>
-                    </>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                    <path d="M10 11L10 17"></path>
+                    <path d="M14 11L14 17"></path>
+                  </svg>
+                </button>
+              </div>
+            )}
+            {/* Left Part: Station Information */}
+            <div className="w-1/2 flex flex-col items-start px-4">
+              <h3 className="text-3xl text-primaryColor font-semibold mb-4">
+                Station {station.station_id}
+              </h3>
+              <p className="text-md text-black">
+                <span className="font-semibold">Availability:</span>{" "}
+                {station.availability}
+              </p>
+              <p className="text-md text-black">
+                <span className="font-semibold">Current Capacity:</span>{" "}
+                {station.charging_power} kWh
+              </p>
+              <p className="text-md text-black mb-4">
+                <span className="font-semibold">Max Capacity:</span>{" "}
+                {station.max_power} kWh
+              </p>
+              {renderGraduatedBar(
+                station.charging_power,
+                station.max_power,
+                index
+              )}
+            </div>
+
+            {/* Right Part: Charging Spots */}
+            <div className="w-1/2 grid grid-cols-4 gap-5 items-center">
+              {Array.from({ length: 4 }).map((_, index) => {
+                //console.log(chargingPoints[station.station_id][index])
+                //const busId = chargingPoints[station.station_id][index];
+                //const bus = buses.find((b) => b.id === busId);
+                //const remainingTime = bus?.remainingTime;
+                const remainingTime = 90;
+                // Format remaining time
+                let formattedTime = "";
+                if (remainingTime !== undefined) {
+                  if (remainingTime < 60) {
+                    formattedTime = `${remainingTime}s`; // Seconds
+                  } else if (remainingTime < 3600) {
+                    formattedTime = `${Math.floor(remainingTime / 60)}m`; // Minutes
+                  } else {
+                    formattedTime = `${Math.floor(remainingTime / 3600)}h`; // Hours
                   }
-                </div>
-              );
-            })}
+                }
+
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
+                  >
+                    {
+                      <>
+                        <span className="absolute -top-6 text-sm font-semibold">
+                          Bus ID
+                        </span>
+                        <BusSVG />
+                        <span className="absolute -bottom-6 text-xs text-gray-700">
+                          {formattedTime}
+                        </span>
+                      </>
+                    }
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      );
-    });
+        );
+      })];
   };
 
   const segmentCount = 20; // Number of segments in the bar
@@ -329,7 +462,7 @@ const ChargingSchedule: React.FC = () => {
             className={`h-6 rounded transition-colors duration-500`}
             style={{
               width: "4%", // Each segment takes 4% of the column width
-              backgroundColor: index < segmentsToShow ? "#078ECD" : "#D3D3D3",
+              backgroundColor: index < animatedSegments[stationIndex] && index < segmentsToShow ? "#078ECD" : "#D3D3D3",
             }}
           ></div>
         ))}
@@ -383,9 +516,59 @@ const ChargingSchedule: React.FC = () => {
       <div className="flex-grow grid grid-cols-2 gap-4 rounded-2xl mr-4">
         {renderStations()}
       </div>
-
       {/* Right Panel */}
       {renderChargingQueue()}
+      {isAddStationOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">Add New Station</h2>
+
+            <label className="block mb-2">Station ID:</label>
+            <input
+              type="text"
+              value={newStation.station_id}
+              onChange={(e) => setNewStation({ ...newStation, station_id: e.target.value })}
+              className="border border-gray-300 p-2 w-full rounded"
+            />
+
+            <label className="block mt-4 mb-2">Availability:</label>
+            <select
+              value={newStation.availability}
+              onChange={(e) => setNewStation({ ...newStation, availability: e.target.value })}
+              className="border border-gray-300 p-2 w-full rounded"
+            >
+              <option value="OK">OK</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Down">Down</option>
+            </select>
+
+            <label className="block mt-4 mb-2">Charging Power:</label>
+            <input
+              type="number"
+              value={newStation.charging_power}
+              onChange={(e) => setNewStation({ ...newStation, charging_power: e.target.value })}
+              className="border border-gray-300 p-2 w-full rounded"
+            />
+
+            <label className="block mt-4 mb-2">Max Power:</label>
+            <input
+              type="number"
+              value={newStation.max_power}
+              onChange={(e) => setNewStation({ ...newStation, max_power: e.target.value })}
+              className="border border-gray-300 p-2 w-full rounded"
+            />
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button onClick={() => setIsAddStationOpen(false)} className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">
+                Cancel
+              </button>
+              <button onClick={handleAddStation} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                Save Station
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
