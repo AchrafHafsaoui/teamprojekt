@@ -38,7 +38,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const getNewAccessToken = async () => {
       try {
         const refresh = localStorage.getItem("refresh token");
-        if (!refresh) throw new Error("No refresh token found.");
+        if (!refresh) {
+          setLoading(false);
+          throw new Error("No refresh token found.");
+        }
 
         const response: AxiosResponse<Tokens> = await axios.post(
           API_ROUTES.REFRESH_TOKEN,
@@ -49,13 +52,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         const { access } = response.data;
 
-        console.log("authpro        ++++++++++     " + access);
-
-        // Update tokens in storage
         setAuth({ access: access });
         setLoading(false);
-        return access;
       } catch (error) {
+        setLoading(false);
+        localStorage.removeItem("refresh token");
         console.error("Failed to refresh token:", error);
         throw error;
       }
@@ -68,13 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
-      {loading &&
-      localStorage.getItem("refresh token") !== null &&
-      auth.access == null ? (
-        <p>Loading...</p>
-      ) : (
-        children
-      )}
+      {loading ? <p>loading...</p> : children}
     </AuthContext.Provider>
   );
 };

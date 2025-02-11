@@ -40,6 +40,8 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [activeUser, setActiveUser] = useState<boolean>(false);
+
   const ITEMS_PER_PAGE = 8;
 
   const navigate = useNavigate();
@@ -53,10 +55,16 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
 
   const { setAuth, auth } = useAuth();
 
+  type AuthReq = {
+    message: string;
+  };
+
   const checkAuth = async () => {
     updateContextValues(setAuth, auth);
     try {
-      const res = await apiClient.post(API_ROUTES.IS_AUTH, { role: 20 });
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 20,
+      });
       if (res.data.message !== "Authorized access") {
         navigate("/login", { replace: true });
       }
@@ -65,9 +73,25 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     }
   };
 
+  const checkActiveUser = async () => {
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+        role: 50,
+      });
+
+      if (res.data.message === "Authorized access") {
+        setActiveUser(true);
+      } else setActiveUser(false);
+    } catch (error) {
+      console.error("Is auth error :", error);
+    }
+  };
+
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
+      checkActiveUser();
     } else {
       navigate("/login", { replace: true });
     }
@@ -122,7 +146,9 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalPages = Math.ceil(sortedAndFilteredSchedules.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(
+    sortedAndFilteredSchedules.length / ITEMS_PER_PAGE
+  );
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
@@ -239,7 +265,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
           <div
             key={entry.id}
             className="schedule-card bg-white shadow-md rounded-xl p-5 flex flex-col justify-between hover:shadow-lg transition-all"
-            style={{ minHeight: "240px", height: "240px"}}
+            style={{ minHeight: "240px", height: "240px" }}
           >
             <div className="mb-4">
               <p className="text-lg font-bold text-primaryColor mb-1">
@@ -300,21 +326,31 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
         ))}
       </div>
 
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
+{/* Pagination Buttons */}
+<div className="w-full h-[10%] flex justify-end items-center mt-auto">
+        <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
+          <button
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-lg font-medium">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

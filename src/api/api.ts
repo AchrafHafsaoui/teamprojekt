@@ -53,7 +53,6 @@ apiClient.interceptors.request.use(
   (config) => {
     const access = auth.access;
     if (access!==null) {
-      // Ensure the body exists and add the access token
       config.data = {
         ...(config.data || {}),
         access,
@@ -83,8 +82,6 @@ apiClient.interceptors.response.use(
 
         return apiClient(originalRequest); // Retry original request
       } catch (refreshError) {
-        alert(refreshError)
-        console.error('Redirecting to login due to refresh failure.');
         setAuth({access:null}) 
         localStorage.removeItem('refresh token');
         window.location.href = '/login'; // Redirect to login

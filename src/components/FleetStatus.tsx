@@ -7,41 +7,6 @@ import API_ROUTES from "../apiRoutes";
 import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
-// Add a new bus
-const addBus = async () => {
-  const newBus = {
-    vehicle_type: "Electric",
-    bus_id: "BUS124",
-    battery: 90,
-    charging_start: null,
-    status: "In Depot",
-    charging_location: null,
-    CAP: "150 kWh",
-    ENE: "Medium",
-    vehicle_age: 3,
-  };
-  const response = await axios.post(API_ROUTES.ADD_BUS, newBus);
-  console.log(response.data);
-};
-
-// Get a specific bus
-const getBusById = async (id: string) => {
-  const response = await axios.get(API_ROUTES.GET_BUS(id));
-  console.log(response.data);
-};
-
-// Update a specific bus
-const updateBus = async (id: string, updatedBusData: object) => {
-  const response = await axios.put(API_ROUTES.UPDATE_BUS(id), updatedBusData);
-  console.log(response.data);
-};
-
-// Delete a specific bus
-const deleteBus = async (id: string) => {
-  const response = await axios.delete(API_ROUTES.DELETE_BUS(id));
-  console.log(response.data);
-};
-
 type BusData = {
   bus_id: string;
   status: "In Depot" | "Maintenance" | "On Route";
@@ -65,7 +30,42 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
       console.error("Error fetching buses:", error);
     }
   };
-
+  const [isAddBusOpen, setIsAddBusOpen] = useState(false);
+  const [newBus, setNewBus] = useState({
+    bus_id: "",
+    status: "In Depot",
+    battery: 100,
+    charging_point: null,
+    session_start: null,
+    CAP: 150,
+    ENE: 100,
+  });
+  const handleAddBus = async () => {
+    if (!newBus.bus_id) {
+      alert("Bus ID is required!");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(API_ROUTES.ADD_BUS, newBus);
+      console.log("New bus added:", response.data);
+      
+      fetchBuses();  // Refresh the bus list
+      setIsAddBusOpen(false); // Close modal
+    } catch (error) {
+      console.error("Error adding bus:", error);
+    }
+  };
+  const handleDeleteBus = async (bus_id: string) => {
+    if (!window.confirm(`Are you sure you want to delete Bus ${bus_id}?`)) return;
+    try {
+      await axios.delete(API_ROUTES.DELETE_BUS(bus_id));
+      setBuses((prevBuses) => prevBuses.filter((bus) => bus.bus_id !== bus_id)); // Remove from UI
+      console.log(`Bus ${bus_id} deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting bus:", error);
+    }
+  };
   // useEffect to fetch data on component mount
   useEffect(() => {
     fetchBuses();
@@ -186,8 +186,9 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   const handleRowClick = (bus_id: string) => {
     // Toggle expanded state
     setExpandedRow((prev) => (prev === bus_id ? null : bus_id));
-  };
-
+  
+  }
+  
   return (
     <div
       className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${
@@ -230,9 +231,18 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         {/* Header Row */}
         <div
           className={`grid gap-4 font-bold h-[10%] text-gray-600 text-center top-0 sticky ${
-            fullPage ? "grid-cols-7 text-base" : "grid-cols-5 text-sm"
+            fullPage 
+            ? activeUser
+             ? "grid-cols-8 text-base" : "grid-cols-7 text-sm"
+             : activeUser
+             ? "grid-cols-7 text-base" : "grid-cols-6 text-sm"
           }`}
         >
+          {activeUser && (
+            <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
+            {/* Empty Column for Delete Button */}
+            </div>
+          )}
           <div className="flex items-center justify-center text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
             Plate Number
           </div>
@@ -270,12 +280,38 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
               }}
               className={`grid gap-4 items-center pb-3 rounded-2xl ${
                 fullPage
-                  ? "grid-cols-7 cursor-pointer"
-                  : "grid-cols-5 h-[33.3%]"
+                ? activeUser
+                ? "grid-cols-8 text-base" : "grid-cols-7 text-sm"
+                : activeUser
+                ? "grid-cols-7 text-base" : "grid-cols-6 text-sm"
               } text-gray-800 shadow-sm font-semibold ${
                 expandedRow === vehicle.bus_id ? "bg-blue-100" : ""
               }`}
             >
+              {activeUser && (
+              <div className="flex items-center justify-center ">
+              <button
+                onClick={() => handleDeleteBus(vehicle.bus_id)}
+                className="bg-red-500 text-white p-1 rounded-lg hover:bg-red-600 transition-all"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                <path d="M10 11L10 17"></path>
+                <path d="M14 11L14 17"></path>
+                </svg>
+                </button>
+                </div>
+              )}
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {vehicle.bus_id}
               </span>
@@ -340,6 +376,8 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
                   </div>
                 )}
               </div>
+              <div className="text-center">
+              </div>
               {expandedRow === vehicle.bus_id && (
                 <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
                   <p>Additional Details for {vehicle.bus_id}</p>
@@ -354,7 +392,76 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
           ))}
         </div>
       </div>
-      <div className="w-full h-[10%] flex justify-end items-center">
+      {isAddBusOpen && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white p-6 rounded-lg shadow-xl">
+        <h2 className="text-lg font-bold text-gray-700 mb-4">Add New Bus</h2>
+
+        <label className="block mb-2">Bus ID:</label>
+          <input
+          type="text"
+          value={newBus.bus_id}
+          onChange={(e) => setNewBus({ ...newBus, bus_id: e.target.value })}
+          className="border border-gray-300 p-2 w-full rounded"
+        />
+
+        <label className="block mt-4 mb-2">Status:</label>
+        <select
+          value={newBus.status}
+          onChange={(e) => setNewBus({ ...newBus, status: e.target.value })}
+          className="border border-gray-300 p-2 w-full rounded"
+          >
+          <option value="In Depot">In Depot</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="On Route">On Route</option>
+        </select>
+
+        <label className="block mt-4 mb-2">Battery Level:</label>
+          <input
+          type="number"
+          value={newBus.battery}
+          onChange={(e) => setNewBus({ ...newBus, battery: Number(e.target.value) })}
+          className="border border-gray-300 p-2 w-full rounded"
+        />
+
+        <label className="block mt-4 mb-2">CAP:</label>
+        <input
+          type="number"
+          value={newBus.CAP}
+          onChange={(e) => setNewBus({ ...newBus, CAP: Number(e.target.value) })}
+          className="border border-gray-300 p-2 w-full rounded"
+        />
+
+        <label className="block mt-4 mb-2">ENE:</label>
+        <input
+          type="number"
+          value={newBus.ENE}
+          onChange={(e) => setNewBus({ ...newBus, ENE: Number(e.target.value) })}
+          className="border border-gray-300 p-2 w-full rounded"
+        />
+
+        <div className="flex justify-end gap-3 mt-4">
+          <button onClick={() => setIsAddBusOpen(false)} className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">
+            Cancel
+          </button>
+          <button onClick={handleAddBus} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+            Save Bus
+          </button>
+        </div>
+    </div>
+  </div>
+    )}
+
+      <div className="w-full h-[10%] flex justify-between items-center">
+        {activeUser ? (
+          <button
+          onClick={() => setIsAddBusOpen(true)}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+        >
+          Add a Bus
+        </button>
+        ): (
+          <div className="w-[160px]"></div>)}
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
