@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OverviewIcon from "../assets/icons/overview.svg";
 import ChargingStationIcon from "../assets/icons/chargingstation.svg";
-import ChargingScheduleIcon from "../assets/icons/charging schedule.svg";
 import DrivingScheduleIcon from "../assets/icons/schedule.svg";
 import ParkingIcon from "../assets/icons/parking.svg";
 import FleetStatusIcon from "../assets/icons/Fleet.svg";
@@ -34,17 +33,12 @@ const Sidebar: React.FC = () => {
     {
       label: "Charging Stations",
       icon: ChargingStationIcon,
-      path: "/charging-stations",
+      path: "/charging-schedule",
     },
     {
       label: "Driving Schedule",
       icon: DrivingScheduleIcon,
       path: "/driving-schedule",
-    },
-    {
-      label: "Charging Schedule",
-      icon: ChargingScheduleIcon,
-      path: "/charging-schedule",
     },
     { label: "Parking", icon: ParkingIcon, path: "/parking" },
   ];
