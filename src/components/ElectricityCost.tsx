@@ -14,24 +14,33 @@ const ElectricityCost: React.FC = () => {
   useEffect(() => {
     const fetchElectricityData = async () => {
       try {
-        setLoading(true); // Start loading
-        const response = await axios.get("http://localhost:8000/api/entsoe-data/"); // Update to your backend URL
-        const fetchedData = response.data;
-
-        // Map the data to match the expected format
-        const formattedData = Object.entries(fetchedData).map(([hour, price]) => ({
-          hour: hour.split(" ")[1], // Extract the hour part from the timestamp
-          price: parseFloat(price), // Convert price to a number
+        setLoading(true);
+        const response = await axios.get("http://localhost:8000/api/entsoe-data/");
+    
+        console.log("Full API Response:", response.data); // Log the API response
+    
+        const fetchedData = response.data.prices;
+        if (!fetchedData) {
+          throw new Error("No data received");
+        }
+    
+        // Convert fetched data into the required format
+        const formattedData = Object.entries(fetchedData).map(([timestamp, price]) => ({
+          hour: new Date(timestamp).getHours().toString(), // Extract hour from timestamp
+          price: parseFloat(price), // Ensure it's a number
         }));
-
+    
+        console.log("Formatted Data for Chart:", formattedData); // Log formatted data
+    
         setHourlyData(formattedData);
-        setLoading(false); // End loading
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching electricity data:", err);
         setError("Failed to fetch data.");
         setLoading(false);
       }
     };
+    
 
     fetchElectricityData(); // Fetch data on component mount
   }, []);
@@ -71,52 +80,50 @@ const ElectricityCost: React.FC = () => {
           <p className="text-red-500">{error}</p>
         ) : (
           <AreaChart
-            width={chartWidth}
-            height={200}
-            data={hourlyData}
-            margin={{ top: 0, right: 60, left: 0, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#e8f4ff" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#e8f4ff" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="hour"
-              tick={{ fill: "#fff", fontSize: 12 }}
-              axisLine={{ stroke: "#ccc" }}
-              tickLine={false}
-            />
-            <YAxis
-              domain={['dataMin', 'dataMax']}
-              tick={{ fill: "#fff", fontSize: 12 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip
-              contentStyle={{
-                background: "transparent",
-                border: "none",
-                boxShadow: "none",
-              }}
-              labelStyle={{
-                color: "transparent",
-              }}
-              itemStyle={{
-                color: "#FFF",
-                fontWeight: "semibold",
-                fontSize: "15px",
-              }}
-            />
-            <Area
-              type="monotone"
-              dataKey="price"
-              stroke="#e8f4ff"
-              fill="url(#colorPrice)"
-              strokeWidth={4}
-            />
-          </AreaChart>
+  width={chartWidth}
+  height={200}
+  data={hourlyData}
+  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+>
+  <defs>
+    <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="5%" stopColor="#e8f4ff" stopOpacity={0.8} />
+      <stop offset="95%" stopColor="#e8f4ff" stopOpacity={0} />
+    </linearGradient>
+  </defs>
+
+  {/* ✅ Fix X-Axis Formatting */}
+  <XAxis
+    dataKey="hour"
+    tickFormatter={(tick) => `${tick}`} // Ensure proper time format
+    tick={{ fill: "#fff", fontSize: 12 }}
+    axisLine={{ stroke: "#ccc" }}
+    tickLine={false}
+  />
+
+  {/* ✅ Fix Y-Axis Formatting */}
+  <YAxis
+    domain={['auto', 'auto']} // Auto-scale based on data
+    tickFormatter={(tick) => tick.toFixed(2)} // Ensure decimal formatting
+    tick={{ fill: "#fff", fontSize: 12 }}
+    tickLine={false}
+    axisLine={false}
+  />
+
+  <Tooltip
+    contentStyle={{ background: "rgba(0, 0, 0, 0.75)", borderRadius: "5px" }}
+    itemStyle={{ color: "#fff", fontSize: "14px" }}
+  />
+
+  <Area
+    type="monotone"
+    dataKey="price"
+    stroke="#e8f4ff"
+    fill="url(#colorPrice)"
+    strokeWidth={2}
+  />
+</AreaChart>
+
         )}
       </div>
     </div>
