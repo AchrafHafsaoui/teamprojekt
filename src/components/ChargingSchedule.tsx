@@ -26,21 +26,26 @@ const BusSVG = () => (
 );
 
 type StationData = {
-  id: Number;
+  id: number;
   station_id: string;
   availability: "OK" | "Down" | "Maintenance";
   charging_power: number;
   max_power: number;
+  charging_points: (BusData | null)[]; // Store full BusData, not just ID
 };
 
-interface Bus {
-  id: number;
-  station: string;
-  maxCapacity: number;
-  currentCharging: number;
-  remainingTime: number;
-  scheduledStart: Date;
-}
+
+
+type BusData = {
+  bus_id: string;
+  status: "In Depot" | "Maintenance" | "On Route";
+  battery: number;
+  charging_point: string | null; // Combined charging station and point (e.g., A1, B23, A17) or null if not charging
+  session_start: string | null; // Charging start time or null if not charging
+  CAP: number;
+  ENE: number;
+};
+
 
 const ChargingSchedule: React.FC = () => {
   const [stations, setStations] = useState<StationData[]>([]);
@@ -55,10 +60,8 @@ const ChargingSchedule: React.FC = () => {
 
   useEffect(() => {
     fetchStations();
-    // Optional: Polling to refresh data every 10 seconds
-    const interval = setInterval(fetchStations, 60000);
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
+    fetchBuses();
+  }, [10000]);
 
   useEffect(() => {
     const intervals: NodeJS.Timeout[] = [];
@@ -80,130 +83,15 @@ const ChargingSchedule: React.FC = () => {
     });
   }, [stations]);
 
-  const [chargingPoints] = useState<{
-    [key: string]: (number | null)[];
-  }>({
-    A: [10091, null, 12307, null],
-    B: [16785, null, 14311, null],
-    C: [null, 16220, null, null],
-    D: [17899, null, null, 11397],
-    E: [18456, null, 15600, null],
-    F: [null, 19422, null, null],
-    G: [null, null, 20311, null],
-    H: [21290, null, 13534, null],
-  });
-
-  const [buses, setBuses] = useState<Bus[]>([
-    {
-      id: 10091,
-      station: "A",
-      maxCapacity: 100,
-      currentCharging: 50,
-      remainingTime: 50,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes from now
-    },
-    {
-      id: 12307,
-      station: "A",
-      maxCapacity: 100,
-      currentCharging: 70,
-      remainingTime: 30,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 10), // 10 minutes from now
-    },
-    {
-      id: 16785,
-      station: "B",
-      maxCapacity: 100,
-      currentCharging: 60,
-      remainingTime: 40,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
-    },
-    {
-      id: 14311,
-      station: "B",
-      maxCapacity: 100,
-      currentCharging: 80,
-      remainingTime: 20,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 8), // 8 minutes from now
-    },
-    {
-      id: 15006,
-      station: "B",
-      maxCapacity: 100,
-      currentCharging: 90,
-      remainingTime: 10,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 20), // 20 minutes from now
-    },
-    {
-      id: 16220,
-      station: "C",
-      maxCapacity: 100,
-      currentCharging: 40,
-      remainingTime: 60,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 12), // 12 minutes from now
-    },
-    {
-      id: 17899,
-      station: "D",
-      maxCapacity: 100,
-      currentCharging: 0,
-      remainingTime: 100,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 18), // 18 minutes from now
-    },
-    {
-      id: 18456,
-      station: "D",
-      maxCapacity: 100,
-      currentCharging: 20,
-      remainingTime: 80,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
-    },
-    {
-      id: 19422,
-      station: "F",
-      maxCapacity: 100,
-      currentCharging: 20,
-      remainingTime: 80,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
-    },
-    {
-      id: 20311,
-      station: "G",
-      maxCapacity: 100,
-      currentCharging: 20,
-      remainingTime: 80,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
-    },
-    {
-      id: 21290,
-      station: "H",
-      maxCapacity: 100,
-      currentCharging: 20,
-      remainingTime: 80,
-      scheduledStart: new Date(Date.now() + 1000 * 60 * 25), // 25 minutes from now
-    },
-  ]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBuses((prevBuses) =>
-        prevBuses.map((bus) =>
-          bus.remainingTime > 0
-            ? {
-                ...bus,
-                remainingTime: bus.remainingTime - 1,
-                currentCharging: Math.min(
-                  bus.currentCharging + 1,
-                  bus.maxCapacity
-                ),
-              }
-            : bus
-        )
-      );
-    }, 1000); // Exact 1-second interval
-
-    return () => clearInterval(interval);
-  }, []);
+  const [buses, setBuses] = useState<BusData[]>([]);
+  const fetchBuses = async () => {
+    try {
+      const response = await axios.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
+      setBuses(response.data.filter((bus) => bus.status == "In Depot").sort((a, b) => a.battery - b.battery));
+    } catch (error) {
+      console.error("Error fetching buses:", error);
+    }
+  };
 
   const navigate = useNavigate();
   const useAuth = () => {
@@ -224,7 +112,6 @@ const ChargingSchedule: React.FC = () => {
       const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
         role: 20,
       });
-      console.log(res.data);
       if (res.data.message != "Authorized access") {
         navigate("/login", { replace: true });
       }
@@ -239,6 +126,7 @@ const ChargingSchedule: React.FC = () => {
     availability: "OK",
     charging_power: "",
     max_power: "",
+    charging_points: [] as (number | null)[], // Empty initially
   });
 
   const [isAddStationOpen, setIsAddStationOpen] = useState(false);
@@ -257,7 +145,7 @@ const ChargingSchedule: React.FC = () => {
       fetchStations(); // Refresh the bus list
       setIsAddStationOpen(false); // Close modal
     } catch (error) {
-      console.error("Error adding bus:", error);
+      console.error("Error adding station:", error);
     }
   };
   const handleDeleteStation = async (stationId: Number) => {
@@ -265,16 +153,13 @@ const ChargingSchedule: React.FC = () => {
       if (!window.confirm(`Are you sure you want to delete Bus ${stationId}?`))
         return;
       const deleteUrl = API_ROUTES.DELETE_STATION(String(stationId));
-      console.log("Attempting DELETE request to:", deleteUrl);
-
-      const response = await axios.delete(deleteUrl, {
+      await axios.delete(deleteUrl, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${auth.access || ""}`,
         },
       });
 
-      console.log("Delete response:", response);
       alert("Charging Station Deleted Successfully!");
 
       fetchStations(); // Refresh the list
@@ -282,8 +167,7 @@ const ChargingSchedule: React.FC = () => {
       console.error("Error deleting station:", error.response || error.message);
 
       alert(
-        `Failed to delete charging station. Error: ${
-          error.response?.data?.message || error.message
+        `Failed to delete charging station. Error: ${error.response?.data?.message || error.message
         }`
       );
     }
@@ -320,7 +204,7 @@ const ChargingSchedule: React.FC = () => {
     return [
       // Empty first div
       <div
-        key="Add Bus"
+        key="Add Station"
         className="bg-secondaryColor border border-borderColor rounded-2xl shadow-xl w-full flex flex-row h-52"
       >
         <button
@@ -334,6 +218,8 @@ const ChargingSchedule: React.FC = () => {
         return (
           <div
             key={station.station_id}
+            onDrop={(e) => handleDrop(e, station.station_id)}
+            onDragOver={(e) => e.preventDefault()}
             className="bg-secondaryColor border border-borderColor p-4 rounded-2xl shadow-xl w-full flex flex-row h-52"
           >
             {activeUser && (
@@ -386,40 +272,32 @@ const ChargingSchedule: React.FC = () => {
 
             {/* Right Part: Charging Spots */}
             <div className="w-1/2 grid grid-cols-4 gap-5 items-center">
-              {Array.from({ length: 4 }).map((_, index) => {
-                //console.log(chargingPoints[station.station_id][index])
-                //const busId = chargingPoints[station.station_id][index];
-                //const bus = buses.find((b) => b.id === busId);
-                //const remainingTime = bus?.remainingTime;
-                const remainingTime = 90;
-                // Format remaining time
-                let formattedTime = "";
-                if (remainingTime !== undefined) {
-                  if (remainingTime < 60) {
-                    formattedTime = `${remainingTime}s`; // Seconds
-                  } else if (remainingTime < 3600) {
-                    formattedTime = `${Math.floor(remainingTime / 60)}m`; // Minutes
-                  } else {
-                    formattedTime = `${Math.floor(remainingTime / 3600)}h`; // Hours
-                  }
-                }
+              {Array.from({ length: station.charging_points.length }).map((_, index) => {
+                const bus = station.charging_points[index]; // Full BusData or null
+                const currentCharge = bus?.battery;
 
                 return (
                   <div
                     key={index}
                     className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
                   >
-                    {
+                    {bus && (
                       <>
                         <span className="absolute -top-6 text-sm font-semibold">
-                          Bus ID
+                          {bus.bus_id}
                         </span>
                         <BusSVG />
-                        <span className="absolute -bottom-6 text-xs text-gray-700">
-                          {formattedTime}
+                        <span className="absolute -bottom-6 text-xs font-semibold text-gray-700">
+                          {currentCharge}%
                         </span>
+                        <button
+                          onClick={() => handleRemoveBus(station.station_id, index)}
+                          className="absolute -right-3 -top-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
                       </>
-                    }
+                    )}
                   </div>
                 );
               })}
@@ -495,22 +373,23 @@ const ChargingSchedule: React.FC = () => {
         <div className="flex flex-col justify-center gap-4 overflow-y-auto custom-scrollbar">
           {buses.map((bus) => (
             <div
-              key={bus.id}
+              key={bus.bus_id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, Number(bus.bus_id))}
               className="flex flex-row justify-between items-center rounded-lg pl-1 text-secondaryColor hover:text-primaryColor hover:bg-secondaryColor py-2 px-4"
             >
               <div className="flex items-center">
                 <div className="flex items-center justify-center bg-secondaryColor rounded-full w-12 h-12 mr-4">
                   <BusSVG />
                 </div>
-                <h2 className="text-lg font-bold">{bus.id}</h2>
+                <h2 className="text-lg font-bold">{bus.bus_id}</h2>
               </div>
               <div className="text-right">
                 <p className="text-sm font-semibold">
-                  Starts:{" "}
-                  {bus.scheduledStart.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  Battery
+                </p>
+                <p className="text-sm font-semibold">
+                  {bus.battery}%
                 </p>
               </div>
             </div>
@@ -519,6 +398,71 @@ const ChargingSchedule: React.FC = () => {
       </div>
     );
   };
+
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>, busId: number) => {
+    event.dataTransfer.setData("busId", busId.toString());
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>, stationId: string) => {
+    event.preventDefault();
+    const busId = Number(event.dataTransfer.getData("busId"));
+    let movedBus: BusData | null;
+
+    setBuses((prevBuses) => {
+      const remainingBuses = prevBuses.filter((bus) => {
+        if (Number(bus.bus_id) === busId) {
+          movedBus = bus; // Store full bus data
+          return false; // Remove from queue
+        }
+        return true;
+      });
+      return remainingBuses;
+    });
+
+    setStations((prevStations) =>
+      prevStations.map((station) => {
+        if (station.station_id === stationId) {
+          const emptyIndex = station.charging_points.findIndex((point) => point === null);
+          if (emptyIndex !== -1) {
+            const updatedChargingPoints = [...station.charging_points];
+            updatedChargingPoints[emptyIndex] = movedBus; // Store entire bus object
+
+            return { ...station, charging_points: updatedChargingPoints };
+          }
+        }
+        return station;
+      })
+    );
+  };
+
+  const handleRemoveBus = (stationId: string, index: number) => {
+    setStations((prevStations) =>
+      prevStations.map((station) => {
+        if (station.station_id === stationId) {
+          const updatedChargingPoints = [...station.charging_points];
+          const removedBus = updatedChargingPoints[index]; // Get removed bus
+
+
+          if (removedBus) {
+            setBuses((prevBuses) => {
+              // Ensure the bus is not already in the queue
+              if (!prevBuses.some((bus) => bus.bus_id === removedBus.bus_id)) {
+                return [...prevBuses, removedBus].sort((a,b)=>a.battery-b.battery);
+              }
+              return prevBuses.sort((a,b)=>a.battery-b.battery);
+            });
+          }
+
+          updatedChargingPoints[index] = null; // Remove the bus from charging point
+
+          return { ...station, charging_points: updatedChargingPoints };
+        }
+        return station;
+      })
+    );
+  };
+
+
 
   return (
     <div className={`flex ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}>
@@ -575,6 +519,21 @@ const ChargingSchedule: React.FC = () => {
               onChange={(e) =>
                 setNewStation({ ...newStation, max_power: e.target.value })
               }
+              className="border border-gray-300 p-2 w-full rounded"
+            />
+
+            <label className="block mt-4 mb-2">Number of Charging Points:</label>
+            <input
+              type="number"
+              min="1"
+              value={newStation.charging_points.length}
+              onChange={(e) => {
+                const numPoints = Math.max(1, parseInt(e.target.value) || 1); // Ensure at least 1
+                setNewStation({
+                  ...newStation,
+                  charging_points: Array(numPoints).fill(null), // Initialize with nulls
+                });
+              }}
               className="border border-gray-300 p-2 w-full rounded"
             />
 
