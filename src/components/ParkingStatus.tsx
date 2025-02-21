@@ -9,18 +9,9 @@ type ParkingStatusProps = {
 };
 
 const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
-  const [parkingLots, setParkingLots] = useState([
-    { name: "Darmstadt Nord", defaultSchema: "SBb-ssBs-BSB-SsSs-bsB" },
-    { name: "Darmstadt Sud", defaultSchema: "SsSs-BBbs-sbBs-BbSS" },
-    { name: "Frankfurt", defaultSchema: "BSBS-sbSb-SSss-BbSB-SbBB" },
-    { name: "Mainz", defaultSchema: "SBSS-ssBb-sbSB-SSbb" },
-    { name: "München", defaultSchema: "SbBB-ssSB-BBbs-SsBB" },
-    { name: "Berlin", defaultSchema: "SSsb-BbBB-SBbs-BbSS-ssSb" },
-  ]);
-
-  const [selectedParking, setSelectedParking] = useState<string | null>(
-    "Darmstadt Nord"
-  );
+  const [dataLoading, setDataLoading] = useState<boolean>(true);
+  const [parkingLots, setParkingLots] = useState<parking[]>([]);
+  const [selectedParking, setSelectedParking] = useState<number | null>(1);
   const [columns, setColumns] = useState<number>(0);
   const [rowsPerColumn, setRowsPerColumn] = useState<string[]>([]);
   const [editMode, setEditMode] = useState<boolean>(false);
@@ -31,6 +22,10 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
   const [direction, setDirection] = useState<"Arrival" | "Departure">(
     "Arrival"
   );
+
+  type resMsg = {
+    message: string;
+  };
 
   const colorOccupied = "rgb(7, 142, 205)";
   const colorFree = "#D3D3D3";
@@ -55,6 +50,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
         role: 20,
       });
       if (res.data.message != "Authorized access") {
+        console.log("access expired");
         navigate("/login", { replace: true });
       }
     } catch (error) {
@@ -85,6 +81,36 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
     } else navigate("/login", { replace: true });
   }, []);
 
+  type parking = {
+    id: number;
+
+    name: string;
+
+    schema: string;
+
+    created_by: number;
+
+    created_at: string;
+  };
+
+  const getAllParking = async () => {
+    setDataLoading(true);
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<parking[]>(API_ROUTES.GET_PARKING, {});
+
+      console.log(res.data);
+      setParkingLots(res.data);
+      setDataLoading(false);
+    } catch (error) {
+      console.error("could not get the parking list :", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllParking();
+  }, []);
+
   const changeDirection = () => {
     setDirection((prev) => (prev === "Arrival" ? "Departure" : "Arrival"));
     setRowsPerColumn((prev) =>
@@ -99,26 +125,28 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
     return column.split("").reverse().join("");
   };
 
-  const selectParking = (parkingName: string, defaultSchema: string) => {
-    setSelectedParking(parkingName);
-    const columnsArray = defaultSchema.split("-");
+  const selectParking = (parkingID: number, schema: string) => {
+    setSelectedParking(parkingID);
+    const columnsArray = schema.split("-");
     setColumns(columnsArray.length);
     setRowsPerColumn(columnsArray);
   };
 
   useEffect(() => {
-    if (selectedParking) {
-      const selectedParkingSchema = parkingLots.find(
-        (parking) => parking.name === selectedParking
-      )?.defaultSchema;
+    if (!dataLoading) {
+      if (selectedParking) {
+        const selectedParkingSchema = parkingLots.find(
+          (parking) => parking.id === selectedParking
+        )?.schema;
 
-      if (selectedParkingSchema) {
-        const columnsArray = selectedParkingSchema.split("-");
-        setColumns(columnsArray.length);
-        setRowsPerColumn(columnsArray);
+        if (selectedParkingSchema) {
+          const columnsArray = selectedParkingSchema.split("-");
+          setColumns(columnsArray.length);
+          setRowsPerColumn(columnsArray);
+        }
       }
     }
-  }, [selectedParking]);
+  }, [selectedParking, dataLoading]);
 
   const handleColumnChange = () => {
     setColumns((prev) => prev + 1); // Increment the columns by one
@@ -227,6 +255,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                       prev.filter((_, index) => index !== colIndex)
                     );
                     setColumns((prev) => prev - 1); // Decrease the column count
+                    // edit parking here
                   }
                 }}
                 className="p-1 text-sm rounded-full font-semibold hover:bg-gray-200 transition"
@@ -287,6 +316,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                       cursor: "pointer",
                     }}
                     onClick={() => {
+                      //edit parking here
                       if (!editMode) return;
                       const updatedRows = [...rows];
                       updatedRows[rowIndex] =
@@ -452,14 +482,37 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           <div className="flex items-center space-x-4">
             {activeUser && (
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (editMode && activeUser) {
-                    // Remove empty columns when exiting edit mode
                     const nonEmptyColumns = rowsPerColumn.filter(
                       (column) => column.trim() !== ""
                     );
                     setRowsPerColumn([...nonEmptyColumns]); // Create a new array to remove empty columns from memory
                     setColumns(nonEmptyColumns.length); // Update the columns count
+                    let newDepotName = parkingLots.find(
+                      (parking) => parking.id == selectedParking
+                    )?.name;
+                    console.log(
+                      "cls2++++++++++++++++++++++++++" + rowsPerColumn
+                    );
+                    console.log(
+                      "cls3++++++++++++++++++++++++" + rowsPerColumn.join("-")
+                    );
+                    updateContextValues(setAuth, auth);
+                    try {
+                      const res = await apiClient.post<parking>(
+                        API_ROUTES.EDIT_PARKING,
+                        {
+                          newName: newDepotName,
+                          newSchema: nonEmptyColumns.join("-"),
+                          parking_id: selectedParking,
+                        }
+                      );
+                      console.log(res.data);
+                      getAllParking();
+                    } catch (error) {
+                      console.error("could not get the users list :", error);
+                    }
                   } else {
                     handleColumnChange(); // Add a new column only when entering edit mode
                   }
@@ -487,11 +540,9 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
             >
               {/* Depot Selection Button */}
               <button
-                onClick={() =>
-                  selectParking(parking.name, parking.defaultSchema)
-                }
+                onClick={() => selectParking(parking.id, parking.schema)}
                 className={`p-2 my-2 rounded-full font-semibold whitespace-nowrap transition ${
-                  parking.name === selectedParking
+                  parking.id === selectedParking
                     ? "bg-primaryColor text-white"
                     : "bg-black text-gray-100 hover:bg-primaryColor hover:text-white"
                 }`}
@@ -518,6 +569,7 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                           setParkingLots(updatedParkingLots);
                           setEditingDepot(null); // Exit editing mode
                           setEditingDepotName(""); // Reset input field
+                          // edit name here
                         }}
                         className="px-3 py-1 rounded-full font-semibold whitespace-nowrap border border-borderColor bg-white text-black hover:bg-primaryColor hover:text-white transition"
                       >
@@ -556,14 +608,34 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
                       </button>
                       {/* Remove Button */}
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (
                             window.confirm(
                               `Are you sure you want to remove "${parking.name}"? This action can not be reversed`
                             )
                           ) {
+                            console.log("parking to delete is: " + parking.id);
+                            // delete parking here
+                            updateContextValues(setAuth, auth);
+                            try {
+                              const res = await apiClient.post<resMsg>(
+                                API_ROUTES.DELETE_PARKING,
+                                { parking_id: parking.id }
+                              );
+                              console.log(res.data);
+                            } catch (error) {
+                              console.error(
+                                "could not delete the parking:",
+                                error
+                              );
+                            }
                             setParkingLots(
                               parkingLots.filter((_, i) => i !== index)
+                            );
+                            setSelectedParking(
+                              parking.id > 1
+                                ? parking.id - 1
+                                : parkingLots[parkingLots.length - 1].id
                             );
                           }
                         }}
@@ -613,11 +685,21 @@ const ParkingStatus: React.FC<ParkingStatusProps> = ({ fullPage = false }) => {
           {/* Add New Depot Button */}
           {editMode && activeUser && (
             <button
-              onClick={() => {
+              onClick={async () => {
                 const newDepotName = `Depot ${parkingLots.length + 1}`;
-                const newDepot = { name: newDepotName, defaultSchema: "" };
-                setParkingLots((prev) => [...prev, newDepot]);
-                selectParking(newDepotName, newDepot.defaultSchema);
+                updateContextValues(setAuth, auth);
+                try {
+                  const res = await apiClient.post<parking>(
+                    API_ROUTES.CREATE_PARKING,
+                    { name: newDepotName, schema: "" }
+                  );
+                  console.log(res.data);
+                  getAllParking();
+                  selectParking(res.data.id, res.data.schema);
+                } catch (error) {
+                  console.error("could not get the users list :", error);
+                }
+                //create new parking
               }}
               className="px-2 my-2 rounded-full font-semibold whitespace-nowrap border border-borderColor bg-componentsColor text-black hover:bg-primaryColor hover:text-white transition"
             >
