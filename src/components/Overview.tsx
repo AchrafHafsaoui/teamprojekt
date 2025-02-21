@@ -79,26 +79,26 @@ const Overview: React.FC = () => {
           <div className="rounded-lg overflow-hidden">
             <ElectricityCost />
           </div>
-          <div className="rounded-lg overflow-hidden bg-secondaryColor shadow-md p-4">
-            <h3 className="text-lg font-bold text-primaryColor mb-2">
+          <div className="rounded-3xl overflow-hidden bg-secondaryColor shadow-md p-4">
+            <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryColor mb-2">
               Driving Schedule
             </h3>
             <table className="table-auto w-full text-left">
               <thead>
-                <tr className="bg-secondaryColor text-gray-600">
-                  <th className="px-4 py-2">Bus ID</th>
-                  <th className="px-4 py-2">Departure</th>
-                  <th className="px-4 py-2">Arrival</th>
+                <tr className="bg-secondaryColor text-gray-600 py-2 text-center">
+                  <th>Bus ID</th>
+                  <th>Departure</th>
+                  <th>Arrival</th>
                 </tr>
               </thead>
               <tbody>
                 {schedules.length > 0 ? (
                   schedules.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-gray-100">
-                      <td className="px-4 py-2 font-semibold">
+                    <tr key={entry.id} className="hover:bg-gray-100 text-center mb-4">
+                      <td className="font-semibold">
                         {entry.bus_details?.bus_id || "N/A"}
                       </td>
-                      <td className="px-4 py-2">
+                      <td>
                         <div>
                           <p className="font-semibold">
                             {entry.departure_location_name}
@@ -118,7 +118,7 @@ const Overview: React.FC = () => {
                           </p>
                         </div>
                       </td>
-                      <td className="px-4 py-2">
+                      <td>
                         <div>
                           <p className="font-semibold">
                             {entry.arrival_location_name}
@@ -141,8 +141,8 @@ const Overview: React.FC = () => {
                     </tr>
                   ))
                 ) : (
-                  <tr>
-                    <td className="px-4 py-2 text-center" colSpan={3}>
+                  <tr className="py-2 text-center">
+                    <td colSpan={3}>
                       No schedules available.
                     </td>
                   </tr>
@@ -161,7 +161,7 @@ const Overview: React.FC = () => {
             <FleetStatus fullPage={false} />
           </div>
           <div className="rounded-lg overflow-hidden">
-            <ChargingSchedule fullPage={false} />
+            <ChargingSchedule fullPage={false}/>
           </div>
         </div>
 

@@ -52,7 +52,7 @@ const ChargingSchedule: React.FC = () => {
   const fetchStations = async () => {
     try {
       const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
-      setStations(response.data);
+      setStations(response.data.filter(station=>station.availability=="OK"));
     } catch (error) {
       console.error("Error fetching stations:", error);
     }
@@ -292,7 +292,7 @@ const ChargingSchedule: React.FC = () => {
                         </span>
                         <button
                           onClick={() => handleRemoveBus(station.station_id, index)}
-                          className="absolute -right-3 -top-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                          className="absolute -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                         >
                           ✕
                         </button>

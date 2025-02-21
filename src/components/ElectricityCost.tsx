@@ -27,7 +27,7 @@ const ElectricityCost: React.FC = () => {
         // Convert fetched data into the required format
         const formattedData = Object.entries(fetchedData).map(([timestamp, price]) => ({
           hour: new Date(timestamp).getHours().toString(), // Extract hour from timestamp
-          price: parseFloat(price), // Ensure it's a number
+          price: parseFloat(String(price)), // Ensure it's a number
         }));
     
         console.log("Formatted Data for Chart:", formattedData); // Log formatted data
