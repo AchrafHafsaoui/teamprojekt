@@ -36,6 +36,10 @@ const API_ROUTES = {
   GET_PARKING: `${BASE_URL}/parking/get/`,
   EDIT_PARKING: `${BASE_URL}/parking/edit/`,
   DELETE_PARKING: `${BASE_URL}/parking/delete/`,
+
+  //logs url
+  GET_SESSION_LOGS: `${BASE_URL}/login_logs/get/`,
+  LOGOUT: `${BASE_URL}/login_logs/logout/`,
 };
 
 export default API_ROUTES;

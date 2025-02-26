@@ -11,6 +11,8 @@ import PowerIcon from "../assets/icons/power.svg";
 import ControlPanelIcon from "../assets/icons/ControlPanelIcon.svg";
 import FenexityEneflex from "../assets/icons/Fenexity-eneflex.svg";
 import AuthContext from "../context/AuthProvider";
+import axios from "axios";
+import API_ROUTES from "../apiRoutes";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const Sidebar: React.FC = () => {
     }
     return context;
   };
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
 
   const menuItems = [
     { label: "Overview", icon: OverviewIcon, path: "/overview" },
@@ -126,7 +128,16 @@ const Sidebar: React.FC = () => {
 
         {/* Logout button without a link */}
         <button
-          onClick={() => {
+          onClick={async () => {
+            const refresh = localStorage.getItem("refresh token");
+            try {
+              await axios.post(API_ROUTES.LOGOUT, {
+                access: auth.access,
+                refresh: refresh,
+              });
+            } catch (error) {
+              console.error("Error fetching buses:", error);
+            }
             localStorage.removeItem("refresh token");
             setAuth({ access: null });
             navigate("/login", { replace: true });

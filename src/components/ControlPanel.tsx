@@ -10,39 +10,6 @@ const generatePassword = () =>
   Math.random().toString(36).substring(2, 10) + "!";
 
 const ControlPanel: React.FC = () => {
-  const sampleLoginLogs = [
-    { user: "John Doe", action: "Login", timestamp: "2024-11-12 09:30" },
-    { user: "Jane Smith", action: "Logout", timestamp: "2024-11-12 10:15" },
-    { user: "Chris Johnson", action: "Login", timestamp: "2024-11-12 10:45" },
-    { user: "Anna Müller", action: "Login", timestamp: "2024-11-12 11:00" },
-    { user: "Lukas Schmidt", action: "Logout", timestamp: "2024-11-12 11:20" },
-    { user: "Sophia Wagner", action: "Login", timestamp: "2024-11-12 11:45" },
-    { user: "Karl Becker", action: "Login", timestamp: "2024-11-12 12:15" },
-    { user: "Emily Davis", action: "Logout", timestamp: "2024-11-12 12:30" },
-    { user: "John Doe", action: "Login", timestamp: "2024-11-12 09:30" },
-    { user: "Jane Smith", action: "Logout", timestamp: "2024-11-12 10:15" },
-    { user: "Chris Johnson", action: "Login", timestamp: "2024-11-12 10:45" },
-    { user: "Anna Müller", action: "Login", timestamp: "2024-11-12 11:00" },
-    { user: "Lukas Schmidt", action: "Logout", timestamp: "2024-11-12 11:20" },
-    { user: "Sophia Wagner", action: "Login", timestamp: "2024-11-12 11:45" },
-    { user: "Karl Becker", action: "Login", timestamp: "2024-11-12 12:15" },
-    { user: "Emily Davis", action: "Logout", timestamp: "2024-11-12 12:30" },
-    { user: "John Doe", action: "Login", timestamp: "2024-11-12 09:30" },
-    { user: "Jane Smith", action: "Logout", timestamp: "2024-11-12 10:15" },
-    { user: "Chris Johnson", action: "Login", timestamp: "2024-11-12 10:45" },
-    { user: "Anna Müller", action: "Login", timestamp: "2024-11-12 11:00" },
-    { user: "Lukas Schmidt", action: "Logout", timestamp: "2024-11-12 11:20" },
-    { user: "Sophia Wagner", action: "Login", timestamp: "2024-11-12 11:45" },
-    { user: "Karl Becker", action: "Login", timestamp: "2024-11-12 12:15" },
-    { user: "Emily Davis", action: "Logout", timestamp: "2024-11-12 12:30" },
-    {
-      user: "Maximilian Hoffmann",
-      action: "Login",
-      timestamp: "2024-11-12 12:45",
-    },
-    { user: "Laura Fischer", action: "Logout", timestamp: "2024-11-12 13:00" },
-  ];
-
   type EditInfo = {
     detail: string;
   };
@@ -56,6 +23,7 @@ const ControlPanel: React.FC = () => {
 
   const [members, setMembers] = useState<member[] | undefined>();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [sessionLogs, setSessionLogs] = useState<SessionLog[]>([]);
 
   const getUsers = async () => {
     updateContextValues(setAuth, auth);
@@ -75,7 +43,9 @@ const ControlPanel: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
+  const [sessionLogsDay, setSessionLogsDay] = useState<Date>(new Date());
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [changeEmail, setChangeEmail] = useState("");
   const [changeUserName, setChangeUserName] = useState("");
   const [changePwd, setChangePwd] = useState("");
@@ -131,6 +101,46 @@ const ControlPanel: React.FC = () => {
       checkAdmin();
     } else navigate("/login", { replace: true });
   }, []);
+
+  type SessionLog = {
+    id: number;
+    login_at: Date;
+    session_end: Date;
+    logout_reason: string;
+    user_id: number;
+    user_name: string;
+  };
+
+  const getSessionLogs = async () => {
+    setIsLoading(true); // Start loading
+    updateContextValues(setAuth, auth);
+    try {
+      const res = await apiClient.post<SessionLog[]>(
+        API_ROUTES.GET_SESSION_LOGS,
+        {
+          day: selectedDate.toISOString(),
+        }
+      );
+      if (res.data) {
+        const transformedData: SessionLog[] = res.data.map((log: any) => ({
+          ...log,
+          login_at: new Date(log.login_at),
+          session_end: new Date(log.session_end),
+        }));
+        setSessionLogs(transformedData);
+      }
+    } catch (error) {
+      console.error("error occurred while getting logs:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) {
+      getSessionLogs();
+    }
+  }, [isAdmin, selectedDate]);
 
   const handleRoleChange = async (member: member, newRole: string) => {
     const userResponse = window.confirm(
@@ -248,6 +258,19 @@ const ControlPanel: React.FC = () => {
       }
     }
   };
+  const handleDayChange = (direction: "prev" | "next") => {
+    const newDate = new Date(sessionLogsDay);
+    if (direction === "prev") {
+      newDate.setDate(newDate.getDate() - 1);
+    } else {
+      newDate.setDate(newDate.getDate() + 1);
+    }
+    setSessionLogsDay(newDate);
+  };
+
+  const handleApplyDate = () => {
+    setSelectedDate(sessionLogsDay); // Update the selected date and trigger log fetching
+  };
 
   return (
     <div className="flex flex-col overflow-hidden ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]">
@@ -344,25 +367,144 @@ const ControlPanel: React.FC = () => {
         {isAdmin && (
           <>
             <div className="flex flex-col bg-secondaryColor rounded-3xl shadow p-4 overflow-y-auto">
-              <h3
-                onClick={getUsers}
-                className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor"
-              >
-                Login/Logout Logs
+              <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold mb-4 text-primaryColor">
+                Session Logs
               </h3>
-              <div className="overflow-y-scroll custom-scrollbar">
-                {sampleLoginLogs.map((log, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center mb-3 border-b pb-2 text-gray-700"
-                  >
-                    <div>
-                      <p className="font-semibold">{log.user}</p>
-                      <p className="text-sm">{log.action}</p>
+
+              {/* Date Navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={() => handleDayChange("prev")}
+                  className="px-4 py-2 bg-primaryColor text-white rounded-lg hover:bg-primaryColorDark transition-colors"
+                >
+                  &larr; Previous Day
+                </button>
+                <input
+                  type="date"
+                  value={sessionLogsDay.toISOString().split("T")[0]}
+                  onChange={(e) => {
+                    const selectedDate = new Date(e.target.value);
+                    const today = new Date();
+                    if (selectedDate <= today) {
+                      setSessionLogsDay(selectedDate);
+                    } else {
+                      alert("You cannot select a future date.");
+                    }
+                  }}
+                  max={new Date().toISOString().split("T")[0]} // Prevent future dates
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor"
+                />
+                <button
+                  onClick={() => handleDayChange("next")}
+                  disabled={
+                    sessionLogsDay.toDateString() === new Date().toDateString()
+                  } // Disable if today
+                  className="px-4 py-2 bg-primaryColor text-white rounded-lg hover:bg-primaryColorDark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next Day &rarr;
+                </button>
+              </div>
+
+              {/* Apply Button */}
+              <button
+                onClick={handleApplyDate}
+                disabled={
+                  isLoading ||
+                  sessionLogsDay.toDateString() === selectedDate.toDateString()
+                }
+                className="w-full py-2 bg-primaryColor text-white rounded-lg hover:bg-primaryColorDark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Loading..." : "Apply"}
+              </button>
+
+              {/* Session Logs List */}
+              <div className="overflow-y-scroll custom-scrollbar mt-4">
+                {isLoading ? (
+                  <p className="text-center text-gray-600">Loading logs...</p>
+                ) : sessionLogs.length === 0 ? (
+                  <p className="text-center text-gray-600">
+                    No logs found for this date.
+                  </p>
+                ) : (
+                  sessionLogs.map((log) => (
+                    <div
+                      key={log.id}
+                      className="flex flex-col p-4 mb-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold text-lg text-gray-800">
+                          {log.user_name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Login at:</span>{" "}
+                          {log.login_at.toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                      <div className="mt-2">
+                        {log.session_end < new Date() && (
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">Logout Reason:</span>{" "}
+                            {log.logout_reason || "N/A"}
+                          </p>
+                        )}
+
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">Session Duration:</span>{" "}
+                          {log.session_end
+                            ? (() => {
+                                const endTime =
+                                  log.session_end > new Date()
+                                    ? new Date()
+                                    : log.session_end; // Use current time if session is still open
+                                const durationInMinutes = Math.floor(
+                                  (endTime.getTime() - log.login_at.getTime()) /
+                                    1000 /
+                                    60
+                                );
+                                const hours = Math.floor(
+                                  durationInMinutes / 60
+                                );
+                                const minutes = durationInMinutes % 60;
+                                return `${
+                                  hours > 0
+                                    ? `${hours} hour${hours > 1 ? "s" : ""} `
+                                    : ""
+                                }${
+                                  minutes > 0
+                                    ? `${minutes} minute${
+                                        minutes > 1 ? "s" : ""
+                                      }`
+                                    : ""
+                                }`;
+                              })()
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div className="mt-2 text-sm text-gray-500">
+                        <p>
+                          <span className="font-medium">Logout Time:</span>{" "}
+                          {log.session_end && log.session_end > new Date()
+                            ? "Session Still Open"
+                            : log.session_end
+                            ? log.session_end.toLocaleString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "N/A"}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-500">{log.timestamp}</p>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 
