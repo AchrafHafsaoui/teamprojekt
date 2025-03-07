@@ -409,7 +409,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
                   {station.charging_power} kW
                 </div>
               </div>
-              {activeUser && (
+              {fullPage && activeUser && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent row click from triggering
@@ -433,7 +433,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
         </div>
       </div>
       <div className="w-full h-[10%] flex justify-end items-center">
-        {activeUser && (
+        { fullPage && activeUser && (
           <div className="flex-1">
             <button
               onClick={() => setShowAddForm(true)}

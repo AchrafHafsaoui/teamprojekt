@@ -477,9 +477,9 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
         {fullPage && activeUser ? (
           <button
             onClick={() => setIsAddBusOpen(true)}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+            className="bg-primaryColor text-white px-4 py-2 rounded-lg hover:bg-green-600"
           >
-            Add a Bus
+            + Add Bus
           </button>
         ) : (
           <div className="w-[160px]"></div>
