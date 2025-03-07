@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import axios from "axios";
 import API_ROUTES from "../apiRoutes";
 import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
@@ -23,8 +22,9 @@ type FleetStatusProps = {
 const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
   const [buses, setBuses] = useState<BusData[]>([]);
   const fetchBuses = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
+      const response = await apiClient.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
       setBuses(response.data);
     } catch (error) {
       console.error("Error fetching buses:", error);
@@ -41,30 +41,37 @@ const FleetStatus: React.FC<FleetStatusProps> = ({ fullPage = true }) => {
     ENE: 100,
   });
   const handleAddBus = async () => {
-    if (!newBus.bus_id) {
-      alert("Bus ID is required!");
-      return;
-    }
+    if (activeUser) {
+      if (!newBus.bus_id) {
+        alert("Bus ID is required!");
+        return;
+      }
 
-    try {
-      const response = await axios.post(API_ROUTES.ADD_BUS, newBus);
-      console.log("New bus added:", response.data);
+      updateContextValues(setAuth, auth);
+      try {
+        const response = await apiClient.post(API_ROUTES.ADD_BUS, newBus);
+        console.log("New bus added:", response.data);
 
-      fetchBuses(); // Refresh the bus list
-      setIsAddBusOpen(false); // Close modal
-    } catch (error) {
-      console.error("Error adding bus:", error);
+        fetchBuses(); // Refresh the bus list
+        setIsAddBusOpen(false); // Close modal
+      } catch (error) {
+        console.error("Error adding bus:", error);
+      }
     }
   };
   const handleDeleteBus = async (bus_id: string) => {
-    if (!window.confirm(`Are you sure you want to delete Bus ${bus_id}?`))
-      return;
-    try {
-      await axios.delete(API_ROUTES.DELETE_BUS(bus_id));
-      fetchBuses();
-      console.log(`Bus ${bus_id} deleted successfully`);
-    } catch (error) {
-      console.error("Error deleting bus:", error);
+    if (activeUser) {
+      if (!window.confirm(`Are you sure you want to delete Bus ${bus_id}?`))
+        return;
+
+      updateContextValues(setAuth, auth);
+      try {
+        await apiClient.delete(API_ROUTES.DELETE_BUS(bus_id));
+        fetchBuses();
+        console.log(`Bus ${bus_id} deleted successfully`);
+      } catch (error) {
+        console.error("Error deleting bus:", error);
+      }
     }
   };
   // useEffect to fetch data on component mount

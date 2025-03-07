@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import axios from "axios";
 import API_ROUTES from "../apiRoutes";
 import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +39,7 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [activeUser, setActiveUser] = useState<boolean>(false);
+  //const [activeUser, setActiveUser] = useState<boolean>(false);
 
   const ITEMS_PER_PAGE = 8;
 
@@ -74,33 +73,34 @@ const DrivingSchedule: React.FC<DrivingScheduleProps> = ({
     }
   };
 
-  const checkActiveUser = async () => {
-    updateContextValues(setAuth, auth);
-    try {
-      const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
-        role: 50,
-      });
+  //const checkActiveUser = async () => {
+  //  updateContextValues(setAuth, auth);
+  //  try {
+  //    const res = await apiClient.post<AuthReq>(API_ROUTES.IS_AUTH, {
+  //      role: 50,
+  //    });
 
-      if (res.data.message === "Authorized access") {
-        setActiveUser(true);
-      } else setActiveUser(false);
-    } catch (error) {
-      console.error("Is auth error :", error);
-    }
-  };
+  //    if (res.data.message === "Authorized access") {
+  //       setActiveUser(true);
+  //    } else setActiveUser(false);
+  //   } catch (error) {
+  //    console.error("Is auth error :", error);
+  //  }
+  // };
 
   useEffect(() => {
     if (auth.access !== null || localStorage.getItem("refresh token")) {
       checkAuth();
-      checkActiveUser();
+      //checkActiveUser();
     } else {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
 
   const fetchSchedules = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<ScheduleEntry[]>(
+      const response = await apiClient.get<ScheduleEntry[]>(
         API_ROUTES.GET_DRIVING_SCHEDULES
       );
       setSchedules(response.data);

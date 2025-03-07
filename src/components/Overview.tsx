@@ -8,7 +8,6 @@ import ChargingSchedule from "./ChargingStationStatus";
 import { useNavigate } from "react-router-dom";
 import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
-import axios from "axios";
 
 type ScheduleEntry = {
   id: string;
@@ -36,8 +35,9 @@ const Overview: React.FC = () => {
   const { setAuth, auth } = useAuth();
 
   const fetchSchedules = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<ScheduleEntry[]>(
+      const response = await apiClient.get<ScheduleEntry[]>(
         API_ROUTES.GET_DRIVING_SCHEDULES
       );
       setSchedules(response.data.slice(0, 3)); // Show top 3 schedules
@@ -94,7 +94,10 @@ const Overview: React.FC = () => {
               <tbody>
                 {schedules.length > 0 ? (
                   schedules.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-gray-100 text-center mb-4">
+                    <tr
+                      key={entry.id}
+                      className="hover:bg-gray-100 text-center mb-4"
+                    >
                       <td className="font-semibold">
                         {entry.bus_details?.bus_id || "N/A"}
                       </td>
@@ -142,9 +145,7 @@ const Overview: React.FC = () => {
                   ))
                 ) : (
                   <tr className="py-2 text-center">
-                    <td colSpan={3}>
-                      No schedules available.
-                    </td>
+                    <td colSpan={3}>No schedules available.</td>
                   </tr>
                 )}
               </tbody>
@@ -161,7 +162,7 @@ const Overview: React.FC = () => {
             <FleetStatus fullPage={false} />
           </div>
           <div className="rounded-lg overflow-hidden">
-            <ChargingSchedule fullPage={false}/>
+            <ChargingSchedule fullPage={false} />
           </div>
         </div>
 

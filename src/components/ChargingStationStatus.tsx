@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
-import axios from "axios";
 import API_ROUTES from "../apiRoutes";
 import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
@@ -29,65 +28,76 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     availability: "OK",
     charging_power: "",
     max_power: "",
-    });
+  });
 
   const fetchStations = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
+      const response = await apiClient.get<StationData[]>(
+        API_ROUTES.GET_STATIONS
+      ); // Fetch from API
       setStations(response.data);
     } catch (error) {
       console.error("Error fetching buses:", error);
     }
   };
   const confirmDelete = (stationId: number, stationName: string) => {
-    if (window.confirm(`Are you sure you want to delete station: ${stationName}?`)) {
-        deleteStation(String(stationId));
+    if (
+      window.confirm(`Are you sure you want to delete station: ${stationName}?`)
+    ) {
+      deleteStation(String(stationId));
     }
-};
+  };
   const deleteStation = async (stationId: string) => {
-    try {
+    updateContextValues(setAuth, auth);
+    if (activeUser) {
+      try {
         const deleteUrl = API_ROUTES.DELETE_STATION(stationId);
         console.log("Attempting DELETE request to:", deleteUrl);
 
-        const response = await axios.delete(deleteUrl, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${auth.access || ''}`, // ✅ Add if authentication is required
-            },
-        });
+        const response = await apiClient.delete(deleteUrl);
 
         console.log("Delete response:", response);
         alert("Charging Station Deleted Successfully!");
 
         fetchStations(); // Refresh the list
-    } catch (error: any) {
-        console.error("Error deleting station:", error.response || error.message);
+      } catch (error: any) {
+        console.error(
+          "Error deleting station:",
+          error.response || error.message
+        );
 
-        alert(`Failed to delete charging station. Error: ${error.response?.data?.message || error.message}`);
+        alert(
+          `Failed to delete charging station. Error: ${
+            error.response?.data?.message || error.message
+          }`
+        );
+      }
     }
-};
+  };
 
-
-
-const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-  const { name, value } = e.target;
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
     setNewStation({ ...newStation, [name]: value });
   };
   const addNewStation = async () => {
-    try {
-        await axios.post(API_ROUTES.ADD_STATION, newStation, {
-            headers: { "Content-Type": "application/json" },
-        });
+    updateContextValues(setAuth, auth);
+    if (activeUser) {
+      try {
+        await apiClient.post(API_ROUTES.ADD_STATION, newStation);
         alert("Charging Station Added Successfully!");
         setShowAddForm(false);
         fetchStations(); // Refresh the stations list
-    } catch (error) {
+      } catch (error) {
         console.error("Error adding station:", error);
         alert("Failed to add charging station.");
+      }
     }
-};
-
-
+  };
 
   const navigate = useNavigate();
   const useAuth = () => {
@@ -217,11 +227,11 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
       (charging_power / max_power) * segmentCount
     );
     <div className="flex justify-between items-center mb-4">
-        <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor">
-            Charging Station
-        </h2>
-    </div>
-    return (      
+      <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor">
+        Charging Station
+      </h2>
+    </div>;
+    return (
       <div className="flex space-x-0.5 w-full justify-center items-center">
         {Array.from({ length: segmentCount }).map((_, index) => (
           <div
@@ -254,7 +264,7 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
     >
       <div className="flex items-center w-full h-[10%] justify-between">
         <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
-          Charging Station 
+          Charging Station
         </h2>
         {fullPage && (
           <input
@@ -284,61 +294,69 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
         </div>
       </div>
       {showAddForm && (
-    <form onSubmit={addNewStation} className="bg-white shadow-lg p-4 rounded-lg mt-4">
-        <h3 className="text-lg font-semibold mb-2">Add New Charging Station</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <form
+          onSubmit={addNewStation}
+          className="bg-white shadow-lg p-4 rounded-lg mt-4"
+        >
+          <h3 className="text-lg font-semibold mb-2">
+            Add New Charging Station
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
             <input
-                type="text"
-                name="station_id"
-                placeholder="Station ID"
-                value={newStation.station_id}
-                onChange={handleInputChange}
-                required
-                className="p-2 border rounded-lg"
+              type="text"
+              name="station_id"
+              placeholder="Station ID"
+              value={newStation.station_id}
+              onChange={handleInputChange}
+              required
+              className="p-2 border rounded-lg"
             />
             <select
-                name="availability"
-                value={newStation.availability}
-                onChange={handleInputChange}
-                className="p-2 border rounded-lg"
+              name="availability"
+              value={newStation.availability}
+              onChange={handleInputChange}
+              className="p-2 border rounded-lg"
             >
-                <option value="OK">OK</option>
-                <option value="Down">Down</option>
-                <option value="Maintenance">Maintenance</option>
+              <option value="OK">OK</option>
+              <option value="Down">Down</option>
+              <option value="Maintenance">Maintenance</option>
             </select>
             <input
-                type="number"
-                name="charging_power"
-                placeholder="Charging Power (kW)"
-                value={newStation.charging_power}
-                onChange={handleInputChange}
-                required
-                className="p-2 border rounded-lg"
+              type="number"
+              name="charging_power"
+              placeholder="Charging Power (kW)"
+              value={newStation.charging_power}
+              onChange={handleInputChange}
+              required
+              className="p-2 border rounded-lg"
             />
             <input
-                type="number"
-                name="max_power"
-                placeholder="Max Power (kW)"
-                value={newStation.max_power}
-                onChange={handleInputChange}
-                required
-                className="p-2 border rounded-lg"
+              type="number"
+              name="max_power"
+              placeholder="Max Power (kW)"
+              value={newStation.max_power}
+              onChange={handleInputChange}
+              required
+              className="p-2 border rounded-lg"
             />
-        </div>
-        <div className="flex justify-end mt-4">
+          </div>
+          <div className="flex justify-end mt-4">
             <button
-                type="button"
-                onClick={() => setShowAddForm(false)}
-                className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
+              type="button"
+              onClick={() => setShowAddForm(false)}
+              className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
             >
-                Cancel
+              Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
-                Add
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+            >
+              Add
             </button>
-        </div>
-    </form>
-)}
+          </div>
+        </form>
+      )}
 
       <div className="w-full h-[80%]">
         {/* Header Row */}
@@ -391,15 +409,17 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
                   {station.charging_power} kW
                 </div>
               </div>
-              <button
-                 onClick={(e) => {
-                 e.stopPropagation(); // Prevent row click from triggering
-                 confirmDelete(station.id, station.station_id);
-                }}
-              className="relative -top-12 p-2 rounded-full hover:bg-red-100 transition w-9"
-              >
-              <Trash2 className="w-5 h-5 text-red-600" />
-              </button>
+              {activeUser && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click from triggering
+                    confirmDelete(station.id, station.station_id);
+                  }}
+                  className="relative -top-12 p-2 rounded-full hover:bg-red-100 transition w-9"
+                >
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </button>
+              )}
 
               {expandedRow === station.station_id && (
                 <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
@@ -413,14 +433,16 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
         </div>
       </div>
       <div className="w-full h-[10%] flex justify-end items-center">
-        <div className="flex-1">
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="px-6 py-3 bg-primaryColor text-white font-semibold rounded-lg"
-          >
-             + Add Station
-          </button>
-        </div>
+        {activeUser && (
+          <div className="flex-1">
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="px-6 py-3 bg-primaryColor text-white font-semibold rounded-lg"
+            >
+              + Add Station
+            </button>
+          </div>
+        )}
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
@@ -445,8 +467,8 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
             Next
           </button>
         </div>
-        </div>
       </div>
+    </div>
   );
 };
 
