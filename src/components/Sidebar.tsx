@@ -159,7 +159,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Version */}
-      <div className="text-xs text-center mb-5 text-black">v 1.0.0</div>
+      <div className="text-xs text-center mb-5 text-black">v 0.0.2</div>
     </div>
   );
 };

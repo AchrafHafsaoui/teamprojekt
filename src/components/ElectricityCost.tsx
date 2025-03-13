@@ -7,7 +7,7 @@ import axios from "axios";
 // Define the type for each data point
 type ElectricityDataPoint = {
   timestamp: string; // The timestamp as a string
-  price: number;     // The price as a number
+  price: number; // The price as a number
 };
 
 // Define the type for selectedData
@@ -15,7 +15,10 @@ type SelectedDataType = "yesterday" | "today";
 
 const ElectricityCost: React.FC = () => {
   const [chartWidth, setChartWidth] = useState(0);
-  const [data, setData] = useState<{ yesterday: any[]; today: any[] }>({ yesterday: [], today: [] });
+  const [data, setData] = useState<{ yesterday: any[]; today: any[] }>({
+    yesterday: [],
+    today: [],
+  });
   const [selectedData, setSelectedData] = useState<SelectedDataType>("today");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,24 +39,34 @@ const ElectricityCost: React.FC = () => {
       updateContextValues(setAuth, auth);
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:8000/api/entsoe-data/");
+        const response = await axios.get(
+          "http://localhost:8000/api/entsoe-data/"
+        );
         console.log("Full API Response:", response.data);
 
         // Ensure the 'prices' key exists and contains both 'yesterday' and 'today'
-        if (!response.data.prices || !response.data.prices.yesterday || !response.data.prices.today) {
+        if (
+          !response.data.prices ||
+          !response.data.prices.yesterday ||
+          !response.data.prices.today
+        ) {
           throw new Error("Incomplete data received");
         }
 
         // Transform the data to extract the hour from the timestamp
         const transformedData = {
-          yesterday: response.data.prices.yesterday.map((item: ElectricityDataPoint) => ({
-            hour: new Date(item.timestamp).getHours().toString(),
-            price: item.price,
-          })),
-          today: response.data.prices.today.map((item: ElectricityDataPoint) => ({
-            hour: new Date(item.timestamp).getHours().toString(),
-            price: item.price,
-          })),
+          yesterday: response.data.prices.yesterday.map(
+            (item: ElectricityDataPoint) => ({
+              hour: new Date(item.timestamp).getHours().toString(),
+              price: item.price,
+            })
+          ),
+          today: response.data.prices.today.map(
+            (item: ElectricityDataPoint) => ({
+              hour: new Date(item.timestamp).getHours().toString(),
+              price: item.price,
+            })
+          ),
         };
 
         setData(transformedData);
@@ -90,7 +103,8 @@ const ElectricityCost: React.FC = () => {
       ref={containerRef}
       className="h-full bg-opacity-90 flex flex-col border border-borderColor shadow-md rounded-3xl p-4 flex-1"
       style={{
-        background: "linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 90%)",
+        background:
+          "linear-gradient(315deg, rgba(0, 0, 0, 1) 40%, rgba(7, 68, 84, 1) 90%)",
       }}
     >
       <div className="flex justify-between items-center px-4">
@@ -131,14 +145,17 @@ const ElectricityCost: React.FC = () => {
               tickLine={false}
             />
             <YAxis
-              domain={['auto', 'auto']}
+              domain={["auto", "auto"]}
               tickFormatter={(tick) => tick.toFixed(2)}
               tick={{ fill: "#fff", fontSize: 12 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
-              contentStyle={{ background: "rgba(0, 0, 0, 0.75)", borderRadius: "5px" }}
+              contentStyle={{
+                background: "rgba(0, 0, 0, 0.75)",
+                borderRadius: "5px",
+              }}
               itemStyle={{ color: "#fff", fontSize: "14px" }}
             />
             <Area

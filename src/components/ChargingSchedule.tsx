@@ -155,7 +155,7 @@ const ChargingSchedule: React.FC = () => {
   };
   const handleDeleteStation = async (stationId: Number) => {
     try {
-      if (!window.confirm(`Are you sure you want to delete Bus ${stationId}?`))
+      if (!window.confirm(`Are you sure you want to delete station ${stationId}?`))
         return;
       const deleteUrl = API_ROUTES.DELETE_STATION(String(stationId));
       await apiClient.delete(deleteUrl);
@@ -407,25 +407,25 @@ const ChargingSchedule: React.FC = () => {
     event.dataTransfer.setData("busId", busId.toString());
   };
 
-  const handleDrop = (
+  const handleDrop = async (
     event: React.DragEvent<HTMLDivElement>,
     stationId: string
   ) => {
     event.preventDefault();
     const busId = Number(event.dataTransfer.getData("busId"));
-    let movedBus: BusData | null;
-
+    let movedBus: BusData | null = null;
+  
     setBuses((prevBuses) => {
       const remainingBuses = prevBuses.filter((bus) => {
         if (Number(bus.bus_id) === busId) {
-          movedBus = bus; // Store full bus data
-          return false; // Remove from queue
+          movedBus = bus;
+          return false;
         }
         return true;
       });
       return remainingBuses;
     });
-
+  
     setStations((prevStations) =>
       prevStations.map((station) => {
         if (station.station_id === stationId) {
@@ -434,8 +434,17 @@ const ChargingSchedule: React.FC = () => {
           );
           if (emptyIndex !== -1) {
             const updatedChargingPoints = [...station.charging_points];
-            updatedChargingPoints[emptyIndex] = movedBus; // Store entire bus object
-
+            updatedChargingPoints[emptyIndex] = movedBus;
+  
+            // Handle API call separately to ensure async behavior
+            (async () => {
+              const updateUrl = API_ROUTES.UPDATE_STATION(String(station.id));
+              await apiClient.put(updateUrl, {
+                ...station,
+                charging_points: updatedChargingPoints,
+              });
+            })();
+  
             return { ...station, charging_points: updatedChargingPoints };
           }
         }
@@ -443,7 +452,7 @@ const ChargingSchedule: React.FC = () => {
       })
     );
   };
-
+  
   const handleRemoveBus = (stationId: string, index: number) => {
     setStations((prevStations) =>
       prevStations.map((station) => {
@@ -465,8 +474,15 @@ const ChargingSchedule: React.FC = () => {
 
           updatedChargingPoints[index] = null; // Remove the bus from charging point
 
-          return { ...station, charging_points: updatedChargingPoints };
-        }
+          (async () => {
+            const updateUrl = API_ROUTES.UPDATE_STATION(String(station.id));
+            await apiClient.put(updateUrl, {
+              ...station,
+              charging_points: updatedChargingPoints,
+            });
+          })();
+
+          return { ...station, charging_points: updatedChargingPoints };        }
         return station;
       })
     );

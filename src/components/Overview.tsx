@@ -77,6 +77,7 @@ const Overview: React.FC = () => {
         {/* Upper Section */}
         <div className="grid gap-10 lg:grid-cols-3 md:grid-cols-1 sm:grid-cols-1 p-4 lg:h-[300px]">
           <div className="rounded-lg overflow-hidden">
+            <ElectricityCost />
           </div>
           <div className="rounded-3xl overflow-hidden bg-secondaryColor shadow-md p-4">
             <h3 className="lg:text-3xl md:text-2xl sm:text-2xl font-bold text-primaryColor mb-2">
