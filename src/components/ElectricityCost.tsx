@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { AreaChart, Area, Tooltip, XAxis, YAxis } from "recharts";
+import React, { useState, useContext, useEffect, useRef } from "react";
+import AuthContext from "../context/AuthProvider";
+import apiClient, { updateContextValues } from "../api/api";
 
 // Define the type for each data point
 type ElectricityDataPoint = {
@@ -19,8 +20,19 @@ const ElectricityCost: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+  };
+
+  const { setAuth, auth } = useAuth();
+
   useEffect(() => {
     const fetchElectricityData = async () => {
+      updateContextValues(setAuth, auth);
       try {
         setLoading(true);
         const response = await axios.get("http://localhost:8000/api/entsoe-data/");

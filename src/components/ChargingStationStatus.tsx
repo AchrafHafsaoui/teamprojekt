@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
-import axios from "axios";
 import API_ROUTES from "../apiRoutes";
 import apiClient, { updateContextValues } from "../api/api";
 import { useNavigate } from "react-router-dom";
@@ -30,10 +29,14 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     charging_power: "",
     max_power: "",
   });
+  });
 
   const fetchStations = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
+      const response = await apiClient.get<StationData[]>(
+        API_ROUTES.GET_STATIONS
+      ); // Fetch from API
       setStations(response.data);
     } catch (error) {
       console.error("Error fetching buses:", error);
@@ -43,6 +46,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     if (window.confirm(`Are you sure you want to delete station: ${stationName}?`)) {
       deleteStation(String(stationId));
     }
+  };
   };
   const deleteStation = async (stationId: string) => {
     try {
@@ -254,6 +258,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
       <div className="flex items-center w-full h-[10%] justify-between">
         <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
           Charging Station
+          Charging Station
         </h2>
         {fullPage && (
           <input
@@ -293,8 +298,19 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               onChange={handleInputChange}
               required
               className="p-2 border rounded-lg"
+              type="text"
+              name="station_id"
+              placeholder="Station ID"
+              value={newStation.station_id}
+              onChange={handleInputChange}
+              required
+              className="p-2 border rounded-lg"
             />
             <select
+              name="availability"
+              value={newStation.availability}
+              onChange={handleInputChange}
+              className="p-2 border rounded-lg"
               name="availability"
               value={newStation.availability}
               onChange={handleInputChange}
@@ -303,8 +319,18 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               <option value="OK">OK</option>
               <option value="Down">Down</option>
               <option value="Maintenance">Maintenance</option>
+              <option value="OK">OK</option>
+              <option value="Down">Down</option>
+              <option value="Maintenance">Maintenance</option>
             </select>
             <input
+              type="number"
+              name="charging_power"
+              placeholder="Charging Power (kW)"
+              value={newStation.charging_power}
+              onChange={handleInputChange}
+              required
+              className="p-2 border rounded-lg"
               type="number"
               name="charging_power"
               placeholder="Charging Power (kW)"
@@ -321,19 +347,35 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               onChange={handleInputChange}
               required
               className="p-2 border rounded-lg"
+              type="number"
+              name="max_power"
+              placeholder="Max Power (kW)"
+              value={newStation.max_power}
+              onChange={handleInputChange}
+              required
+              className="p-2 border rounded-lg"
             />
+          </div>
+          <div className="flex justify-end mt-4">
           </div>
           <div className="flex justify-end mt-4">
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
               className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
+              type="button"
+              onClick={() => setShowAddForm(false)}
+              className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
             >
+              Cancel
               Cancel
             </button>
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
               Add
             </button>
+          </div>
+        </form>
+      )}
           </div>
         </form>
       )}
@@ -439,6 +481,8 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
             Next
           </button>
         </div>
+      </div>
+    </div>
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthProvider";
-import axios from "axios";
 import apiClient, { updateContextValues } from "../api/api";
 import API_ROUTES from "../apiRoutes";
 import { useNavigate } from "react-router-dom";
@@ -34,8 +33,6 @@ type StationData = {
   charging_points: (BusData | null)[]; // Store full BusData, not just ID
 };
 
-
-
 type BusData = {
   bus_id: string;
   status: "In Depot" | "Maintenance" | "On Route";
@@ -46,13 +43,17 @@ type BusData = {
   ENE: number;
 };
 
-
 const ChargingSchedule: React.FC = () => {
   const [stations, setStations] = useState<StationData[]>([]);
   const fetchStations = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<StationData[]>(API_ROUTES.GET_STATIONS); // Fetch from API
-      setStations(response.data.filter(station=>station.availability=="OK"));
+      const response = await apiClient.get<StationData[]>(
+        API_ROUTES.GET_STATIONS
+      ); // Fetch from API
+      setStations(
+        response.data.filter((station) => station.availability == "OK")
+      );
     } catch (error) {
       console.error("Error fetching stations:", error);
     }
@@ -85,9 +86,14 @@ const ChargingSchedule: React.FC = () => {
 
   const [buses, setBuses] = useState<BusData[]>([]);
   const fetchBuses = async () => {
+    updateContextValues(setAuth, auth);
     try {
-      const response = await axios.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
-      setBuses(response.data.filter((bus) => bus.status == "In Depot").sort((a, b) => a.battery - b.battery));
+      const response = await apiClient.get<BusData[]>(API_ROUTES.GET_BUSES); // Fetch from API
+      setBuses(
+        response.data
+          .filter((bus) => bus.status == "In Depot")
+          .sort((a, b) => a.battery - b.battery)
+      );
     } catch (error) {
       console.error("Error fetching buses:", error);
     }
@@ -132,15 +138,14 @@ const ChargingSchedule: React.FC = () => {
   const [isAddStationOpen, setIsAddStationOpen] = useState(false);
 
   const handleAddStation = async () => {
+    updateContextValues(setAuth, auth);
     if (!newStation.station_id) {
       alert("Station ID is required!");
       return;
     }
 
     try {
-      await axios.post(API_ROUTES.ADD_STATION, newStation, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await apiClient.post(API_ROUTES.ADD_STATION, newStation);
       alert("Charging Station Added Successfully!");
       fetchStations(); // Refresh the bus list
       setIsAddStationOpen(false); // Close modal
@@ -153,12 +158,7 @@ const ChargingSchedule: React.FC = () => {
       if (!window.confirm(`Are you sure you want to delete Bus ${stationId}?`))
         return;
       const deleteUrl = API_ROUTES.DELETE_STATION(String(stationId));
-      await axios.delete(deleteUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.access || ""}`,
-        },
-      });
+      await apiClient.delete(deleteUrl);
 
       alert("Charging Station Deleted Successfully!");
 
@@ -167,7 +167,8 @@ const ChargingSchedule: React.FC = () => {
       console.error("Error deleting station:", error.response || error.message);
 
       alert(
-        `Failed to delete charging station. Error: ${error.response?.data?.message || error.message
+        `Failed to delete charging station. Error: ${
+          error.response?.data?.message || error.message
         }`
       );
     }
@@ -272,35 +273,39 @@ const ChargingSchedule: React.FC = () => {
 
             {/* Right Part: Charging Spots */}
             <div className="w-1/2 grid grid-cols-4 gap-5 items-center">
-              {Array.from({ length: station.charging_points.length }).map((_, index) => {
-                const bus = station.charging_points[index]; // Full BusData or null
-                const currentCharge = bus?.battery;
+              {Array.from({ length: station.charging_points.length }).map(
+                (_, index) => {
+                  const bus = station.charging_points[index]; // Full BusData or null
+                  const currentCharge = bus?.battery;
 
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
-                  >
-                    {bus && (
-                      <>
-                        <span className="absolute -top-6 text-sm font-semibold">
-                          {bus.bus_id}
-                        </span>
-                        <BusSVG />
-                        <span className="absolute -bottom-6 text-xs font-semibold text-gray-700">
-                          {currentCharge}%
-                        </span>
-                        <button
-                          onClick={() => handleRemoveBus(station.station_id, index)}
-                          className="absolute -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                        >
-                          ✕
-                        </button>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center justify-center bg-secondaryColor rounded-full w-12 h-12 border border-borderColor relative"
+                    >
+                      {bus && (
+                        <>
+                          <span className="absolute -top-6 text-sm font-semibold">
+                            {bus.bus_id}
+                          </span>
+                          <BusSVG />
+                          <span className="absolute -bottom-6 text-xs font-semibold text-gray-700">
+                            {currentCharge}%
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleRemoveBus(station.station_id, index)
+                            }
+                            className="absolute -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                          >
+                            ✕
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  );
+                }
+              )}
             </div>
           </div>
         );
@@ -385,12 +390,8 @@ const ChargingSchedule: React.FC = () => {
                 <h2 className="text-lg font-bold">{bus.bus_id}</h2>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold">
-                  Battery
-                </p>
-                <p className="text-sm font-semibold">
-                  {bus.battery}%
-                </p>
+                <p className="text-sm font-semibold">Battery</p>
+                <p className="text-sm font-semibold">{bus.battery}%</p>
               </div>
             </div>
           ))}
@@ -399,11 +400,17 @@ const ChargingSchedule: React.FC = () => {
     );
   };
 
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>, busId: number) => {
+  const handleDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    busId: number
+  ) => {
     event.dataTransfer.setData("busId", busId.toString());
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>, stationId: string) => {
+  const handleDrop = (
+    event: React.DragEvent<HTMLDivElement>,
+    stationId: string
+  ) => {
     event.preventDefault();
     const busId = Number(event.dataTransfer.getData("busId"));
     let movedBus: BusData | null;
@@ -422,7 +429,9 @@ const ChargingSchedule: React.FC = () => {
     setStations((prevStations) =>
       prevStations.map((station) => {
         if (station.station_id === stationId) {
-          const emptyIndex = station.charging_points.findIndex((point) => point === null);
+          const emptyIndex = station.charging_points.findIndex(
+            (point) => point === null
+          );
           if (emptyIndex !== -1) {
             const updatedChargingPoints = [...station.charging_points];
             updatedChargingPoints[emptyIndex] = movedBus; // Store entire bus object
@@ -442,14 +451,15 @@ const ChargingSchedule: React.FC = () => {
           const updatedChargingPoints = [...station.charging_points];
           const removedBus = updatedChargingPoints[index]; // Get removed bus
 
-
           if (removedBus) {
             setBuses((prevBuses) => {
               // Ensure the bus is not already in the queue
               if (!prevBuses.some((bus) => bus.bus_id === removedBus.bus_id)) {
-                return [...prevBuses, removedBus].sort((a,b)=>a.battery-b.battery);
+                return [...prevBuses, removedBus].sort(
+                  (a, b) => a.battery - b.battery
+                );
               }
-              return prevBuses.sort((a,b)=>a.battery-b.battery);
+              return prevBuses.sort((a, b) => a.battery - b.battery);
             });
           }
 
@@ -461,8 +471,6 @@ const ChargingSchedule: React.FC = () => {
       })
     );
   };
-
-
 
   return (
     <div className={`flex ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]`}>
@@ -522,7 +530,9 @@ const ChargingSchedule: React.FC = () => {
               className="border border-gray-300 p-2 w-full rounded"
             />
 
-            <label className="block mt-4 mb-2">Number of Charging Points:</label>
+            <label className="block mt-4 mb-2">
+              Number of Charging Points:
+            </label>
             <input
               type="number"
               min="1"

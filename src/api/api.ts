@@ -52,11 +52,8 @@ const refreshAccessToken = async (): Promise<string> => {
 apiClient.interceptors.request.use(
   (config) => {
     const access = auth.access;
-    if (access!==null) {
-      config.data = {
-        ...(config.data || {}),
-        access,
-      };
+    if (access !== null) {
+      config.headers.Authorization = `Bearer ${access}`;
     }
     return config;
   },
@@ -75,10 +72,7 @@ apiClient.interceptors.response.use(
       try {
         const access = await refreshAccessToken(); // Refresh token
 
-        originalRequest.data = {
-          ...JSON.parse(originalRequest.data),
-          access, // Include new access token in the body
-        };
+        originalRequest.headers.Authorization = `Bearer ${access}`;
 
         return apiClient(originalRequest); // Retry original request
       } catch (refreshError) {
