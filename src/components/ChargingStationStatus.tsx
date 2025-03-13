@@ -29,7 +29,6 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     charging_power: "",
     max_power: "",
   });
-  });
 
   const fetchStations = async () => {
     updateContextValues(setAuth, auth);
@@ -43,55 +42,62 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
     }
   };
   const confirmDelete = (stationId: number, stationName: string) => {
-    if (window.confirm(`Are you sure you want to delete station: ${stationName}?`)) {
+    if (
+      window.confirm(`Are you sure you want to delete station: ${stationName}?`)
+    ) {
       deleteStation(String(stationId));
     }
   };
-  };
   const deleteStation = async (stationId: string) => {
-    try {
-      const deleteUrl = API_ROUTES.DELETE_STATION(stationId);
-      console.log("Attempting DELETE request to:", deleteUrl);
+    updateContextValues(setAuth, auth);
+    if (activeUser) {
+      try {
+        const deleteUrl = API_ROUTES.DELETE_STATION(stationId);
+        console.log("Attempting DELETE request to:", deleteUrl);
 
-      const response = await axios.delete(deleteUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${auth.access || ''}`, // ✅ Add if authentication is required
-        },
-      });
+        const response = await apiClient.delete(deleteUrl);
 
-      console.log("Delete response:", response);
-      alert("Charging Station Deleted Successfully!");
+        console.log("Delete response:", response);
+        alert("Charging Station Deleted Successfully!");
 
-      fetchStations(); // Refresh the list
-    } catch (error: any) {
-      console.error("Error deleting station:", error.response || error.message);
+        fetchStations(); // Refresh the list
+      } catch (error: any) {
+        console.error(
+          "Error deleting station:",
+          error.response || error.message
+        );
 
-      alert(`Failed to delete charging station. Error: ${error.response?.data?.message || error.message}`);
+        alert(
+          `Failed to delete charging station. Error: ${
+            error.response?.data?.message || error.message
+          }`
+        );
+      }
     }
   };
 
-
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
     setNewStation({ ...newStation, [name]: value });
   };
   const addNewStation = async () => {
-    try {
-      await axios.post(API_ROUTES.ADD_STATION, newStation, {
-        headers: { "Content-Type": "application/json" },
-      });
-      alert("Charging Station Added Successfully!");
-      setShowAddForm(false);
-      fetchStations(); // Refresh the stations list
-    } catch (error) {
-      console.error("Error adding station:", error);
-      alert("Failed to add charging station.");
+    updateContextValues(setAuth, auth);
+    if (activeUser) {
+      try {
+        await apiClient.post(API_ROUTES.ADD_STATION, newStation);
+        alert("Charging Station Added Successfully!");
+        setShowAddForm(false);
+        fetchStations(); // Refresh the stations list
+      } catch (error) {
+        console.error("Error adding station:", error);
+        alert("Failed to add charging station.");
+      }
     }
   };
-
-
 
   const navigate = useNavigate();
   const useAuth = () => {
@@ -224,7 +230,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
       <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor">
         Charging Station
       </h2>
-    </div>
+    </div>;
     return (
       <div className="flex space-x-0.5 w-full justify-center items-center">
         {Array.from({ length: segmentCount }).map((_, index) => (
@@ -252,12 +258,12 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
 
   return (
     <div
-      className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
-        }`}
+      className={`bg-secondaryColor bg-opacity-80 flex-col border border-borderColor shadow-md rounded-3xl p-4 overflow-hidden ${
+        fullPage ? "ml-32 mt-12 mr-12 h-[calc(100vh-6rem)]" : "h-full"
+      }`}
     >
       <div className="flex items-center w-full h-[10%] justify-between">
         <h2 className="font-bold lg:text-3xl md:text-2xl sm:text-2xl text-primaryColor mb-2">
-          Charging Station
           Charging Station
         </h2>
         {fullPage && (
@@ -276,10 +282,11 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
                 setFilterStatus(status as typeof filterStatus);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${filterStatus === status
-                ? "bg-primaryColor text-white"
-                : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
-                } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
+              className={`px-3 py-2 text-xs rounded-lg border font-semibold border-borderColor ${
+                filterStatus === status
+                  ? "bg-primaryColor text-white"
+                  : "bg-componentsColor border border-borderColor text-black hover:bg-primaryColor hover:text-white"
+              } transition-colors 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </button>
@@ -287,17 +294,15 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
         </div>
       </div>
       {showAddForm && (
-        <form onSubmit={addNewStation} className="bg-white shadow-lg p-4 rounded-lg mt-4">
-          <h3 className="text-lg font-semibold mb-2">Add New Charging Station</h3>
+        <form
+          onSubmit={addNewStation}
+          className="bg-white shadow-lg p-4 rounded-lg mt-4"
+        >
+          <h3 className="text-lg font-semibold mb-2">
+            Add New Charging Station
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             <input
-              type="text"
-              name="station_id"
-              placeholder="Station ID"
-              value={newStation.station_id}
-              onChange={handleInputChange}
-              required
-              className="p-2 border rounded-lg"
               type="text"
               name="station_id"
               placeholder="Station ID"
@@ -311,14 +316,7 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               value={newStation.availability}
               onChange={handleInputChange}
               className="p-2 border rounded-lg"
-              name="availability"
-              value={newStation.availability}
-              onChange={handleInputChange}
-              className="p-2 border rounded-lg"
             >
-              <option value="OK">OK</option>
-              <option value="Down">Down</option>
-              <option value="Maintenance">Maintenance</option>
               <option value="OK">OK</option>
               <option value="Down">Down</option>
               <option value="Maintenance">Maintenance</option>
@@ -331,13 +329,6 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               onChange={handleInputChange}
               required
               className="p-2 border rounded-lg"
-              type="number"
-              name="charging_power"
-              placeholder="Charging Power (kW)"
-              value={newStation.charging_power}
-              onChange={handleInputChange}
-              required
-              className="p-2 border rounded-lg"
             />
             <input
               type="number"
@@ -347,35 +338,22 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               onChange={handleInputChange}
               required
               className="p-2 border rounded-lg"
-              type="number"
-              name="max_power"
-              placeholder="Max Power (kW)"
-              value={newStation.max_power}
-              onChange={handleInputChange}
-              required
-              className="p-2 border rounded-lg"
             />
-          </div>
-          <div className="flex justify-end mt-4">
           </div>
           <div className="flex justify-end mt-4">
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
               className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
-              type="button"
-              onClick={() => setShowAddForm(false)}
-              className="mr-2 px-4 py-2 border rounded-lg bg-gray-200 hover:bg-gray-300"
             >
               Cancel
-              Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+            >
               Add
             </button>
-          </div>
-        </form>
-      )}
           </div>
         </form>
       )}
@@ -406,9 +384,11 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
               onClick={() => {
                 if (fullPage) handleRowClick(station.station_id); // Only allow expansion if fullPage is true
               }}
-              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${fullPage ? "cursor-pointer" : "h-[25%]"
-                } min-h-14 py-3 shadow-sm font-semibold mr-5 ${expandedRow === station.station_id ? "bg-blue-100" : ""
-                }`}
+              className={`grid grid-cols-4 gap-4 items-center rounded-2xl  text-gray-800 ${
+                fullPage ? "cursor-pointer" : "h-[25%]"
+              } min-h-14 py-3 shadow-sm font-semibold mr-5 ${
+                expandedRow === station.station_id ? "bg-blue-100" : ""
+              }`}
             >
               <span className="text-center 2xl:text-[0.95rem] md:text-[0.7rem] sm:text-[0.6rem] leading-none">
                 {station.station_id}
@@ -429,15 +409,17 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
                   {station.charging_power} kW
                 </div>
               </div>
-              {activeUser && fullPage && (<button
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent row click from triggering
-                  confirmDelete(station.id, station.station_id);
-                }}
-                className="relative -top-12 p-2 rounded-full hover:bg-red-100 transition w-9"
-              >
-                <Trash2 className="w-5 h-5 text-red-600" />
-              </button>)}
+              {fullPage && activeUser && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click from triggering
+                    confirmDelete(station.id, station.station_id);
+                  }}
+                  className="relative -top-12 p-2 rounded-full hover:bg-red-100 transition w-9"
+                >
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </button>
+              )}
 
               {expandedRow === station.station_id && (
                 <div className="col-span-full text-black pl-14 mb-4 rounded-lg">
@@ -451,19 +433,22 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
         </div>
       </div>
       <div className="w-full h-[10%] flex justify-end items-center">
-        {activeUser && fullPage && <div className="flex-1">
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="px-6 py-3 bg-primaryColor text-white font-semibold rounded-lg"
-          >
-            + Add Station
-          </button>
-        </div>}
+        { fullPage && activeUser && (
+          <div className="flex-1">
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="px-6 py-3 bg-primaryColor text-white font-semibold rounded-lg"
+            >
+              + Add Station
+            </button>
+          </div>
+        )}
         {/* Pagination Controls */}
         <div className={`space-x-3 ${fullPage ? "text-base" : "text-xs"}`}>
           <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handlePrevious}
             disabled={currentPage === 1}
           >
@@ -473,16 +458,15 @@ const ChargingStationStatus: React.FC<ChargingStationProps> = ({
             {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-4 py-2 bg-componentsColor border border-borderColor rounded-lg hover:bg-primaryColor hover:text-white ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handleNext}
             disabled={currentPage === totalPages}
           >
             Next
           </button>
         </div>
-      </div>
-    </div>
       </div>
     </div>
   );

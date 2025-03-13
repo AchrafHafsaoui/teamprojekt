@@ -1,7 +1,8 @@
 import { AreaChart, Area, Tooltip, XAxis, YAxis } from "recharts";
 import React, { useState, useContext, useEffect, useRef } from "react";
 import AuthContext from "../context/AuthProvider";
-import apiClient, { updateContextValues } from "../api/api";
+import { updateContextValues } from "../api/api";
+import axios from "axios";
 
 // Define the type for each data point
 type ElectricityDataPoint = {
