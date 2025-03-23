@@ -253,10 +253,6 @@ const ChargingSchedule: React.FC = () => {
                 Station {station.station_id}
               </h3>
               <p className="text-md text-black">
-                <span className="font-semibold">Availability:</span>{" "}
-                {station.availability}
-              </p>
-              <p className="text-md text-black">
                 <span className="font-semibold">Current Capacity:</span>{" "}
                 {station.charging_power} kWh
               </p>
@@ -476,8 +472,7 @@ const ChargingSchedule: React.FC = () => {
 
           (async () => {
             const updateUrl = API_ROUTES.UPDATE_STATION(String(station.id));
-            await apiClient.put(updateUrl, {
-              ...station,
+            await apiClient.patch(updateUrl, {
               charging_points: updatedChargingPoints,
             });
           })();
@@ -512,19 +507,6 @@ const ChargingSchedule: React.FC = () => {
               }
               className="border border-gray-300 p-2 w-full rounded"
             />
-
-            <label className="block mt-4 mb-2">Availability:</label>
-            <select
-              value={newStation.availability}
-              onChange={(e) =>
-                setNewStation({ ...newStation, availability: e.target.value })
-              }
-              className="border border-gray-300 p-2 w-full rounded"
-            >
-              <option value="OK">OK</option>
-              <option value="Maintenance">Maintenance</option>
-              <option value="Down">Down</option>
-            </select>
 
             <label className="block mt-4 mb-2">Charging Power:</label>
             <input
